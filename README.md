@@ -2,8 +2,9 @@
 
 <br/>
 
+[![Velog's GitHub stats](https://velog-readme-stats.vercel.app/api?name=silverbeen&slug=Naver-Map-자유롭게-활용하기)](https://github.com/eungyeole/velog-readme-stats)
+
+
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=silverbeen&layout=compact)](https://github.com/silverbeen/github-readme-stats)
 
 
-
-[![Velog's GitHub stats](https://velog-readme-stats.vercel.app/api?name=silverbeen&slug=Naver-Map-자유롭게-활용하기)](https://github.com/eungyeole/velog-readme-stats)
