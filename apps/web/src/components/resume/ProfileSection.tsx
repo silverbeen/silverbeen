@@ -1,8 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Mail, Phone, Github, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Profile } from "@/types/resume";
+
+// 타이핑 효과 컴포넌트
+function TypingEffect({ text, className }: { text: string; className?: string }) {
+  const [displayedText, setDisplayedText] = useState("");
+  const isComplete = displayedText.length >= text.length;
+
+  useEffect(() => {
+    if (displayedText.length < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(text.slice(0, displayedText.length + 1));
+      }, 80);
+      return () => clearTimeout(timeout);
+    }
+  }, [displayedText, text]);
+
+  return (
+    <motion.h1
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {displayedText}
+      {!isComplete && (
+        <motion.span
+          className="inline-block w-0.75 h-[1em] bg-primary ml-1 align-middle"
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+        />
+      )}
+    </motion.h1>
+  );
+}
 
 interface ProfileSectionProps {
   profile: Profile;
@@ -77,6 +111,7 @@ export function ProfileSection({
 }: ProfileSectionProps) {
   return (
     <motion.section
+      id="profile"
       className="flex flex-col gap-6 sm:flex-row sm:gap-8"
       variants={containerVariants}
       initial="hidden"
@@ -85,12 +120,10 @@ export function ProfileSection({
       <motion.div className="flex flex-1 flex-col gap-4" variants={itemVariants}>
         <div className="flex flex-col gap-2">
           {profile.greeting && (
-            <motion.h1
-              className="text-3xl font-bold text-foreground"
-              variants={itemVariants}
-            >
-              {profile.greeting}
-            </motion.h1>
+            <TypingEffect
+              text={profile.greeting}
+              className="text-[50px] font-bold text-foreground"
+            />
           )}
           {profile.tagline && (
             <motion.p
