@@ -8,7 +8,7 @@
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
     "photo": "/images/profile.jpg",
-    "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트라벨 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\n\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
+    "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트 레이블 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\n\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
   },
   "skills": {
     "languages": ["TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS"],
@@ -37,6 +37,7 @@
         {
           "name": "BubbleChat / TingleChat (AI 캐릭터 채팅 B2C 서비스)",
           "period": "2024.10 - 현재",
+          "techStack": ["React", "TypeScript", "Turborepo", "SSE", "Socket.IO", "React Query", "Zustand", "Storybook", "GA4", "Airbridge", "Clarity"],
           "description": "사용자가 다양한 AI 캐릭터와 1:1 실시간 채팅을 즐기는 B2C 서비스입니다.\n\nSSE 기반 스트리밍 응답으로 자연스러운 대화 경험을 제공하며, 북마크, 채팅 히스토리, 캐릭터 즐겨찾기 등 개인화 기능을 지원합니다.\n\nBubbleChat(2024.10), TingleChat(2025.04) 런칭 후 태국, 대만, 일본으로 글로벌 확장했습니다.",
           "role": "프론트엔드 개발 리드, 기술적 의사결정 및 팀 문서화 주도",
           "tasks": [
@@ -53,7 +54,7 @@
             {
               "title": "[아키텍처] Turborepo 모노레포 구축",
               "items": [
-                "[배경] TingleChat 화이트라벨링 서비스 도입으로 기존 단일 React 구조의 한계",
+                "[배경] TingleChat 화이트 레이블링 서비스 도입으로 기존 단일 React 구조의 한계",
                 "[선택 이유] 멀티 브랜딩 지원, 코드 중복 제거, 일관된 배포 파이프라인",
                 "[결과] BubbleChat/TingleChat 동시 유지보수, 신규 브랜드 추가 시 중복 작업 제거",
                 "글로벌 서비스(태국, 대만, 일본) 대응: 시간대/통화 처리, CDN 최적화"
@@ -64,7 +65,7 @@
               "items": [
                 "디자이너와 협업하여 프로젝트 디자인 시스템 정립 및 문서화",
                 "다크모드 컬러셋 구성: 라이트/다크 테마별 컬러 토큰 설계 및 CSS 변수 기반 통합 관리",
-                "2개 화이트라벨 서비스(BubbleChat/TingleChat)에 적합하도록 원소스 멀티 브랜드 아키텍처 설계",
+                "2개 화이트 레이블 서비스(BubbleChat/TingleChat)에 적합하도록 원소스 멀티 브랜드 아키텍처 설계",
                 "Button, Input, Modal 등 30개 이상 공통 컴포넌트 라이브러리 구축"
               ]
             },
@@ -109,12 +110,13 @@
             "태국, 대만, 일본 4개국 서비스 확장",
             "Figma MCP 도입으로 퍼블리싱 시간 80% 단축",
             "Claude Code MR 자동 리뷰로 코드 리뷰 시간 90% 단축",
-            "화이트라벨링 구조로 신규 브랜드 중복 작업 제거"
+            "화이트 레이블링 구조로 신규 브랜드 중복 작업 제거"
           ]
         },
         {
           "name": "버블탭 스튜디오 (웹소설 에디터)",
           "period": "2022.07 - 2025.03",
+          "techStack": ["React", "TypeScript", "React Beautiful DnD", "Lottie", "AWS S3", "Presigned URL"],
           "description": "창작자가 채팅형 웹소설을 제작하는 전용 에디터입니다.\n AI 생성 커버/배경/캐릭터/효과음 애셋을 활용해 에피소드를 편집하고, 드래그앤드롭으로 정렬 기능과 다양한 단축키 기능을 제공했습니다.\n\n 실시간 미리보기로 독자 경험을 확인할 수 있습니다.",
           "role": "스튜디오 기능 개발 및 유지보수, 내부 PD UI/UX 피드백 반영",
           "tasks": [
@@ -171,6 +173,7 @@
         {
           "name": "버블탭 (탭소설 B2C 서비스)",
           "period": "2022.07 - 2025.03",
+          "techStack": ["React", "TypeScript", "React Query", "Storybook", "Elastic Search", "GA4", "Airbridge"],
           "description": "독자가 채팅형 웹소설을 감상하는 콘텐츠 소비 플랫폼입니다.\n\n메인/베스트/디스커버 페이지에서 작품을 탐색하고, 작가 팔로우와 댓글로 커뮤니티 활동을 할 수 있습니다.\n\n효과음, 배경음악, 애니메이션이 동기화된 몰입감 있는 뷰어 경험을 제공합니다.",
           "role": "웹 신규 기능 개발 및 유지보수, 배포 관리",
           "tasks": [
@@ -219,15 +222,16 @@
             { "label": "서비스 바로가기", "url": "https://www.bubbletap.com" }
           ],
           "images": [
-            "/images/bubbletap/viewer.png",
-            "/images/bubbletap/mypage.png",
             "/images/bubbletap/main.png",
-            "/images/bubbletap/detail.png"
+            "/images/bubbletap/detail.png",
+            "/images/bubbletap/viewer.png",
+            "/images/bubbletap/mypage.png"
           ]
         },
         {
           "name": "백오피스 시스템 (어드민 대시보드)",
           "period": "2022.07 - 현재",
+          "techStack": ["React", "TypeScript", "React Query", "FCM", "AWS S3"],
           "description": "버블탭 서비스 전체를 운영하는 내부 관리자 시스템입니다.\n\n유저/작품/결제 관리, 크리에이터 수익 정산, 애셋 업로드, 배너/푸시 알림 발송, 구독 관리 등 운영에 필요한 모든 기능을 제공합니다.",
           "role": "기능 요구사항 수집, 신규 기능 개발, 리팩토링",
           "tasks": [
@@ -280,6 +284,7 @@
         {
           "name": "티랩 스튜디오 웹 페이지",
           "period": "2022.01 - 2022.02",
+          "techStack": ["Next.js", "TypeScript", "Naver Map API", "Geolocation API", "Emotion", "AWS S3", "CloudFront"],
           "description": "필라테스 스튜디오 브랜드 웹사이트입니다.\n\n전국 지점 위치를 지도에서 확인하고, 현재 위치 기반으로 가까운 지점을 찾을 수 있습니다.",
           "role": "프론트엔드 개발",
           "tasks": [
@@ -330,9 +335,24 @@
   ],
   "awards": [
     {
+      "date": "2025.01",
+      "title": "WOOWACON 2025 컨퍼런스 참여",
+      "description": "AI 기반 업무 변화, 디자인시스템 자동화 등 세션 참여"
+    },
+    {
+      "date": "2023.01",
+      "title": "8th HighThon 해커톤 참여",
+      "description": "MBTI 기반 오픈채팅 서비스 (웹소켓, 네이버 Map API)"
+    },
+    {
+      "date": "2022.11",
+      "title": "NHN Forward 컨퍼런스 참여",
+      "description": "프론트엔드 성능 최적화, MSA 아키텍처, 개발 문화 세션 참여"
+    },
+    {
       "date": "2022.02",
       "title": "7th HighThon 해커톤 대상",
-      "description": "마이스터고/특성화고 학생 대상 모의 면접 서비스 개발. TTS, STT 기술 활용.",
+      "description": "마이스터고 학생 모의 면접 서비스 (TTS, STT)",
       "link": "https://github.com/Highthon-EASY"
     },
     {
