@@ -3,20 +3,20 @@
     "name": "강은빈",
     "greeting": "안녕하세요, 강은빈입니다.",
     "title": "Frontend Developer",
-    "tagline": "AI와 협업하여 개발 생산성과 UX를 동시에 개선하는 4년차 프론트엔드 개발자입니다.",
+    "tagline": "개발 생산성과 UX를 개선하는 4년차 프론트엔드 개발자입니다.",
     "email": "kub9722@gmail.com",
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
     "photo": "/images/profile.jpg",
-    "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트 레이블 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\n\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
+    "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트 레이블 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
   },
   "skills": {
     "languages": ["TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS"],
-    "stateManagement": ["React Query (TanStack Query)", "Zustand", "SWR"],
-    "libraries": ["Turborepo", "Nx", "pnpm", "Storybook", "React Beautiful DnD", "Framer Motion"],
+    "stateManagement": ["React Query (TanStack Query)", "Zustand"],
+    "libraries": ["Turborepo", "pnpm", "Storybook", "Framer Motion", "Emotion", "i18next"],
     "tools": ["Git", "GitLab", "GitHub", "GitHub Actions", "Claude Code", "Cursor", "Figma MCP"],
-    "collaboration": ["Slack", "Figma", "Jira", "Swagger UI", "Postman"],
-    "integrations": ["Firebase (Auth, GA4, FCM)", "Airbridge SDK", "Naver Map API", "SSE", "Supabase"],
+    "collaboration": ["Slack", "Figma", "Swagger UI", "Zeplin"],
+    "integrations": ["Firebase (Auth, GA4, FCM)", "Airbridge SDK", "SSE", "Supabase", "Geolocation API", "Naver Map API"],
     "infrastructure": ["Vercel", "Railway", "AWS EC2", "AWS S3", "CloudFront"],
     "testing": ["Jest", "Vitest", "React Testing Library"]
   },
@@ -36,13 +36,13 @@
       "projects": [
         {
           "name": "BubbleChat / TingleChat (AI 캐릭터 채팅 B2C 서비스)",
-          "period": "2024.10 - 현재",
-          "techStack": ["React", "TypeScript", "Turborepo", "SSE", "Socket.IO", "React Query", "Zustand", "Storybook", "GA4", "Airbridge", "Clarity"],
-          "description": "사용자가 다양한 AI 캐릭터와 1:1 실시간 채팅을 즐기는 B2C 서비스입니다.\n\nSSE 기반 스트리밍 응답으로 자연스러운 대화 경험을 제공하며, 북마크, 채팅 히스토리, 캐릭터 즐겨찾기 등 개인화 기능을 지원합니다.\n\nBubbleChat(2024.10), TingleChat(2025.04) 런칭 후 태국, 대만, 일본으로 글로벌 확장했습니다.",
-          "role": "프론트엔드 개발 리드, 기술적 의사결정 및 팀 문서화 주도",
+          "period": "2024.09 - 현재",
+          "techStack": ["React", "TypeScript", "Turborepo", "SSE", "Socket.IO", "React Query", "Zustand", "Storybook", "i18next", "GA4", "Airbridge", "Clarity"],
+          "description": "사용자가 다양한 AI 캐릭터와 1:1 실시간 채팅을 즐기는 B2C 서비스입니다.\nSSE 기반 스트리밍 응답으로 자연스러운 대화 경험을 제공하며, 북마크, 채팅 히스토리, 캐릭터 즐겨찾기 등 개인화 기능을 지원합니다.\nBubbleChat(2024.10), TingleChat(2025.04) 런칭 후 태국, 대만, 일본으로 글로벌 확장했습니다.",
+          "role": "프론트엔드 개발, 기술적 의사결정 및 팀 문서화 주도",
           "tasks": [
             {
-              "title": "[서비스 개발] 프론트엔드 전체 개발 및 2.0 개편",
+              "title": "[서비스 개발] 프론트엔드 개발 및 2.0 개편",
               "items": [
                 "PoC 단계부터 프론트엔드 단독 개발로 서비스 런칭 주도",
                 "Web 2.0 전면 개편: 메인/상세 페이지 UX 개선, 성능 최적화",
@@ -61,11 +61,11 @@
               ]
             },
             {
-              "title": "[아키텍처] 디자인 시스템 (30개+ 공통 컴포넌트)",
+              "title": "[아키텍처] 디자인 시스템 구축",
               "items": [
                 "디자이너와 협업하여 프로젝트 디자인 시스템 정립 및 문서화",
                 "다크모드 컬러셋 구성: 라이트/다크 테마별 컬러 토큰 설계 및 CSS 변수 기반 통합 관리",
-                "2개 화이트 레이블 서비스(BubbleChat/TingleChat)에 적합하도록 원소스 멀티 브랜드 아키텍처 설계",
+                "화이트 레이블 서비스(BubbleChat/TingleChat, Reward)에 적합하도록 원소스 멀티 브랜드 아키텍처 설계",
                 "Button, Input, Modal 등 30개 이상 공통 컴포넌트 라이브러리 구축"
               ]
             },
@@ -91,7 +91,7 @@
               "items": [
                 "배포 후 버그/장애 실시간 대응 및 핫픽스 배포",
                 "트래픽 급증 대응 경험 (이벤트/프로모션)",
-                "CS 이슈 대응을 위한 문의하기 페이지 직접 개발",
+                "CS 이슈 대응을 위한 문의하기 기능 개발",
                 "GA4, Airbridge 연동 종합 로깅 시스템으로 사용자 행동 분석 기반 UX 개선"
               ]
             },
@@ -102,6 +102,16 @@
                 "주니어 개발자 코드 리뷰 및 1:1 멘토링 진행",
                 "사내 기술 세미나 발표: Figma MCP 활용법, Claude Code 워크플로우 개선",
                 "우아콘 디자인 자동화 세션 내용 공유 → 팀 내 Figma MCP 도입 리드"
+              ]
+            },
+            {
+              "title": "[DevOps] CI/CD 파이프라인 개선",
+              "items": [
+                "[배경] 서비스 증가(web, reward, design-system)에 따른 단일 파이프라인 구조의 한계",
+                "[구현] Parent-Child Pipeline 구조로 서비스별 독립 배포 파이프라인 설계",
+                "공통 변수/캐시 설정을 common.yml로 분리하여 중복 코드 제거",
+                "YAML Anchor 기반 변경 감지 로직으로 해당 서비스 파일 변경 시에만 Job 실행",
+                "[결과] 빌드 시간 감소, 서비스별 독립 배포 가능, 유지보수성 향상"
               ]
             }
           ],
@@ -114,10 +124,38 @@
           ]
         },
         {
+          "name": "BubbleChat / TingleChat 리워드 (크리에이터 수익화 서비스)",
+          "period": "2024.12 - 현재",
+          "techStack": ["React", "TypeScript", "React Query", "Zustand", "i18next"],
+          "description": "크리에이터가 콘텐츠 수익을 정산받을 수 있는 수익화 플랫폼입니다.\n본인인증(KYC), 계좌인증을 통해 정산 자격을 획득하고, 수익 현황을 확인할 수 있습니다.\n메인 서비스와 크로스 도메인 SSO를 통해 seamless한 사용자 경험을 제공합니다.",
+          "role": "프론트엔드 개발, 인증 아키텍처 설계",
+          "tasks": [
+            {
+              "title": "수익화 기능 개발",
+              "items": [
+                "본인인증(KYC) 연동 및 UI 구현",
+                "계좌인증 연동 및 정산 신청 플로우 구현"
+              ]
+            },
+            {
+              "title": "크로스 도메인 SSO 시스템 구현",
+              "items": [
+                "메인/서브 도메인 간 토큰 공유 아키텍처 설계",
+                "메인 도메인 로그인 시 서브 도메인 자동 인증 처리",
+                "토큰 만료/갱신 시 도메인 간 동기화 처리"
+              ]
+            }
+          ],
+          "impact": [
+            "리워드 서비스 출시로 크리에이터 수익화 플랫폼 구축",
+            "크로스 도메인 SSO로 서비스 간 seamless한 사용자 경험 제공"
+          ]
+        },
+        {
           "name": "버블탭 스튜디오 (웹소설 에디터)",
           "period": "2022.07 - 2025.03",
-          "techStack": ["React", "TypeScript", "React Beautiful DnD", "Lottie", "AWS S3", "Presigned URL"],
-          "description": "창작자가 채팅형 웹소설을 제작하는 전용 에디터입니다.\n AI 생성 커버/배경/캐릭터/효과음 애셋을 활용해 에피소드를 편집하고, 드래그앤드롭으로 정렬 기능과 다양한 단축키 기능을 제공했습니다.\n\n 실시간 미리보기로 독자 경험을 확인할 수 있습니다.",
+          "techStack": ["React", "TypeScript", "Zustand", "React Query", "AWS S3", "i18next"],
+          "description": "창작자가 채팅형 웹소설을 제작하는 전용 에디터입니다.\n AI 생성 커버/배경/캐릭터/효과음 애셋을 활용해 에피소드를 편집하고, 드래그앤드롭으로 정렬 기능과 다양한 단축키 기능을 제공했습니다.\n 실시간 미리보기로 독자 경험을 확인할 수 있습니다.",
           "role": "스튜디오 기능 개발 및 유지보수, 내부 PD UI/UX 피드백 반영",
           "tasks": [
             {
@@ -171,10 +209,10 @@
           ]
         },
         {
-          "name": "버블탭 (탭소설 B2C 서비스)",
+          "name": "버블탭 (채팅형 웹소설 B2C 서비스)",
           "period": "2022.07 - 2025.03",
-          "techStack": ["React", "TypeScript", "React Query", "Storybook", "Elastic Search", "GA4", "Airbridge"],
-          "description": "독자가 채팅형 웹소설을 감상하는 콘텐츠 소비 플랫폼입니다.\n\n메인/베스트/디스커버 페이지에서 작품을 탐색하고, 작가 팔로우와 댓글로 커뮤니티 활동을 할 수 있습니다.\n\n효과음, 배경음악, 애니메이션이 동기화된 몰입감 있는 뷰어 경험을 제공합니다.",
+          "techStack": ["React", "TypeScript", "React Query", "Zustand", "Storybook", "i18next", "GA4", "Airbridge"],
+          "description": "채팅형 웹소설을 감상하는 콘텐츠 소비 플랫폼입니다.\n메인/베스트/디스커버 페이지에서 작품을 탐색하고, 작가 팔로우와 댓글로 커뮤니티 활동을 할 수 있습니다.\n효과음, 배경음악, 애니메이션이 동기화된 몰입감 있는 뷰어 경험을 제공합니다.",
           "role": "웹 신규 기능 개발 및 유지보수, 배포 관리",
           "tasks": [
             {
@@ -191,9 +229,9 @@
               "title": "커뮤니티 기능 기획 및 개발",
               "items": [
                 "커뮤니티 기능 직접 기획: 사용자 니즈 분석 후 기능 정의 및 화면 설계",
-                "작가 팔로우/팬 시스템 구현",
+                "스토리 좋아요/북마크 등 사용자 인터랙션 기능 구현",
                 "에피소드별 댓글 및 대댓글 기능 개발",
-                "좋아요/북마크 등 사용자 인터랙션 기능 구현"
+                "작가 팔로우/팔로잉 시스템 구현"
               ]
             },
             {
@@ -213,7 +251,7 @@
             }
           ],
           "impact": [
-            "커뮤니티 기능 기획부터 개발까지 주도하여 사용자 참여도 향상",
+            "커뮤니티 기능 기획을 주도하여 사용자 참여도 향상",
             "React Query 도입으로 API 호출 최적화 및 캐싱 전략 수립",
             "Viewer 공통화로 Web/Studio 간 코드 중복 제거",
             "Storybook 도입으로 UI 컴포넌트 문서화 및 재사용성 향상"
@@ -231,17 +269,17 @@
         {
           "name": "백오피스 시스템 (어드민 대시보드)",
           "period": "2022.07 - 현재",
-          "techStack": ["React", "TypeScript", "React Query", "FCM", "AWS S3"],
-          "description": "버블탭 서비스 전체를 운영하는 내부 관리자 시스템입니다.\n\n유저/작품/결제 관리, 크리에이터 수익 정산, 애셋 업로드, 배너/푸시 알림 발송, 구독 관리 등 운영에 필요한 모든 기능을 제공합니다.",
+          "techStack": ["React", "TypeScript", "React Query", "FCM", "AWS S3", "i18next"],
+          "description": "버블탭 서비스 전체를 운영하는 내부 관리자 시스템입니다.\n유저/작품/결제 관리, 크리에이터 수익 정산, 애셋 업로드, 배너/푸시 알림 발송, 구독 관리 등 운영에 필요한 모든 기능을 제공합니다.",
           "role": "기능 요구사항 수집, 신규 기능 개발, 리팩토링",
           "tasks": [
             {
               "title": "수익 분배 및 구독 관리",
               "items": [
-                "크리에이터 수익 분배 시스템 구현",
+                "크리에이터 수익 분배 시스템 개발",
                 "구독 관리 시스템 개발",
                 "포션/샴푸(인앱 재화) 관리 시스템 개발",
-                "본인인증(KYC), 계좌인증 연동 및 Manual KYC 어드민 기능"
+                "본인인증(KYC), 계좌인증 연동 및 Manual KYC 시스템 개발"
               ]
             },
             {
@@ -249,7 +287,23 @@
               "items": [
                 "콘텐츠 필터링 시스템 개발",
                 "애셋 벌크 업로드 (CSV 카테고리 바인딩)",
-                "배너 및 푸시(FCM) 관리 시스템"
+                "배너 관리 시스템"
+              ]
+            },
+            {
+              "title": "푸시(FCM) Management 기획 및 개발",
+              "items": [
+                "즉시/예약/반복/액션 발송 타입 구성으로 유연한 푸시 메시지 발송 시스템 구축",
+                "푸시 Configuration 관리를 위한 카테고리 설정 기능으로 관리 편의성 향상",
+                "다양한 기기에서 푸시(텍스트/이미지) 미리보기 화면 제공으로 메시지 정확성 보장"
+              ]
+            },
+            {
+              "title": "보너스 버블 지급 Management 기획 및 개발",
+              "items": [
+                "즉시/예약/액션 타입으로 유연한 보너스 버블 지급 시스템 구축",
+                "유저의 특정 행위에 따른 보너스 버블 자동 지급 설정 기능",
+                "보너스 버블 지급 시 토스트 메시지로 유저 안내 (FCM과 별도 노출)"
               ]
             },
             {
@@ -277,15 +331,14 @@
       "techStack": [
         { "category": "코어", "items": ["Next.js", "TypeScript", "yarn"] },
         { "category": "상태관리", "items": ["React Query"] },
-        { "category": "라이브러리", "items": ["Storybook", "Emotion", "Naver Map API"] },
+        { "category": "라이브러리", "items": ["Storybook", "Emotion", "Naver Map API", "Geolocation API"] },
         { "category": "협업 툴", "items": ["Git", "GitHub", "Figma", "Zeplin"] }
       ],
       "projects": [
         {
           "name": "티랩 스튜디오 웹 페이지",
           "period": "2022.01 - 2022.02",
-          "techStack": ["Next.js", "TypeScript", "Naver Map API", "Geolocation API", "Emotion", "AWS S3", "CloudFront"],
-          "description": "필라테스 스튜디오 브랜드 웹사이트입니다.\n\n전국 지점 위치를 지도에서 확인하고, 현재 위치 기반으로 가까운 지점을 찾을 수 있습니다.",
+          "description": "필라테스 스튜디오 브랜드 웹사이트입니다.\n전국 지점 위치를 지도에서 확인하고, 현재 위치 기반으로 가까운 지점을 찾을 수 있습니다.",
           "role": "프론트엔드 개발",
           "tasks": [
             {
