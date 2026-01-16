@@ -1,0 +1,8 @@
+export { SectionTitle } from "./SectionTitle";
+export { ProfileSection } from "./ProfileSection";
+export { SkillsSection } from "./SkillsSection";
+export { EducationSection } from "./EducationSection";
+export { ExperienceSection } from "./ExperienceSection";
+export { CertificationSection } from "./CertificationSection";
+export { AwardSection } from "./AwardSection";
+export { ImageModal } from "./ImageModal";
