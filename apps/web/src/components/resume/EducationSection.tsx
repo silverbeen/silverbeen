@@ -33,8 +33,8 @@ const itemVariants = {
 
 export function EducationSection({ education }: EducationSectionProps) {
   return (
-    <section>
-      <SectionTitle>학력사항</SectionTitle>
+    <section id="education">
+      <SectionTitle>학력</SectionTitle>
       <motion.div
         className="flex flex-col gap-6"
         variants={containerVariants}

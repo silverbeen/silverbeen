@@ -31,6 +31,7 @@ export interface ProjectTask {
 export interface Project {
   name: string;
   period?: string;
+  techStack?: string[];
   description: string;
   role: string;
   tasks: ProjectTask[];

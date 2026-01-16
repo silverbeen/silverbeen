@@ -77,7 +77,7 @@ export function ExperienceSection({
   ImageComponent = DefaultImage,
 }: ExperienceSectionProps) {
   return (
-    <section>
+    <section id="experience">
       <SectionTitle>경력</SectionTitle>
       <motion.div
         className="flex flex-col gap-12"
@@ -86,13 +86,17 @@ export function ExperienceSection({
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
       >
-        {experience.map((exp) => (
-          <ExperienceCard
-            key={exp.company}
-            experience={exp}
-            ImageComponent={ImageComponent}
-          />
-        ))}
+        {experience.map((exp) => {
+          const companyId = `company-${exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`;
+          return (
+            <div key={exp.company} id={companyId}>
+              <ExperienceCard
+                experience={exp}
+                ImageComponent={ImageComponent}
+              />
+            </div>
+          );
+        })}
       </motion.div>
     </section>
   );
@@ -167,18 +171,22 @@ function ExperienceCard({
 
       <div className="flex flex-col gap-6">
         <h4 className="text-sm font-semibold text-foreground">프로젝트</h4>
-        {experience.projects.map((project, index) => (
-          <motion.div
-            key={project.name}
-            variants={projectVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <ProjectCard project={project} ImageComponent={ImageComponent} />
-          </motion.div>
-        ))}
+        {experience.projects.map((project, index) => {
+          const projectId = `project-${project.name.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`;
+          return (
+            <motion.div
+              key={project.name}
+              id={projectId}
+              variants={projectVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <ProjectCard project={project} ImageComponent={ImageComponent} />
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -267,6 +275,24 @@ function ProjectCard({
             {project.role}
           </span>
         </div>
+        {project.techStack && project.techStack.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {project.techStack.map((tech, index) => (
+              <motion.span
+                key={tech}
+                className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-2.5 py-1 text-xs font-medium text-foreground/80 backdrop-blur-sm transition-all duration-200 hover:border-primary/40 hover:text-primary"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.03 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                {tech}
+              </motion.span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 주요 업무 */}

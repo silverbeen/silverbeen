@@ -62,7 +62,7 @@ const badgeVariants = {
 
 export function SkillsSection({ skills }: SkillsSectionProps) {
   return (
-    <section>
+    <section id="skills">
       <SectionTitle>보유 기술</SectionTitle>
       <motion.div
         className="flex flex-col gap-3"

@@ -36,7 +36,7 @@ export function CertificationSection({
   certifications,
 }: CertificationSectionProps) {
   return (
-    <section>
+    <section id="certifications">
       <SectionTitle>자격증</SectionTitle>
       <motion.div
         className="flex flex-wrap gap-4"
