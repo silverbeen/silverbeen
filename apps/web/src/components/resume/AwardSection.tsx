@@ -33,7 +33,7 @@ const itemVariants = {
 
 export function AwardSection({ awards }: AwardSectionProps) {
   return (
-    <section>
+    <section id="awards">
       <SectionTitle>수상 및 기타</SectionTitle>
       <motion.div
         className="flex flex-col gap-4"
@@ -45,7 +45,7 @@ export function AwardSection({ awards }: AwardSectionProps) {
         {awards.map((award) => (
           <motion.div
             key={`${award.date}-${award.title}`}
-            className="group flex gap-4 rounded-lg border border-border bg-card p-4"
+            className="group flex gap-4 rounded-lg border border-primary/20 bg-card p-4"
             variants={itemVariants}
             whileHover={{ x: 4, borderColor: "var(--primary)" }}
             transition={{ duration: 0.2 }}
