@@ -19,16 +19,16 @@ export function calculateDuration(
   const end = endDate ? parseYearMonth(endDate) : new Date();
 
   let years = end.getFullYear() - start.getFullYear();
-  let months = end.getMonth() - start.getMonth() + 1;
+  let months = end.getMonth() - start.getMonth();
 
-  if (months <= 0) {
+  if (months < 0) {
     years -= 1;
     months += 12;
   }
 
-  if (months >= 12) {
-    years += Math.floor(months / 12);
-    months = months % 12;
+  // 같은 달이면 최소 1개월로 처리
+  if (years === 0 && months === 0) {
+    return "1개월";
   }
 
   if (years > 0 && months > 0) {
