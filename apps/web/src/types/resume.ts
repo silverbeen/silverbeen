@@ -31,7 +31,10 @@ export interface ProjectTask {
 export interface Project {
   name: string;
   period?: string;
-  techStack?: string[];
+  techStack?: {
+    category: string;
+    items: string[];
+  }[] | string[];
   description: string;
   role: string;
   tasks: ProjectTask[];
@@ -73,6 +76,7 @@ export interface Award {
   title: string;
   description?: string;
   link?: string;
+  linkLabel?: string;
 }
 
 export interface ResumeData {
