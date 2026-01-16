@@ -29,7 +29,7 @@ function TypingEffect({ text, className }: { text: string; className?: string })
       {displayedText}
       {!isComplete && (
         <motion.span
-          className="inline-block w-0.75 h-[1em] bg-primary ml-1 align-middle"
+          className="inline-block w-1 h-[1em] bg-primary ml-1 align-middle"
           animate={{ opacity: [1, 0] }}
           transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
         />
@@ -99,8 +99,7 @@ function DefaultImage({
     <img
       src={src}
       alt={alt}
-      className={className}
-      style={{ objectFit: "cover", width: "100%", height: "100%" }}
+      className={`${className || ""} object-cover w-full h-full`}
     />
   );
 }

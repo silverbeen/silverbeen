@@ -66,8 +66,7 @@ function DefaultImage({
     <img
       src={src}
       alt={alt}
-      className={className}
-      style={{ objectFit: "cover", width: "100%", height: "100%" }}
+      className={`${className || ""} object-cover w-full h-full`}
     />
   );
 }
@@ -277,20 +276,24 @@ function ProjectCard({
         </div>
         {project.techStack && project.techStack.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
-            {project.techStack.map((tech, index) => (
-              <motion.span
-                key={tech}
-                className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-2.5 py-1 text-xs font-medium text-foreground/80 backdrop-blur-sm transition-all duration-200 hover:border-primary/40 hover:text-primary"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.03 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                {tech}
-              </motion.span>
-            ))}
+            {project.techStack.map((tech, index) => {
+              const techName = typeof tech === "string" ? tech : tech.items.join(", ");
+              const techKey = typeof tech === "string" ? tech : `${tech.category}-${index}`;
+              return (
+                <motion.span
+                  key={techKey}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-2.5 py-1 text-xs font-medium text-foreground/80 backdrop-blur-sm transition-all duration-200 hover:border-primary/40 hover:text-primary"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.03 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                  {techName}
+                </motion.span>
+              );
+            })}
           </div>
         )}
       </div>
