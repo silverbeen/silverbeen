@@ -1,0 +1,13 @@
+{
+  "name": "@silverbeen/config",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./eslint": "./eslint.config.mjs",
+    "./typescript": "./tsconfig.json"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": "^5.7.0"
+  }
+}
