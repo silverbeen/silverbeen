@@ -44,11 +44,14 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
             id: `company-${companyKey}`,
             title: exp.company,
             level: 2 as const,
-            children: exp.projects.map((project) => ({
-              id: `project-${project.name.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`,
-              title: project.name,
-              level: 3 as const,
-            })),
+            children: exp.projects.map((project) => {
+              const projectSlug = project.name.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase();
+              return {
+                id: `project-${companyKey}-${projectSlug}`,
+                title: project.name,
+                level: 3 as const,
+              };
+            }),
           }];
         }),
       },

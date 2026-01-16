@@ -93,6 +93,7 @@ export function ExperienceSection({
             <div key={companyKey} id={companyId}>
               <ExperienceCard
                 experience={exp}
+                companyKey={companyKey}
                 ImageComponent={ImageComponent}
               />
             </div>
@@ -105,9 +106,11 @@ export function ExperienceSection({
 
 function ExperienceCard({
   experience,
+  companyKey,
   ImageComponent = DefaultImage,
 }: {
   experience: Experience;
+  companyKey: string;
   ImageComponent?: React.ComponentType<{
     src: string;
     alt: string;
@@ -173,7 +176,8 @@ function ExperienceCard({
       <div className="flex flex-col gap-6">
         <h4 className="text-sm font-semibold text-foreground">프로젝트</h4>
         {experience.projects.map((project, index) => {
-          const projectId = `project-${project.name.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`;
+          const projectSlug = project.name.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase();
+          const projectId = `project-${companyKey}-${projectSlug}`;
           return (
             <motion.div
               key={project.name}
