@@ -20,7 +20,6 @@ interface TocSection {
 const SCROLL_OFFSET = 150;
 const VISIBILITY_THRESHOLD = 200;
 const SCROLL_TO_OFFSET = 80;
-const TOC_LEFT_POSITION = "calc(50% - 448px - 220px - 24px)";
 
 export function TableOfContents({ experience }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
@@ -38,9 +37,11 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
         id: "experience",
         title: "경력",
         level: 1,
-        children: experience.flatMap((exp) => [
-          {
-            id: `company-${exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`,
+        children: experience.flatMap((exp) => {
+          const companySlug = exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase();
+          const companyKey = `${companySlug}-${exp.startDate}`;
+          return [{
+            id: `company-${companyKey}`,
             title: exp.company,
             level: 2 as const,
             children: exp.projects.map((project) => ({
@@ -48,8 +49,8 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
               title: project.name,
               level: 3 as const,
             })),
-          },
-        ]),
+          }];
+        }),
       },
       { id: "education", title: "학력", level: 1 },
       { id: "certifications", title: "자격증", level: 1 },
@@ -158,13 +159,14 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
           <motion.button
             onClick={() => scrollToSection(item.id)}
             className={`relative flex-1 cursor-pointer text-left text-[13px] transition-all duration-200 ${
+              hasChildren ? "pl-0" : depth > 0 ? "pl-1" : "pl-5"
+            } ${
               active
                 ? "font-semibold text-primary"
                 : parentOfActive
                   ? "font-medium text-foreground hover:text-primary"
                   : "text-muted-foreground hover:text-primary"
             }`}
-            style={{ paddingLeft: hasChildren ? 0 : depth > 0 ? "4px" : "20px" }}
             whileHover={{ x: 2 }}
           >
             {active && (
@@ -207,8 +209,7 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          className="fixed top-1/2 z-50 hidden max-h-[80vh] w-52 -translate-y-1/2 overflow-y-auto rounded-xl border border-primary/20 bg-background/95 p-4 shadow-xl backdrop-blur-md xl:block"
-          style={{ left: TOC_LEFT_POSITION }}
+          className="fixed top-1/2 left-[calc(50%-448px-220px-24px)] z-50 hidden max-h-[80vh] w-52 -translate-y-1/2 overflow-y-auto rounded-xl border border-primary/20 bg-background/95 p-4 shadow-xl backdrop-blur-md xl:block"
         >
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
             <span className="h-1 w-1 rounded-full bg-primary" />

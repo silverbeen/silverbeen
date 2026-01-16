@@ -86,9 +86,11 @@ export function ExperienceSection({
         viewport={{ once: true, margin: "-100px" }}
       >
         {experience.map((exp) => {
-          const companyId = `company-${exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase()}`;
+          const companySlug = exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase();
+          const companyKey = `${companySlug}-${exp.startDate}`;
+          const companyId = `company-${companyKey}`;
           return (
-            <div key={exp.company} id={companyId}>
+            <div key={companyKey} id={companyId}>
               <ExperienceCard
                 experience={exp}
                 ImageComponent={ImageComponent}
