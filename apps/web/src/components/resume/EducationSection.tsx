@@ -42,9 +42,9 @@ export function EducationSection({ education }: EducationSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
       >
-        {education.map((edu, index) => (
+        {education.map((edu) => (
           <motion.div
-            key={`${edu.school}-${index}`}
+            key={`${edu.school}-${edu.major}-${edu.period}`}
             className="group flex items-start gap-4"
             variants={itemVariants}
             whileHover={{ x: 4 }}
