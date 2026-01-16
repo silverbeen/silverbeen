@@ -73,7 +73,7 @@ export function AwardSection({ awards }: AwardSectionProps) {
                     className="flex items-center gap-1 text-xs text-primary hover:underline"
                     whileHover={{ scale: 1.05 }}
                   >
-                    GitHub
+                    {award.linkLabel || "링크"}
                     <ExternalLink className="h-3 w-3" />
                   </motion.a>
                 )}
