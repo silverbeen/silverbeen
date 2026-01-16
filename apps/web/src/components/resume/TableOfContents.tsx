@@ -16,6 +16,12 @@ interface TocSection {
   children?: TocSection[];
 }
 
+// Layout constants
+const SCROLL_OFFSET = 150;
+const VISIBILITY_THRESHOLD = 200;
+const SCROLL_TO_OFFSET = 80;
+const TOC_LEFT_POSITION = "calc(50% - 448px - 220px - 24px)";
+
 export function TableOfContents({ experience }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isVisible, setIsVisible] = useState(true);
@@ -67,7 +73,7 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
 
   // 현재 보이는 섹션 감지
   const updateActiveSection = useCallback(() => {
-    const scrollPosition = window.scrollY + 150;
+    const scrollPosition = window.scrollY + SCROLL_OFFSET;
 
     for (let i = allIds.length - 1; i >= 0; i--) {
       const element = document.getElementById(allIds[i]);
@@ -82,7 +88,7 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
     const handleScroll = () => {
       // 스크롤 위치에 따라 TOC 표시/숨김
       const scrollY = window.scrollY;
-      setIsVisible(scrollY > 200);
+      setIsVisible(scrollY > VISIBILITY_THRESHOLD);
 
       updateActiveSection();
     };
@@ -96,8 +102,7 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80;
-      const elementPosition = element.offsetTop - offset;
+      const elementPosition = element.offsetTop - SCROLL_TO_OFFSET;
       window.scrollTo({
         top: elementPosition,
         behavior: "smooth",
@@ -203,7 +208,7 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           className="fixed top-1/2 z-50 hidden max-h-[80vh] w-52 -translate-y-1/2 overflow-y-auto rounded-xl border border-primary/20 bg-background/95 p-4 shadow-xl backdrop-blur-md xl:block"
-          style={{ left: "calc(50% - 448px - 220px - 24px)" }}
+          style={{ left: TOC_LEFT_POSITION }}
         >
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
             <span className="h-1 w-1 rounded-full bg-primary" />
