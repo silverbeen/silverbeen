@@ -60,6 +60,22 @@
   --color-primary-800: #282690;
   --color-primary-900: #1C1A6E;
   --color-primary-950: #0F0E4A;
+
+  /* Sky accent color palette - #DEF0FF based */
+  --color-sky-50: #F5FAFF;
+  --color-sky-100: #DEF0FF;
+  --color-sky-200: #B8DFFF;
+  --color-sky-300: #8ACBFF;
+  --color-sky-400: #5CB5FF;
+  --color-sky-500: #3A9EF5;
+  --color-sky-600: #2B7FCC;
+  --color-sky-700: #1E62A3;
+  --color-sky-800: #14477A;
+  --color-sky-900: #0C2E51;
+
+  /* Semantic aliases */
+  --color-highlight: var(--color-sky-100);
+  --color-highlight-foreground: var(--color-sky-700);
 }
 
 :root {
@@ -77,7 +93,7 @@
   --secondary: #F3F4F6;
   --secondary-foreground: #1F2937;
   --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
+  --muted-foreground: #4B5563;
   --accent: #EEEEFF;
   --accent-foreground: #514EF6;
   --destructive: #EF4444;
@@ -121,7 +137,7 @@
   --secondary: #2D2D44;
   --secondary-foreground: #F3F4F6;
   --muted: #2D2D44;
-  --muted-foreground: #9CA3AF;
+  --muted-foreground: #D1D5DB;
   --accent: #282690;
   --accent-foreground: #DCDCFF;
   --destructive: #F87171;
