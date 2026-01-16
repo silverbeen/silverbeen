@@ -8,23 +8,33 @@ import type { Profile } from "@/types/resume";
 // 타이핑 효과 컴포넌트
 function TypingEffect({ text, className }: { text: string; className?: string }) {
   const [displayedText, setDisplayedText] = useState("");
+  const [isPlaying, setIsPlaying] = useState(true);
   const isComplete = displayedText.length >= text.length;
 
   useEffect(() => {
+    if (!isPlaying) return;
+
     if (displayedText.length < text.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(text.slice(0, displayedText.length + 1));
       }, 80);
       return () => clearTimeout(timeout);
     }
-  }, [displayedText, text]);
+  }, [displayedText, text, isPlaying]);
+
+  const handleClick = () => {
+    setDisplayedText("");
+    setIsPlaying(true);
+  };
 
   return (
     <motion.h1
-      className={className}
+      className={`${className} cursor-pointer select-none`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
+      onClick={handleClick}
+      title="클릭하여 다시 재생"
     >
       {displayedText}
       {!isComplete && (
