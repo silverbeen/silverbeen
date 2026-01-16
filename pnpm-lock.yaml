@@ -204,13 +204,6 @@ importers:
         version: 5.9.3
 
   packages/ui:
-    dependencies:
-      framer-motion:
-        specifier: ^12.26.2
-        version: 12.26.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      lucide-react:
-        specifier: ^0.562.0
-        version: 0.562.0(react@19.2.3)
     devDependencies:
       '@storybook/addon-essentials':
         specifier: 8.6.14
