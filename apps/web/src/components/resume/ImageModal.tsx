@@ -87,6 +87,9 @@ export function ImageModal({
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${projectName} 이미지 미리보기`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -104,6 +107,7 @@ export function ImageModal({
           {/* Close Button */}
           <button
             onClick={onClose}
+            aria-label="닫기"
             className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
           >
             <X className="h-6 w-6" />
@@ -114,12 +118,14 @@ export function ImageModal({
             <>
               <button
                 onClick={onPrev}
+                aria-label="이전 이미지"
                 className="absolute left-4 z-10 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
               <button
                 onClick={onNext}
+                aria-label="다음 이미지"
                 className="absolute right-4 z-10 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20"
               >
                 <ChevronRight className="h-6 w-6" />
