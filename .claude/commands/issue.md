@@ -232,7 +232,7 @@ GitHub 인증이 필요합니다.
 
 ## 참고사항
 
-- 프로젝트 URL: https://github.com/silverbeen/silverbeen
+- 프로젝트: [silverbeen](https://github.com/silverbeen/silverbeen)
 - 이슈는 **구현 전 기획서**로 작성 (구현 완료 보고서가 아님)
 - 이슈 생성 후 `--web` 옵션으로 브라우저에서 열기 가능
 - Assignee 지정: `--assignee @me` 옵션 사용 가능
