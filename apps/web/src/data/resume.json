@@ -7,7 +7,7 @@
     "email": "kub9722@gmail.com",
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
-    "photo": "/images/profile.jpg",
+    "photo": "/images/profile.jpeg",
     "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트 레이블 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
   },
   "skills": {
