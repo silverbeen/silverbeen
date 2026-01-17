@@ -204,7 +204,7 @@ export function ProfileSection({
       </motion.div>
       {profile.photo && (
         <motion.div
-          className="relative h-40 w-32 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-48 sm:w-36"
+          className="relative h-52 w-40 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-64 sm:w-48"
           variants={imageVariants}
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}

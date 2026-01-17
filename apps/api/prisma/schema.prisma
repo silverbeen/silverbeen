@@ -6,17 +6,17 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// User model - synced with Supabase Auth
+// User model - for admin authentication
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
   role      Role     @default(USER)
-  resumes   Resume[]
   posts     Post[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -24,20 +24,13 @@ model User {
   @@map("users")
 }
 
-// Resume model - for resume builder
+// Resume model - singleton for single resume management
 model Resume {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  content   Json     // Resume sections data (JSON)
-  isPublic  Boolean  @default(false) @map("is_public")
-  shareSlug String?  @unique @map("share_slug")
+  id        String   @id @default("main")
+  content   Json     // Full resume data (JSON)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([userId])
-  @@index([shareSlug])
   @@map("resumes")
 }
 
@@ -52,6 +45,7 @@ model Post {
   excerpt    String?
   coverImage String?  @map("cover_image")
   published  Boolean  @default(false)
+  viewCount  Int      @default(0) @map("view_count")
   tags       Tag[]
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
