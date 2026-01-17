@@ -61,10 +61,10 @@ function LoginForm() {
       });
 
       if (error) {
-        setError('GitHub 로그인 중 오류가 발생했습니다.');
-        setIsLoading(false);
+        throw error;
       }
-    } catch {
+    } catch (error) {
+      console.error('GitHub login error:', error);
       setError('GitHub 로그인 중 오류가 발생했습니다.');
       setIsLoading(false);
     }
