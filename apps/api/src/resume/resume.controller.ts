@@ -1,5 +1,6 @@
 import { Controller, Get, Put, Body } from '@nestjs/common';
 import { ResumeService } from './resume.service';
+import { UpdateResumeDto } from './dto';
 
 @Controller('resume')
 export class ResumeController {
@@ -11,7 +12,7 @@ export class ResumeController {
   }
 
   @Put()
-  async updateResume(@Body() content: object) {
-    return this.resumeService.updateResume(content);
+  async updateResume(@Body() updateResumeDto: UpdateResumeDto) {
+    return this.resumeService.updateResume(updateResumeDto.content);
   }
 }

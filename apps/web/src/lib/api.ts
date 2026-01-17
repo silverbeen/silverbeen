@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import type { ResumeData } from '@/types/resume';
+import { config } from '@/config';
 
 class ApiError extends Error {
   constructor(
@@ -11,7 +12,7 @@ class ApiError extends Error {
 }
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${config.apiBaseUrl}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -28,11 +29,11 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   resume: {
-    get: () => fetcher<Record<string, unknown>>('/resume'),
-    update: (content: Record<string, unknown>) =>
-      fetcher('/resume', {
+    get: () => fetcher<ResumeData>('/resume'),
+    update: (content: ResumeData) =>
+      fetcher<ResumeData>('/resume', {
         method: 'PUT',
-        body: JSON.stringify(content),
+        body: JSON.stringify({ content }),
       }),
   },
 };

@@ -2,17 +2,16 @@ import type { Metadata } from "next";
 import type { ResumeData } from "@/types/resume";
 import resumeData from "@/data/resume.json";
 import { ResumeContent } from "./ResumeContent";
+import { config } from "@/config";
 
 export const metadata: Metadata = {
   title: "이력서 | 강은빈",
   description: "프론트엔드 개발자 강은빈의 이력서입니다.",
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 async function getResumeData(): Promise<ResumeData> {
   try {
-    const response = await fetch(`${API_BASE_URL}/resume`, {
+    const response = await fetch(`${config.apiBaseUrl}/resume`, {
       next: { revalidate: 60 }, // ISR: 60초마다 재검증
     });
 

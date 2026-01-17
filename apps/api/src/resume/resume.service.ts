@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -17,7 +18,7 @@ export class ResumeService {
     return resume.content;
   }
 
-  async updateResume(content: object) {
+  async updateResume(content: Prisma.InputJsonValue) {
     return this.prisma.resume.upsert({
       where: { id: 'main' },
       update: { content },

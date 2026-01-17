@@ -6,11 +6,7 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://silverbeen.dev',
-      'https://www.silverbeen.dev',
-    ],
+    origin: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
     credentials: true,
   });
 
