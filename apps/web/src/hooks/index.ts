@@ -1,0 +1,1 @@
+export { useResume } from "./useResume";
