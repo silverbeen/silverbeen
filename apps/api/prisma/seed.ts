@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Read resume.json from web app
-  const resumePath = path.join(__dirname, '../../../web/src/data/resume.json');
+  const resumePath = path.join(__dirname, '../../../apps/web/src/data/resume.json');
   const resumeData = JSON.parse(fs.readFileSync(resumePath, 'utf-8'));
 
   // Upsert resume data
