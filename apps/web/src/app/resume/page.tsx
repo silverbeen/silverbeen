@@ -8,8 +8,28 @@ export const metadata: Metadata = {
   description: "프론트엔드 개발자 강은빈의 이력서입니다.",
 };
 
-export default function ResumePage() {
-  const data = resumeData as ResumeData;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+async function getResumeData(): Promise<ResumeData> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resume`, {
+      next: { revalidate: 60 }, // ISR: 60초마다 재검증
+    });
+
+    if (!response.ok) {
+      console.warn("API fetch failed, using fallback data");
+      return resumeData as ResumeData;
+    }
+
+    return response.json();
+  } catch {
+    console.warn("API unavailable, using fallback data");
+    return resumeData as ResumeData;
+  }
+}
+
+export default async function ResumePage() {
+  const data = await getResumeData();
 
   return <ResumeContent data={data} />;
 }
