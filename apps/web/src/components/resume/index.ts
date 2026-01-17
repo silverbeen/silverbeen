@@ -7,3 +7,4 @@ export { CertificationSection } from "./CertificationSection";
 export { AwardSection } from "./AwardSection";
 export { ImageModal } from "./ImageModal";
 export { TableOfContents } from "./TableOfContents";
+export { ResumeSkeleton } from "./ResumeSkeleton";
