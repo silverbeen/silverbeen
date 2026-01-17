@@ -10,9 +10,9 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY'
-    );
+    // 환경변수가 없으면 인증 체크 없이 통과
+    console.warn('Missing Supabase environment variables in middleware');
+    return NextResponse.next({ request });
   }
 
   let supabaseResponse = NextResponse.next({
