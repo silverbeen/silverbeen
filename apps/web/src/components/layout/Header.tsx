@@ -7,14 +7,14 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const navItems = [
-  { href: "/resume", label: "Portfolio", icon: FileText },
+  { href: "/resume", label: "Resume", icon: FileText },
   { href: "https://velog.io/@silverbeen", label: "Blog", icon: BookOpen, external: true },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
@@ -28,9 +28,9 @@ export function Header() {
           href="/"
           className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground transition-colors hover:text-primary"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-sm font-bold text-white shadow-sm shadow-primary/30">
+          {/* <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-sm font-bold text-white shadow-sm shadow-primary/30">
             S
-          </span>
+          </span> */}
           <span>Silverbeen</span>
         </Link>
 

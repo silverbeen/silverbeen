@@ -3,7 +3,7 @@
     "name": "강은빈",
     "greeting": "안녕하세요, 강은빈입니다.",
     "title": "Frontend Developer",
-    "tagline": "개발 생산성과 UX를 개선하는 4년차 프론트엔드 개발자입니다.",
+  "tagline": "개발 생산성과 UX를 개선하는 4년차 프론트엔드 개발자입니다.",
     "email": "kub9722@gmail.com",
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
@@ -203,9 +203,9 @@
             { "label": "스튜디오", "url": "https://www.bubbletap.com/studio/titles" }
           ],
           "images": [
-            "/images/studio/asset-manager.png",
-            "/images/studio/episode-editor.png",
-            "/images/studio/viewer-preview.png"
+            "/images/studio/edit_title.png",
+            "/images/studio/episode_editor.png",
+            "/images/studio/add_images.png"
           ]
         },
         {
