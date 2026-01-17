@@ -1,4 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 export interface AuthUser {
   id: string;
@@ -7,9 +11,17 @@ export interface AuthUser {
 }
 
 export const CurrentUser = createParamDecorator(
-  (data: keyof AuthUser | undefined, ctx: ExecutionContext): AuthUser | string => {
+  (
+    data: keyof AuthUser | undefined,
+    ctx: ExecutionContext,
+  ): AuthUser | string => {
     const request = ctx.switchToHttp().getRequest();
-    const user = request.user as AuthUser;
-    return data ? user?.[data] : user;
+    const user = request.user as AuthUser | undefined;
+
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    return data ? user[data] : user;
   },
 );
