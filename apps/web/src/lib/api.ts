@@ -11,13 +11,21 @@ class ApiError extends Error {
   }
 }
 
-async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
+interface FetcherOptions extends RequestInit {
+  revalidate?: number | false;
+  tags?: string[];
+}
+
+async function fetcher<T>(endpoint: string, options?: FetcherOptions): Promise<T> {
+  const { revalidate, tags, ...fetchOptions } = options || {};
+
   const response = await fetch(`${config.apiBaseUrl}${endpoint}`, {
-    ...options,
+    ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...options?.headers,
+      ...fetchOptions?.headers,
     },
+    next: revalidate !== undefined || tags ? { revalidate, tags } : undefined,
   });
 
   if (!response.ok) {
@@ -29,7 +37,8 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   resume: {
-    get: () => fetcher<ResumeData>('/resume'),
+    get: (options?: { revalidate?: number }) =>
+      fetcher<ResumeData>('/resume', { revalidate: options?.revalidate }),
     update: (content: ResumeData) =>
       fetcher<ResumeData>('/resume', {
         method: 'PUT',

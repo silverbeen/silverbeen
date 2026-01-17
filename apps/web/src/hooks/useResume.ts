@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { ResumeData } from "@/types/resume";
-import { config } from "@/config";
+import { api } from "@/lib/api";
 
 interface UseResumeResult {
   data: ResumeData | null;
@@ -21,16 +21,7 @@ export function useResume(): UseResumeResult {
     setError(null);
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/resume`);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Resume not found");
-        }
-        throw new Error(`Failed to fetch resume: ${response.status}`);
-      }
-
-      const resumeData = await response.json();
+      const resumeData = await api.resume.get();
       setData(resumeData);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Unknown error"));
