@@ -25,11 +25,15 @@ export class PostsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('tag') tag?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('order') order?: string,
   ) {
     return this.postsService.findAll({
       page: page ? parseInt(page, 10) : undefined,
       limit: limit ? parseInt(limit, 10) : undefined,
       tag,
+      sortBy: sortBy as 'createdAt' | 'viewCount' | 'title',
+      order: order as 'asc' | 'desc',
     });
   }
 
@@ -77,5 +81,10 @@ export class PostsController {
   @Post(':slug/view')
   async incrementView(@Param('slug') slug: string) {
     return this.postsService.incrementViewCount(slug);
+  }
+
+  @Get(':id/adjacent')
+  async getAdjacentPosts(@Param('id') id: string) {
+    return this.postsService.getAdjacentPosts(parseInt(id, 10));
   }
 }

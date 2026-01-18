@@ -1,5 +1,5 @@
 import { fetcher } from './client';
-import type { Tag, CreateTagDto } from '@/types/blog';
+import type { Tag, CreateTagDto } from '@/types/post';
 
 export const tagsApi = {
   getList: () => fetcher<Tag[]>('/tags'),

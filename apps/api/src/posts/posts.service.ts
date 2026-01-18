@@ -49,10 +49,18 @@ export class PostsService implements OnModuleInit {
     }
   }
 
-  async findAll(options?: { page?: number; limit?: number; tag?: string }) {
+  async findAll(options?: {
+    page?: number;
+    limit?: number;
+    tag?: string;
+    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    order?: 'asc' | 'desc';
+  }) {
     const page = options?.page || 1;
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
+    const sortBy = options?.sortBy || 'createdAt';
+    const order = options?.order || 'desc';
 
     const where: Record<string, unknown> = { published: true };
 
@@ -67,7 +75,7 @@ export class PostsService implements OnModuleInit {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: order },
         include: { tags: true },
       }),
       this.prisma.post.count({ where }),
@@ -191,5 +199,37 @@ export class PostsService implements OnModuleInit {
       where: { slug },
       data: { viewCount: { increment: 1 } },
     });
+  }
+
+  async getAdjacentPosts(id: number) {
+    const currentPost = await this.prisma.post.findUnique({
+      where: { id },
+      select: { createdAt: true, published: true },
+    });
+
+    if (!currentPost) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const [prevPost, nextPost] = await Promise.all([
+      this.prisma.post.findFirst({
+        where: {
+          published: true,
+          createdAt: { lt: currentPost.createdAt },
+        },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, title: true, slug: true },
+      }),
+      this.prisma.post.findFirst({
+        where: {
+          published: true,
+          createdAt: { gt: currentPost.createdAt },
+        },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, title: true, slug: true },
+      }),
+    ]);
+
+    return { prevPost, nextPost };
   }
 }

@@ -4,14 +4,23 @@ import type {
   PostListResponse,
   CreatePostDto,
   UpdatePostDto,
-} from '@/types/blog';
+  AdjacentPostsResponse,
+} from '@/types/post';
 
 export const postsApi = {
-  getList: (params?: { page?: number; limit?: number; tag?: string }) => {
+  getList: (params?: {
+    page?: number;
+    limit?: number;
+    tag?: string;
+    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    order?: 'asc' | 'desc';
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.limit) searchParams.set('limit', params.limit.toString());
     if (params?.tag) searchParams.set('tag', params.tag);
+    if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
+    if (params?.order) searchParams.set('order', params.order);
 
     const query = searchParams.toString();
     return fetcher<PostListResponse>(`/posts${query ? `?${query}` : ''}`);
@@ -50,4 +59,7 @@ export const postsApi = {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     }),
+
+  getAdjacent: (id: number, options?: { revalidate?: number }) =>
+    fetcher<AdjacentPostsResponse>(`/posts/${id}/adjacent`, { revalidate: options?.revalidate }),
 };
