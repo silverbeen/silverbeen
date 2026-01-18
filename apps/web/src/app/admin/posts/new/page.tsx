@@ -5,21 +5,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PostEditor } from '@/components/post/PostEditor';
 import { useAdminPosts } from '@/hooks/usePosts';
+import { useToast } from '@/components/ui';
 import type { CreatePostDto } from '@/types/post';
 
 export default function NewPostPage() {
   const router = useRouter();
   const { createPost } = useAdminPosts();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
 
   const handleSave = async (data: CreatePostDto) => {
     setSaving(true);
     try {
       const post = await createPost(data);
-      alert(data.published ? '글이 발행되었습니다.' : '임시저장되었습니다.');
+      toast(data.published ? '글이 발행되었습니다.' : '임시저장되었습니다.', 'success');
       router.push(`/admin/posts/${post.id}/edit`);
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast('저장에 실패했습니다.', 'error');
       console.error(err);
     } finally {
       setSaving(false);

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAdminPosts } from '@/hooks/usePosts';
+import { useToast } from '@/components/ui';
 import type { Post } from '@/types/post';
 
 function formatDate(dateString: string) {
@@ -15,6 +16,7 @@ function formatDate(dateString: string) {
 
 export default function AdminPostsPage() {
   const { posts, loading, error, deletePost } = useAdminPosts();
+  const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = async (post: Post) => {
@@ -23,8 +25,9 @@ export default function AdminPostsPage() {
     setDeletingId(post.id);
     try {
       await deletePost(post.id);
+      toast('글이 삭제되었습니다.', 'success');
     } catch (err) {
-      alert('삭제에 실패했습니다.');
+      toast('삭제에 실패했습니다.', 'error');
       console.error(err);
     } finally {
       setDeletingId(null);

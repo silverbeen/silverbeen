@@ -1,35 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { PostEditor } from '@/components/post/PostEditor';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/components/ui';
 import type { Post, CreatePostDto } from '@/types/post';
 
 export default function EditPostPage() {
   const params = useParams();
   const id = parseInt(params.id as string, 10);
+  const { toast } = useToast();
 
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.access_token) {
-          throw new Error('Not authenticated');
-        }
-
-        const posts = await api.blogs.getAdminList(session.access_token);
-        const foundPost = posts.find((p) => p.id === id);
+        const foundPost = await api.blogs.getById(id);
 
         if (!foundPost) {
           throw new Error('Post not found');
@@ -44,7 +38,7 @@ export default function EditPostPage() {
     };
 
     fetchPost();
-  }, [id, supabase.auth]);
+  }, [id]);
 
   const handleSave = async (data: CreatePostDto) => {
     setSaving(true);
@@ -58,9 +52,9 @@ export default function EditPostPage() {
 
       const updatedPost = await api.blogs.update(id, data, session.access_token);
       setPost(updatedPost);
-      alert(data.published ? '글이 발행되었습니다.' : '저장되었습니다.');
+      toast(data.published ? '글이 발행되었습니다.' : '저장되었습니다.', 'success');
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast('저장에 실패했습니다.', 'error');
       console.error(err);
     } finally {
       setSaving(false);
