@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export function CodeBlockCopy() {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
   useEffect(() => {
     const addCopyButtons = () => {
       const codeBlocks = document.querySelectorAll('.prose pre');
