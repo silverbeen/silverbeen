@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { TagSelector } from './TagSelector';
 import { useTags } from '@/hooks/useTags';
+import { useToast } from '@/components/ui';
 import type { CreatePostDto, Post } from '@/types/post';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
@@ -16,6 +17,7 @@ interface PostEditorProps {
 
 export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const { tags, loading: tagsLoading, createTag } = useTags();
+  const { toast } = useToast();
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
@@ -27,11 +29,11 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
 
   const handleSave = async (shouldPublish: boolean) => {
     if (!title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast('제목을 입력해주세요.', 'warning');
       return;
     }
     if (!content.trim()) {
-      alert('내용을 입력해주세요.');
+      toast('내용을 입력해주세요.', 'warning');
       return;
     }
 
