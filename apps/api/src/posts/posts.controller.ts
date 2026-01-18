@@ -1,16 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, UpdatePostDto, GetPostsQueryDto } from './dto';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -21,19 +11,13 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('tag') tag?: string,
-    @Query('sortBy') sortBy?: string,
-    @Query('order') order?: string,
-  ) {
+  async findAll(@Query() query: GetPostsQueryDto) {
     return this.postsService.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-      tag,
-      sortBy: sortBy as 'createdAt' | 'viewCount' | 'title',
-      order: order as 'asc' | 'desc',
+      page: query.page,
+      limit: query.limit,
+      tag: query.tag,
+      sortBy: query.sortBy,
+      order: query.order,
     });
   }
 
@@ -55,10 +39,7 @@ export class PostsController {
 
   @Post()
   @UseGuards(SupabaseGuard, AdminGuard)
-  async create(
-    @CurrentUser() user: AuthUser,
-    @Body() createPostDto: CreatePostDto,
-  ) {
+  async create(@CurrentUser() user: AuthUser, @Body() createPostDto: CreatePostDto) {
     return this.postsService.create(user.id, createPostDto);
   }
 
