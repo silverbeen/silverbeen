@@ -14,6 +14,7 @@ import { PostActions } from '@/components/post/PostActions';
 import { PostNavigation } from '@/components/post/PostNavigation';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { WritePostButton } from '@/components/post/WritePostButton';
+import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -171,6 +172,7 @@ export default async function BlogPage({ params }: PageProps) {
           )}
 
           <div className="prose prose-lg dark:prose-invert mb-12 max-w-none">
+            <CodeBlockCopy />
             <MDXRemote
               source={blog.content}
               options={{
