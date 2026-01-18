@@ -3,8 +3,16 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 
+// 빌드 시점에 prerender 방지 - 인증이 필요한 페이지
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
   const supabase = await createClient();
+
+  if (!supabase) {
+    redirect('/admin/login');
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
