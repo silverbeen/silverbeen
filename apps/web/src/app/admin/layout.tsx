@@ -1,11 +1,15 @@
+import { ToastProvider } from '@/components/ui';
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="admin-layout">
-      {children}
-    </div>
+    <ToastProvider>
+      <div className="admin-layout">
+        {children}
+      </div>
+    </ToastProvider>
   );
 }

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+.turbo/
+build/
+
+# Generated files
+*.generated.*
+prisma/migrations/
+
+# Package manager
+pnpm-lock.yaml
+
+# IDE
+.idea/
+.vscode/
+
+# Coverage
+coverage/
+
+# Misc
+*.min.js
+*.min.css

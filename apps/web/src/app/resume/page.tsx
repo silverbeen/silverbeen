@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { ResumeData } from "@/types/resume";
 import resumeData from "@/data/resume.json";
 import { ResumeContent } from "./ResumeContent";
+import { ScrollToTopButton } from "@/components/post/ScrollToTopButton";
 import { api, ApiError } from "@/lib/api";
 
 async function getResumeData(): Promise<ResumeData | null> {
@@ -65,6 +66,7 @@ export default async function ResumePage() {
     <>
       <ResumeContent data={data} />
       <JsonLd data={data} />
+      <ScrollToTopButton />
     </>
   );
 }

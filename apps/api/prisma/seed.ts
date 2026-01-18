@@ -15,8 +15,6 @@ async function main() {
     update: { content: resumeData },
     create: { id: 'main', content: resumeData },
   });
-
-  console.log('Resume data seeded successfully!');
 }
 
 main()

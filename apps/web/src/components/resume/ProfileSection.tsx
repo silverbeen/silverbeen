@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Mail, Phone, Github, BookOpen } from "lucide-react";
-import { motion } from "framer-motion";
-import type { Profile } from "@/types/resume";
+import { useState, useEffect } from 'react';
+import { Mail, Phone, Github, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { Profile } from '@/types/resume';
 
 // 타이핑 효과 컴포넌트
 function TypingEffect({ text, className }: { text: string; className?: string }) {
-  const [displayedText, setDisplayedText] = useState("");
+  const [displayedText, setDisplayedText] = useState('');
   const [isPlaying, setIsPlaying] = useState(true);
   const isComplete = displayedText.length >= text.length;
 
@@ -23,8 +23,44 @@ function TypingEffect({ text, className }: { text: string; className?: string })
   }, [displayedText, text, isPlaying]);
 
   const handleClick = () => {
-    setDisplayedText("");
+    setDisplayedText('');
     setIsPlaying(true);
+  };
+
+  // 마침표: 메인 컬러, 강은빈: 물결 밑줄
+  const renderStyledText = (text: string) => {
+    const targetName = '강은빈';
+    const parts: React.ReactNode[] = [];
+    let currentIndex = 0;
+
+    while (currentIndex < text.length) {
+      if (text.slice(currentIndex).startsWith(targetName)) {
+        // TODO: 물결 밑줄 스타일 (disabled)
+        // style={{
+        //   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 12'%3E%3Cpath d='M0 6 Q8 2, 17 6 T35 6 T52 6 T70 6' stroke='%23514EF6' stroke-width='4.5' fill='none' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M2 6.5 Q10 3, 19 6.5 T37 6.5 T54 6.5 T70 6.5' stroke='%23514EF6' stroke-width='2' fill='none' stroke-linecap='round' opacity='0.4'/%3E%3Cpath d='M0 5.5 Q9 2.5, 18 5.5 T36 5.5 T53 5.5 T70 5.5' stroke='%23514EF6' stroke-width='1' fill='none' stroke-linecap='round' opacity='0.25'/%3E%3C/svg%3E")`,
+        //   backgroundRepeat: 'repeat-x',
+        //   backgroundPosition: 'bottom',
+        //   backgroundSize: '70px 12px',
+        //   paddingBottom: '9px',
+        // }}
+        parts.push(<span key={currentIndex}>{targetName}</span>);
+        currentIndex += targetName.length;
+      } else {
+        const char = text[currentIndex];
+        if (char === '.') {
+          parts.push(
+            <span key={currentIndex} className="text-primary">
+              {char}
+            </span>
+          );
+        } else {
+          parts.push(<span key={currentIndex}>{char}</span>);
+        }
+        currentIndex++;
+      }
+    }
+
+    return parts;
   };
 
   return (
@@ -36,12 +72,12 @@ function TypingEffect({ text, className }: { text: string; className?: string })
       onClick={handleClick}
       title="클릭하여 다시 재생"
     >
-      {displayedText}
+      {renderStyledText(displayedText)}
       {!isComplete && (
         <motion.span
-          className="inline-block w-1 h-[1em] bg-primary ml-1 align-middle"
+          className="bg-primary ml-1 inline-block h-[1em] w-1 align-middle"
           animate={{ opacity: [1, 0] }}
-          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+          transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
         />
       )}
     </motion.h1>
@@ -77,7 +113,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: "easeOut" as const,
+      ease: 'easeOut' as const,
     },
   },
 };
@@ -89,7 +125,7 @@ const imageVariants = {
     scale: 1,
     transition: {
       duration: 0.6,
-      ease: "easeOut" as const,
+      ease: 'easeOut' as const,
     },
   },
 };
@@ -105,19 +141,10 @@ function DefaultImage({
   className?: string;
   priority?: boolean;
 }) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={`${className || ""} object-cover w-full h-full`}
-    />
-  );
+  return <img src={src} alt={alt} className={`${className || ''} h-full w-full object-cover`} />;
 }
 
-export function ProfileSection({
-  profile,
-  ImageComponent = DefaultImage,
-}: ProfileSectionProps) {
+export function ProfileSection({ profile, ImageComponent = DefaultImage }: ProfileSectionProps) {
   return (
     <motion.section
       id="profile"
@@ -131,14 +158,11 @@ export function ProfileSection({
           {profile.greeting && (
             <TypingEffect
               text={profile.greeting}
-              className="text-[50px] font-bold text-foreground"
+              className="text-foreground text-[50px] font-bold"
             />
           )}
           {profile.tagline && (
-            <motion.p
-              className="text-lg font-medium text-foreground/90"
-              variants={itemVariants}
-            >
+            <motion.p className="text-foreground/90 text-lg font-medium" variants={itemVariants}>
               {profile.tagline}
             </motion.p>
           )}
@@ -146,10 +170,10 @@ export function ProfileSection({
 
         {profile.introduction && (
           <motion.div
-            className="max-w-2xl space-y-3 text-[15px] leading-relaxed text-foreground/70"
+            className="text-foreground/70 max-w-2xl space-y-3 text-[15px] leading-relaxed"
             variants={itemVariants}
           >
-            {profile.introduction.split("\n\n").map((paragraph, idx) => (
+            {profile.introduction.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="whitespace-pre-line">
                 {paragraph}
               </p>
@@ -161,7 +185,7 @@ export function ProfileSection({
           {profile.phone && (
             <motion.a
               href={`tel:${profile.phone}`}
-              className="w-fit flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
               whileHover={{ x: 4 }}
               transition={{ duration: 0.2 }}
             >
@@ -171,7 +195,7 @@ export function ProfileSection({
           )}
           <motion.a
             href={`mailto:${profile.email}`}
-            className="w-fit flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
             whileHover={{ x: 4 }}
             transition={{ duration: 0.2 }}
           >
@@ -182,7 +206,7 @@ export function ProfileSection({
             href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-fit flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
             whileHover={{ x: 4 }}
             transition={{ duration: 0.2 }}
           >
@@ -193,7 +217,7 @@ export function ProfileSection({
             href={profile.blog}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-fit flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
             whileHover={{ x: 4 }}
             transition={{ duration: 0.2 }}
           >
@@ -204,7 +228,7 @@ export function ProfileSection({
       </motion.div>
       {profile.photo && (
         <motion.div
-          className="relative h-52 w-40 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-64 sm:w-48"
+          className="bg-muted relative h-52 w-40 shrink-0 overflow-hidden rounded-lg sm:h-64 sm:w-48"
           variants={imageVariants}
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
