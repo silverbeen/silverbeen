@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BookOpen, FileText, Moon, Sun } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { BookOpen, FileText, Moon, Sun, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/resume", label: "Resume", icon: FileText },
@@ -13,12 +14,31 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
+
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   // 어드민 페이지에서는 헤더 숨김
   if (pathname.startsWith('/admin')) {
@@ -77,6 +97,18 @@ export function Header() {
               <div className="h-4 w-4" />
             )}
           </button>
+
+          {/* Logout Button */}
+          {isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="ml-2 flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+              aria-label="Logout"
+              title="로그아웃"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
         </nav>
       </div>
     </header>
