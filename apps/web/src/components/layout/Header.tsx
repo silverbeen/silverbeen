@@ -20,6 +20,11 @@ export function Header() {
     setMounted(true);
   }, []);
 
+  // 어드민 페이지에서는 헤더 숨김
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-6">
