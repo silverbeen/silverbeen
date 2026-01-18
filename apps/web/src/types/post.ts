@@ -48,3 +48,14 @@ export interface UpdatePostDto {
 export interface CreateTagDto {
   name: string;
 }
+
+export interface AdjacentPost {
+  id: number;
+  title: string;
+  slug: string;
+}
+
+export interface AdjacentPostsResponse {
+  prevPost: AdjacentPost | null;
+  nextPost: AdjacentPost | null;
+}

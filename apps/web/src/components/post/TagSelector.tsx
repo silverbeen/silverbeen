@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Tag } from '@/types/blog';
+import type { Tag } from '@/types/post';
 
 interface TagSelectorProps {
   tags: Tag[];

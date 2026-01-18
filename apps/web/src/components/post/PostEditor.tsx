@@ -4,17 +4,17 @@ import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { TagSelector } from './TagSelector';
 import { useTags } from '@/hooks/useTags';
-import type { CreatePostDto, Post } from '@/types/blog';
+import type { CreatePostDto, Post } from '@/types/post';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
-interface BlogEditorProps {
+interface PostEditorProps {
   initialData?: Post;
   onSave: (data: CreatePostDto) => Promise<void>;
   saving?: boolean;
 }
 
-export function BlogEditor({ initialData, onSave, saving }: BlogEditorProps) {
+export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const { tags, loading: tagsLoading, createTag } = useTags();
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');

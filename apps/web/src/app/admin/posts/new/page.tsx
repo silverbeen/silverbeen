@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BlogEditor } from '@/components/blog/BlogEditor';
+import { PostEditor } from '@/components/post/PostEditor';
 import { useAdminPosts } from '@/hooks/usePosts';
-import type { CreatePostDto } from '@/types/blog';
+import type { CreatePostDto } from '@/types/post';
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function NewPostPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8">
         <div className="mb-8">
           <Link
             href="/admin/posts"
@@ -42,7 +42,7 @@ export default function NewPostPage() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-          <BlogEditor onSave={handleSave} saving={saving} />
+          <PostEditor onSave={handleSave} saving={saving} />
         </div>
       </div>
     </div>

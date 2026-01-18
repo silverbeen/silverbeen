@@ -29,12 +29,10 @@ export function ViewCounter({ slug, initialCount }: ViewCounterProps) {
     hasIncremented.current = true;
     localStorage.setItem(viewedKey, now.toString());
 
-    api.posts.incrementView(slug).catch(console.error);
+    api.blogs.incrementView(slug).catch(console.error);
   }, [slug]);
 
   return (
-    <span className="text-gray-500 dark:text-gray-400">
-      {initialCount.toLocaleString()} views
-    </span>
+    <span className="text-gray-500 dark:text-gray-400">{initialCount.toLocaleString()} views</span>
   );
 }

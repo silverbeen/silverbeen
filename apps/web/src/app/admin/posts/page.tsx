@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAdminPosts } from '@/hooks/usePosts';
-import type { Post } from '@/types/blog';
+import type { Post } from '@/types/post';
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('ko-KR', {

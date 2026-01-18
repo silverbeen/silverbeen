@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { BlogEditor } from '@/components/blog/BlogEditor';
+import { PostEditor } from '@/components/post/PostEditor';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
-import type { Post, CreatePostDto } from '@/types/blog';
+import type { Post, CreatePostDto } from '@/types/post';
 
 export default function EditPostPage() {
   const params = useParams();
@@ -21,12 +21,14 @@ export default function EditPostPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session?.access_token) {
           throw new Error('Not authenticated');
         }
 
-        const posts = await api.posts.getAdminList(session.access_token);
+        const posts = await api.blogs.getAdminList(session.access_token);
         const foundPost = posts.find((p) => p.id === id);
 
         if (!foundPost) {
@@ -47,12 +49,14 @@ export default function EditPostPage() {
   const handleSave = async (data: CreatePostDto) => {
     setSaving(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
 
-      const updatedPost = await api.posts.update(id, data, session.access_token);
+      const updatedPost = await api.blogs.update(id, data, session.access_token);
       setPost(updatedPost);
       alert(data.published ? '글이 발행되었습니다.' : '저장되었습니다.');
     } catch (err) {
@@ -65,11 +69,11 @@ export default function EditPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+        <div className="mx-auto max-w-7xl">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded" />
+            <div className="h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-96 rounded bg-gray-200 dark:bg-gray-700" />
           </div>
         </div>
       </div>
@@ -78,11 +82,11 @@ export default function EditPostPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+        <div className="mx-auto max-w-7xl">
           <Link
             href="/admin/posts"
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-4 inline-block"
+            className="mb-4 inline-block text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             ← 글 목록으로 돌아가기
           </Link>
@@ -96,23 +100,21 @@ export default function EditPostPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto p-8">
+      <div className="mx-auto max-w-7xl p-8">
         <div className="mb-8">
           <Link
             href="/admin/posts"
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-2 inline-block"
+            className="mb-2 inline-block text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             ← 글 목록으로 돌아가기
           </Link>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              글 수정
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">글 수정</h1>
             {post.published && (
               <Link
                 href={`/post/${post.id}`}
                 target="_blank"
-                className="text-sm text-primary-500 hover:text-primary-600"
+                className="text-primary-500 hover:text-primary-600 text-sm"
               >
                 게시글 보기 →
               </Link>
@@ -120,8 +122,8 @@ export default function EditPostPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-          <BlogEditor initialData={post} onSave={handleSave} saving={saving} />
+        <div className="rounded-xl bg-white p-6 shadow dark:bg-gray-800">
+          <PostEditor initialData={post} onSave={handleSave} saving={saving} />
         </div>
       </div>
     </div>

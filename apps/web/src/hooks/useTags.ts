@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
-import type { Tag, CreateTagDto } from '@/types/blog';
+import type { Tag, CreateTagDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
 
 export function useTags() {

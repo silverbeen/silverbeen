@@ -315,11 +315,12 @@
 .prose thead {
   border-bottom-width: 1px;
   border-bottom-color: var(--border);
+  background-color: var(--muted);
 }
 
 .prose thead th {
   font-weight: 600;
-  padding: 0 0.5714286em 0.5714286em;
+  padding: 0.75em 0.5714286em;
   vertical-align: bottom;
 }
 

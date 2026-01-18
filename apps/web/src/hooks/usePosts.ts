@@ -2,10 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
-import type { Post, PostListResponse, CreatePostDto, UpdatePostDto } from '@/types/blog';
+import type { Post, PostListResponse, CreatePostDto, UpdatePostDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
 
-export function usePosts(params?: { tag?: string; page?: number }) {
+export function usePosts(params?: {
+  tag?: string;
+  page?: number;
+  sortBy?: 'createdAt' | 'viewCount' | 'title';
+  order?: 'asc' | 'desc';
+}) {
   const [data, setData] = useState<PostListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -13,9 +18,11 @@ export function usePosts(params?: { tag?: string; page?: number }) {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.posts.getList({
+      const response = await api.blogs.getList({
         page: params?.page,
         tag: params?.tag,
+        sortBy: params?.sortBy,
+        order: params?.order,
       });
       setData(response);
       setError(null);
@@ -24,7 +31,7 @@ export function usePosts(params?: { tag?: string; page?: number }) {
     } finally {
       setLoading(false);
     }
-  }, [params?.page, params?.tag]);
+  }, [params?.page, params?.tag, params?.sortBy, params?.order]);
 
   useEffect(() => {
     fetchPosts();
@@ -42,7 +49,7 @@ export function usePost(slug: string) {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const response = await api.posts.getBySlug(slug);
+        const response = await api.blogs.getBySlug(slug);
         setPost(response);
         setError(null);
       } catch (err) {
@@ -69,11 +76,13 @@ export function useAdminPosts() {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
-      const response = await api.posts.getAdminList(session.access_token);
+      const response = await api.blogs.getAdminList(session.access_token);
       setPosts(response);
       setError(null);
     } catch (err) {
@@ -88,33 +97,37 @@ export function useAdminPosts() {
   }, [fetchPosts]);
 
   const createPost = async (data: CreatePostDto) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session?.access_token) {
       throw new Error('Not authenticated');
     }
-    const newPost = await api.posts.create(data, session.access_token);
+    const newPost = await api.blogs.create(data, session.access_token);
     setPosts((prev) => [newPost, ...prev]);
     return newPost;
   };
 
   const updatePost = async (id: number, data: UpdatePostDto) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session?.access_token) {
       throw new Error('Not authenticated');
     }
-    const updatedPost = await api.posts.update(id, data, session.access_token);
-    setPosts((prev) =>
-      prev.map((post) => (post.id === id ? updatedPost : post))
-    );
+    const updatedPost = await api.blogs.update(id, data, session.access_token);
+    setPosts((prev) => prev.map((post) => (post.id === id ? updatedPost : post)));
     return updatedPost;
   };
 
   const deletePost = async (id: number) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session?.access_token) {
       throw new Error('Not authenticated');
     }
-    await api.posts.delete(id, session.access_token);
+    await api.blogs.delete(id, session.access_token);
     setPosts((prev) => prev.filter((post) => post.id !== id));
   };
 
