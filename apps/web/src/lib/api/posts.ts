@@ -8,13 +8,16 @@ import type {
 } from '@/types/post';
 
 export const postsApi = {
-  getList: (params?: {
-    page?: number;
-    limit?: number;
-    tag?: string;
-    sortBy?: 'createdAt' | 'viewCount' | 'title';
-    order?: 'asc' | 'desc';
-  }) => {
+  getList: (
+    params?: {
+      page?: number;
+      limit?: number;
+      tag?: string;
+      sortBy?: 'createdAt' | 'viewCount' | 'title';
+      order?: 'asc' | 'desc';
+    },
+    options?: { revalidate?: number }
+  ) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.limit) searchParams.set('limit', params.limit.toString());
@@ -23,7 +26,9 @@ export const postsApi = {
     if (params?.order) searchParams.set('order', params.order);
 
     const query = searchParams.toString();
-    return fetcher<PostListResponse>(`/posts${query ? `?${query}` : ''}`);
+    return fetcher<PostListResponse>(`/posts${query ? `?${query}` : ''}`, {
+      revalidate: options?.revalidate,
+    });
   },
 
   getBySlug: (slug: string, options?: { revalidate?: number }) =>

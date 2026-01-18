@@ -18,12 +18,15 @@ export function usePosts(params?: {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.blogs.getList({
-        page: params?.page,
-        tag: params?.tag,
-        sortBy: params?.sortBy,
-        order: params?.order,
-      });
+      const response = await api.blogs.getList(
+        {
+          page: params?.page,
+          tag: params?.tag,
+          sortBy: params?.sortBy,
+          order: params?.order,
+        },
+        { revalidate: 60 }
+      );
       setData(response);
       setError(null);
     } catch (err) {
