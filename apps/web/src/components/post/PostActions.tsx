@@ -62,7 +62,7 @@ export function PostActions({ postId, postTitle }: PostActionsProps) {
         throw new Error('Not authenticated');
       }
 
-      await api.posts.delete(postId, session.access_token);
+      await api.blogs.delete(postId, session.access_token);
       router.push('/blog');
       router.refresh();
     } catch (error) {
