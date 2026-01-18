@@ -74,3 +74,18 @@
 - Supabase 크레덴셜은 절대 커밋하지 않기
 - API 키는 서버 사이드에서만 사용
 - 이미지는 Supabase Storage 또는 외부 CDN 사용
+
+## 패턴 문서 활용
+
+새 기능 개발 시 `/docs/patterns/index.md`를 읽고 해당 상황에 맞는 패턴 파일을 참조하세요.
+
+| 상황 | 참조 파일 |
+|------|----------|
+| 새 컴포넌트 만들기 | `docs/patterns/frontend/component.md` |
+| 새 페이지 만들기 | `docs/patterns/frontend/page.md` |
+| 커스텀 훅 만들기 | `docs/patterns/frontend/hook.md` |
+| API 호출 함수 추가 | `docs/patterns/frontend/api-client.md` |
+| 폼 컴포넌트 만들기 | `docs/patterns/frontend/form.md` |
+| 새 API 모듈 만들기 | `docs/patterns/backend/module.md` |
+| DB 테이블 추가 | `docs/patterns/database/schema.md` |
+| 타입 정의 추가 | `docs/patterns/shared/types.md` |
