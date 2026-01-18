@@ -175,6 +175,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  select,
+  label,
+  a,
+  summary {
+    cursor: pointer;
+  }
 }
 
 /* Prose styles for markdown content */
@@ -345,4 +356,40 @@
 
 .dark .prose pre {
   background-color: #0f172a;
+}
+
+/* Code block copy button */
+.copy-code-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 0.375rem;
+  color: #94a3b8;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.prose pre:hover .copy-code-button {
+  opacity: 1;
+}
+
+.copy-code-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
+
+.copy-code-button:active {
+  transform: scale(0.95);
+}
+
+.copy-code-button .hidden {
+  display: none;
 }
