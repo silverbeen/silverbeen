@@ -46,3 +46,25 @@ export function calculateDuration(
 export function formatPeriod(startDate: string, endDate?: string): string {
   return endDate ? `${startDate} - ${endDate}` : `${startDate} - 재직중`;
 }
+
+/**
+ * ISO 날짜 문자열을 한국어 형식으로 변환 (예: 2024년 1월 15일)
+ */
+export function formatDateKorean(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/**
+ * ISO 날짜 문자열을 짧은 한국어 형식으로 변환 (예: 2024년 1월 15일)
+ */
+export function formatDateShort(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}

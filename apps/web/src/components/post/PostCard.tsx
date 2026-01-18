@@ -1,40 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Post } from '@/types/post';
+import { formatDateShort } from '@/utils/date';
+import { getReadingTime, getPreview } from '@/utils/post';
 
 interface PostCardProps {
   post: Post;
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function getReadingTime(content: string): number {
-  const wordsPerMinute = 200;
-  const words = content.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / wordsPerMinute));
-}
-
-function getPreview(content: string, maxLength: number = 120): string {
-  const plainText = content
-    .replace(/#{1,6}\s/g, '')
-    .replace(/\*\*|__/g, '')
-    .replace(/\*|_/g, '')
-    .replace(/`{1,3}[^`]*`{1,3}/g, '')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
-    .replace(/>\s/g, '')
-    .replace(/-\s/g, '')
-    .replace(/\n+/g, ' ')
-    .trim();
-
-  if (plainText.length <= maxLength) return plainText;
-  return plainText.slice(0, maxLength).trim() + '...';
 }
 
 export function PostCard({ post }: PostCardProps) {
@@ -135,7 +106,7 @@ export function PostCard({ post }: PostCardProps) {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {formatDate(post.createdAt)}
+              {formatDateShort(post.createdAt)}
             </time>
             {post.coverImage && (
               <>

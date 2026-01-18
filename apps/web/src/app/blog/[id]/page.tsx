@@ -15,6 +15,8 @@ import { PostNavigation } from '@/components/post/PostNavigation';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { WritePostButton } from '@/components/post/WritePostButton';
 import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
+import { formatDateKorean } from '@/utils/date';
+import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -45,20 +47,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: '글을 찾을 수 없습니다',
     };
   }
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-function getReadingTime(content: string): number {
-  const wordsPerMinute = 200;
-  const words = content.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / wordsPerMinute));
 }
 
 export default async function BlogPage({ params }: PageProps) {
@@ -94,7 +82,7 @@ export default async function BlogPage({ params }: PageProps) {
           <div className="flex min-w-0 flex-1 items-center gap-4">
             <Link
               href="/blog"
-              className="flex-shrink-0 text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+              className="hover:text-primary-500 dark:hover:text-primary-400 flex-shrink-0 text-gray-400 transition-colors dark:text-gray-500"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -115,7 +103,7 @@ export default async function BlogPage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl px-6 py-12">
         {/* Floating ToC - Right Side */}
-        <aside className="fixed top-30 right-[max(1rem,calc(50%-38rem))] z-30 hidden w-40 xl:block">
+        <aside className="fixed top-40 right-[max(1rem,calc(50%-38rem))] z-30 hidden w-40 xl:block">
           <div className="sticky top-24">
             <TableOfContents content={blog.content} />
           </div>
@@ -146,7 +134,7 @@ export default async function BlogPage({ params }: PageProps) {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                {formatDate(blog.createdAt)}
+                {formatDateKorean(blog.createdAt)}
               </time>
               <span className="text-gray-300 dark:text-gray-600">·</span>
               <span className="flex items-center gap-1.5">
