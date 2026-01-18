@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Tag } from '@/types/post';
 
 interface TagSelectorProps {
@@ -21,6 +21,11 @@ export function TagSelector({
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [creating, setCreating] = useState(false);
+  const selectedTagIdsRef = useRef(selectedTagIds);
+
+  useEffect(() => {
+    selectedTagIdsRef.current = selectedTagIds;
+  }, [selectedTagIds]);
 
   const toggleTag = (tagId: string) => {
     if (selectedTagIds.includes(tagId)) {
@@ -36,7 +41,7 @@ export function TagSelector({
     setCreating(true);
     try {
       const newTag = await onCreateTag(newTagName.trim());
-      onTagsChange([...selectedTagIds, newTag.id]);
+      onTagsChange([...selectedTagIdsRef.current, newTag.id]);
       setNewTagName('');
     } catch {
       alert('태그 생성에 실패했습니다.');
@@ -59,7 +64,7 @@ export function TagSelector({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        aria-haspopup="listbox"
+        aria-haspopup="dialog"
         className="min-h-[42px] w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex flex-wrap gap-1 items-center text-left"
       >
         {selectedTags.length === 0 ? (
@@ -77,6 +82,8 @@ export function TagSelector({
                   e.stopPropagation();
                   toggleTag(tag.id);
                 }}
+                aria-label={`${tag.name} 태그 제거`}
+                title={`${tag.name} 태그 제거`}
                 className="ml-1 hover:text-primary-900 dark:hover:text-primary-100"
               >
                 ×
@@ -92,7 +99,11 @@ export function TagSelector({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div
+            role="dialog"
+            aria-label="태그 선택"
+            className="absolute top-full left-0 right-0 mt-1 z-20 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+          >
             <div className="p-2 border-b border-gray-200 dark:border-gray-700">
               <div className="flex gap-2">
                 <input

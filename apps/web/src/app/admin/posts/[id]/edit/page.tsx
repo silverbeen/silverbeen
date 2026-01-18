@@ -11,7 +11,9 @@ import type { Post, CreatePostDto } from '@/types/post';
 
 export default function EditPostPage() {
   const params = useParams();
-  const id = parseInt(params.id as string, 10);
+  const rawId = params.id as string;
+  const isValidId = typeof rawId === 'string' && /^\d+$/.test(rawId);
+  const id = isValidId ? parseInt(rawId, 10) : NaN;
   const { toast } = useToast();
 
   const [post, setPost] = useState<Post | null>(null);
@@ -21,6 +23,12 @@ export default function EditPostPage() {
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    if (!isValidId || isNaN(id)) {
+      setError(new Error('Invalid post id'));
+      setLoading(false);
+      return;
+    }
+
     const fetchPost = async () => {
       try {
         const foundPost = await api.blogs.getById(id);
@@ -38,7 +46,7 @@ export default function EditPostPage() {
     };
 
     fetchPost();
-  }, [id]);
+  }, [id, isValidId]);
 
   const handleSave = async (data: CreatePostDto) => {
     setSaving(true);
