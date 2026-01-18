@@ -24,7 +24,6 @@ export function PostActions({ postId, postTitle }: PostActionsProps) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log(user);
 
       if (user) {
         const isAdmin = user.user_metadata?.role === 'admin';
