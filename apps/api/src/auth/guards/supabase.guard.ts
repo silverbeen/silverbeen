@@ -13,7 +13,7 @@ export class SupabaseGuard extends AuthGuard('supabase') {
     info: Error | null,
   ): TUser {
     if (err || !user) {
-      throw err || new UnauthorizedException(info?.message || 'Unauthorized');
+      throw new UnauthorizedException(err?.message || info?.message || 'Unauthorized');
     }
     return user;
   }

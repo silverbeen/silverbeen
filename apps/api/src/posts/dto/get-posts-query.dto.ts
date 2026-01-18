@@ -3,13 +3,21 @@ import { Transform } from 'class-transformer';
 
 export class GetPostsQueryDto {
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }) => {
+    if (value == null || value === '') return undefined;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? undefined : parsed;
+  })
   @IsInt()
   @Min(1)
   page?: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }) => {
+    if (value == null || value === '') return undefined;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? undefined : parsed;
+  })
   @IsInt()
   @Min(1)
   limit?: number;

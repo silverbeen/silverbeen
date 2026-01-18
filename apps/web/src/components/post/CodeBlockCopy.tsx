@@ -31,17 +31,27 @@ export function CodeBlockCopy() {
           const code = pre.querySelector('code');
           if (code) {
             const text = code.textContent || '';
-            await navigator.clipboard.writeText(text);
-
             const copyIcon = button.querySelector('.copy-icon');
             const checkIcon = button.querySelector('.check-icon');
-            copyIcon?.classList.add('hidden');
-            checkIcon?.classList.remove('hidden');
 
-            setTimeout(() => {
+            try {
+              await navigator.clipboard.writeText(text);
+              copyIcon?.classList.add('hidden');
+              checkIcon?.classList.remove('hidden');
+
+              setTimeout(() => {
+                copyIcon?.classList.remove('hidden');
+                checkIcon?.classList.add('hidden');
+              }, 2000);
+            } catch (error) {
+              console.error('Failed to copy to clipboard:', error);
               copyIcon?.classList.remove('hidden');
               checkIcon?.classList.add('hidden');
-            }, 2000);
+              button.setAttribute('aria-label', '복사 실패');
+              setTimeout(() => {
+                button.removeAttribute('aria-label');
+              }, 2000);
+            }
           }
         });
 

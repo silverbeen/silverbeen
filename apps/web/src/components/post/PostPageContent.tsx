@@ -1,22 +1,26 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { usePosts } from '@/hooks/usePosts';
 import { TagFilter } from './TagFilter';
 import { SortSelector, type SortByType, type OrderType } from './SortSelector';
 import { PostsGrid } from './PostsGrid';
 import { Pagination } from './Pagination';
+import type { PostListResponse } from '@/types/post';
 
 export function PostPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [postsData, setPostsData] = useState<PostListResponse | null>(null);
 
   const tag = searchParams.get('tag');
   const page = parseInt(searchParams.get('page') || '1', 10);
   const sortBy = (searchParams.get('sortBy') || 'createdAt') as SortByType;
   const order = (searchParams.get('order') || 'desc') as OrderType;
 
-  const { data } = usePosts({ tag: tag || undefined, page, sortBy, order });
+  const handleDataLoaded = useCallback((data: PostListResponse | null) => {
+    setPostsData(data);
+  }, []);
 
   const updateParams = (
     newTag: string | null,
@@ -52,11 +56,11 @@ export function PostPageContent() {
         <TagFilter currentTag={tag} onTagChange={handleTagChange} />
         <SortSelector sortBy={sortBy} order={order} onSortChange={handleSortChange} />
       </div>
-      <PostsGrid tag={tag || undefined} page={page} sortBy={sortBy} order={order} />
-      {data && (
+      <PostsGrid tag={tag || undefined} page={page} sortBy={sortBy} order={order} onDataLoaded={handleDataLoaded} />
+      {postsData && (
         <Pagination
           currentPage={page}
-          totalPages={data.totalPages}
+          totalPages={postsData.totalPages}
           onPageChange={handlePageChange}
         />
       )}

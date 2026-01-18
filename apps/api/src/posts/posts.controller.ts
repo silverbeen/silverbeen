@@ -29,10 +29,9 @@ export class PostsController {
 
   @Get(':idOrSlug')
   async findByIdOrSlug(@Param('idOrSlug') idOrSlug: string) {
-    // 숫자인 경우 ID로 조회, 아닌 경우 slug로 조회
-    const id = parseInt(idOrSlug, 10);
-    if (!isNaN(id)) {
-      return this.postsService.findById(id);
+    // 전체 문자열이 숫자인 경우에만 ID로 조회, 아닌 경우 slug로 조회
+    if (/^\d+$/.test(idOrSlug)) {
+      return this.postsService.findById(parseInt(idOrSlug, 10));
     }
     return this.postsService.findBySlug(idOrSlug);
   }

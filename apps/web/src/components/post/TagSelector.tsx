@@ -55,9 +55,12 @@ export function TagSelector({
 
   return (
     <div className="relative">
-      <div
+      <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="min-h-[42px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex flex-wrap gap-1 items-center"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        className="min-h-[42px] w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex flex-wrap gap-1 items-center text-left"
       >
         {selectedTags.length === 0 ? (
           <span className="text-gray-400">태그를 선택하세요</span>
@@ -69,6 +72,7 @@ export function TagSelector({
             >
               {tag.name}
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleTag(tag.id);
@@ -80,7 +84,7 @@ export function TagSelector({
             </span>
           ))
         )}
-      </div>
+      </button>
 
       {isOpen && (
         <>

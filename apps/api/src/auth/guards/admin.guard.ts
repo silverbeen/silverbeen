@@ -16,11 +16,20 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // user_metadata.role에서 admin 권한 확인
-    const isAdmin =
-      user.role === 'ADMIN' ||
-      user.role === 'admin' ||
-      user.user_metadata?.role === 'admin';
+    // is_admin 플래그 또는 role 확인 (대소문자 구분 없음)
+    const isAdminFlag =
+      user.is_admin === true ||
+      user.is_admin === 'true' ||
+      user.is_admin === '1' ||
+      user.user_metadata?.is_admin === true ||
+      user.user_metadata?.is_admin === 'true' ||
+      user.user_metadata?.is_admin === '1';
+
+    const isAdminRole =
+      user.role?.toLowerCase() === 'admin' ||
+      user.user_metadata?.role?.toLowerCase() === 'admin';
+
+    const isAdmin = isAdminFlag || isAdminRole;
 
     if (!isAdmin) {
       throw new ForbiddenException('Admin access required');

@@ -8,8 +8,9 @@ export interface AuthUser {
   id: string;
   email: string;
   role: string;
+  is_admin?: boolean | string;
   user_metadata?: {
-    is_admin?: boolean;
+    is_admin?: boolean | string;
     role?: string;
     [key: string]: unknown;
   };

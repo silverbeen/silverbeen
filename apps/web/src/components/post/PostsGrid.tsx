@@ -1,18 +1,27 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePosts } from '@/hooks/usePosts';
 import { PostCard } from './PostCard';
 import type { SortByType, OrderType } from './SortSelector';
+import type { PostListResponse } from '@/types/post';
 
 interface PostsGridProps {
   tag?: string;
   page: number;
   sortBy: SortByType;
   order: OrderType;
+  onDataLoaded?: (data: PostListResponse | null) => void;
 }
 
-export function PostsGrid({ tag, page, sortBy, order }: PostsGridProps) {
+export function PostsGrid({ tag, page, sortBy, order, onDataLoaded }: PostsGridProps) {
   const { data, loading, error } = usePosts({ tag, page, sortBy, order });
+
+  useEffect(() => {
+    if (onDataLoaded) {
+      onDataLoaded(data);
+    }
+  }, [data, onDataLoaded]);
 
   if (loading) {
     return (

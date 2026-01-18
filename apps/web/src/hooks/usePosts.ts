@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '@/lib/api';
 import type { Post, PostListResponse, CreatePostDto, UpdatePostDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
@@ -74,7 +74,7 @@ export function useAdminPosts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -93,13 +93,13 @@ export function useAdminPosts() {
     } finally {
       setLoading(false);
     }
-  }, [supabase.auth]);
+  }, [supabase]);
 
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
 
-  const createPost = async (data: CreatePostDto) => {
+  const createPost = useCallback(async (data: CreatePostDto) => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -109,9 +109,9 @@ export function useAdminPosts() {
     const newPost = await api.blogs.create(data, session.access_token);
     setPosts((prev) => [newPost, ...prev]);
     return newPost;
-  };
+  }, [supabase]);
 
-  const updatePost = async (id: number, data: UpdatePostDto) => {
+  const updatePost = useCallback(async (id: number, data: UpdatePostDto) => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -121,9 +121,9 @@ export function useAdminPosts() {
     const updatedPost = await api.blogs.update(id, data, session.access_token);
     setPosts((prev) => prev.map((post) => (post.id === id ? updatedPost : post)));
     return updatedPost;
-  };
+  }, [supabase]);
 
-  const deletePost = async (id: number) => {
+  const deletePost = useCallback(async (id: number) => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -132,7 +132,7 @@ export function useAdminPosts() {
     }
     await api.blogs.delete(id, session.access_token);
     setPosts((prev) => prev.filter((post) => post.id !== id));
-  };
+  }, [supabase]);
 
   return {
     posts,
