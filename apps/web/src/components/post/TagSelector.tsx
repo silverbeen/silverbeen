@@ -110,6 +110,7 @@ export function TagSelector({
                   }}
                 />
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCreateTag();

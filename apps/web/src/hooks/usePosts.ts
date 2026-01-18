@@ -49,6 +49,13 @@ export function usePost(slug: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!slug) {
+      setPost(null);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     const fetchPost = async () => {
       try {
         setLoading(true);
@@ -62,9 +69,7 @@ export function usePost(slug: string) {
       }
     };
 
-    if (slug) {
-      fetchPost();
-    }
+    fetchPost();
   }, [slug]);
 
   return { post, loading, error };

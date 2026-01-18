@@ -14,9 +14,21 @@ export function PostPageContent() {
   const [postsData, setPostsData] = useState<PostListResponse | null>(null);
 
   const tag = searchParams.get('tag');
-  const page = parseInt(searchParams.get('page') || '1', 10);
-  const sortBy = (searchParams.get('sortBy') || 'createdAt') as SortByType;
-  const order = (searchParams.get('order') || 'desc') as OrderType;
+
+  const rawPage = parseInt(searchParams.get('page') || '1', 10);
+  const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+
+  const validSortBy: SortByType[] = ['createdAt', 'viewCount', 'title'];
+  const rawSortBy = searchParams.get('sortBy');
+  const sortBy: SortByType = validSortBy.includes(rawSortBy as SortByType)
+    ? (rawSortBy as SortByType)
+    : 'createdAt';
+
+  const validOrder: OrderType[] = ['asc', 'desc'];
+  const rawOrder = searchParams.get('order');
+  const order: OrderType = validOrder.includes(rawOrder as OrderType)
+    ? (rawOrder as OrderType)
+    : 'desc';
 
   const handleDataLoaded = useCallback((data: PostListResponse | null) => {
     setPostsData(data);

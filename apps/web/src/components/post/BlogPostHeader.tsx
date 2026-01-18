@@ -19,6 +19,7 @@ export function BlogPostHeader({ postId, postTitle }: BlogPostHeaderProps) {
           <div className="flex min-w-0 flex-1 items-center gap-4">
             <Link
               href="/blog"
+              aria-label="블로그 목록으로 돌아가기"
               className="hover:text-primary-500 dark:hover:text-primary-400 flex-shrink-0 text-gray-400 transition-colors dark:text-gray-500"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

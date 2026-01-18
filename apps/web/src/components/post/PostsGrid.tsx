@@ -19,9 +19,13 @@ export function PostsGrid({ tag, page, sortBy, order, onDataLoaded }: PostsGridP
 
   useEffect(() => {
     if (onDataLoaded) {
-      onDataLoaded(data);
+      if (error || !data) {
+        onDataLoaded(null);
+      } else {
+        onDataLoaded(data);
+      }
     }
-  }, [data, onDataLoaded]);
+  }, [data, error, onDataLoaded]);
 
   if (loading) {
     return (

@@ -17,6 +17,7 @@ export function CodeBlockCopy() {
         const button = document.createElement('button');
         button.className = 'copy-code-button';
         button.setAttribute('data-index', index.toString());
+        button.setAttribute('aria-label', '코드 복사');
         button.innerHTML = `
           <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -49,7 +50,7 @@ export function CodeBlockCopy() {
               checkIcon?.classList.add('hidden');
               button.setAttribute('aria-label', '복사 실패');
               setTimeout(() => {
-                button.removeAttribute('aria-label');
+                button.setAttribute('aria-label', '코드 복사');
               }, 2000);
             }
           }
