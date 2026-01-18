@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 
@@ -37,14 +38,17 @@ export default async function AdminPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <Link
+            href="/admin/posts"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 hover:shadow-lg transition-shadow block"
+          >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               블로그 관리
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               블로그 포스트를 작성하고 관리합니다.
             </p>
-          </div>
+          </Link>
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">

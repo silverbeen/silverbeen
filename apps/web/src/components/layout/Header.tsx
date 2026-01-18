@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/resume", label: "Resume", icon: FileText },
-  { href: "https://velog.io/@silverbeen", label: "Blog", icon: BookOpen, external: true },
+  { href: "/blog", label: "Blog", icon: BookOpen},
 ];
 
 export function Header() {
@@ -44,21 +44,6 @@ export function Header() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
-
-            if (item.external) {
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{item.label}</span>
-                </a>
-              );
-            }
 
             return (
               <Link
