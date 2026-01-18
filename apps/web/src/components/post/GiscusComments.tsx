@@ -22,16 +22,18 @@ export function GiscusComments({ slug }: GiscusCommentsProps) {
 
   if (!mounted) {
     return (
-      <div className="h-32 flex items-center justify-center text-gray-500 dark:text-gray-400">
+      <div className="flex h-32 items-center justify-center text-gray-500 dark:text-gray-400">
         댓글을 불러오는 중...
       </div>
     );
   }
 
   if (!GISCUS_REPO_ID || !GISCUS_CATEGORY_ID) {
-    console.error('Giscus configuration missing: NEXT_PUBLIC_GISCUS_REPO_ID and NEXT_PUBLIC_GISCUS_CATEGORY_ID must be set in .env.local');
+    console.error(
+      'Giscus configuration missing: NEXT_PUBLIC_GISCUS_REPO_ID and NEXT_PUBLIC_GISCUS_CATEGORY_ID must be set in .env.local',
+    );
     return (
-      <div className="h-32 flex items-center justify-center text-gray-500 dark:text-gray-400">
+      <div className="flex h-32 items-center justify-center text-gray-500 dark:text-gray-400">
         댓글을 불러올 수 없습니다.
       </div>
     );
@@ -42,7 +44,7 @@ export function GiscusComments({ slug }: GiscusCommentsProps) {
       id="comments"
       repo={GISCUS_REPO as `${string}/${string}`}
       repoId={GISCUS_REPO_ID}
-      category="Blog Comments"
+      category="Announcements"
       categoryId={GISCUS_CATEGORY_ID}
       mapping="specific"
       term={slug}
