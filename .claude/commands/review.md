@@ -8,10 +8,10 @@ PR에서 Gemini Code Assist 및 CodeRabbit의 코드 리뷰를 가져와 자동�
 
 ## 지원하는 AI 리뷰어
 
-| 리뷰어 | 봇 ID |
-|--------|-------|
+| 리뷰어             | 봇 ID                     |
+| ------------------ | ------------------------- |
 | Gemini Code Assist | `gemini-code-assist[bot]` |
-| CodeRabbit | `coderabbitai[bot]` |
+| CodeRabbit         | `coderabbitai[bot]`       |
 
 ## 작업 순서
 
@@ -27,6 +27,7 @@ AskUser로 다음 내용을 질문:
 ```
 
 현재 브랜치에서 PR 찾기:
+
 ```bash
 gh pr view --json number --jq '.number'
 ```
@@ -48,6 +49,7 @@ gh api repos/{owner}/{repo}/pulls/[PR번호]/comments
 ### 4단계: AI 코멘트 필터링
 
 응답에서 AI 리뷰어의 코멘트만 필터링:
+
 - `user.login`이 `gemini-code-assist[bot]` 또는 `coderabbitai[bot]`인 항목
 - `body`에서 제안 내용 추출
 - `path`에서 파일 경로 추출
@@ -85,6 +87,7 @@ GitHub suggestion 형식을 파싱하여 직접 적용:
 ```
 
 파싱 방법:
+
 1. `body`에서 ` ```suggestion ` 블록 찾기
 2. 블록 내 코드 추출
 3. `original_line` 위치의 코드를 suggestion 코드로 교체
@@ -92,6 +95,7 @@ GitHub suggestion 형식을 파싱하여 직접 적용:
 #### 일반 코멘트 처리
 
 suggestion 블록이 없는 경우:
+
 1. 코멘트 내용을 분석
 2. 제안 의도 파악 (리팩토링, 접근성, 성능 등)
 3. 적절한 수정 적용
@@ -127,8 +131,6 @@ refactor: AI 코드 리뷰 피드백 반영
 - [수정 사항 1]
 - [수정 사항 2]
 - [수정 사항 3]
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 EOF
 )"
 
@@ -162,17 +164,20 @@ PR: [PR URL]
 ## 에러 처리
 
 ### PR을 찾을 수 없음
+
 ```text
 PR #[번호]를 찾을 수 없습니다.
 PR 번호를 확인해주세요.
 ```
 
 ### AI 리뷰가 없음
+
 ```text
 해당 PR에 AI 코드 리뷰가 없습니다.
 ```
 
 ### 파일을 찾을 수 없음
+
 ```text
 [파일명] 파일을 찾을 수 없습니다.
 파일이 삭제되었거나 경로가 변경되었을 수 있습니다.
