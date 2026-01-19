@@ -8,3 +8,4 @@
 - 범위: 해당되는 경우 (선택적)
 - 설명: 변경사항의 핵심 요약
 - 커밋 메시지 마지막 Generated with Claude Code 포함 아래 부분 제거
+- 커밋 메세지에 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com> 포함하지 말 것
