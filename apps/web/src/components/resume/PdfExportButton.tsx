@@ -1,57 +1,81 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useResumePdf } from "@/hooks/useResumePdf";
-import { ResumePdfContent } from "./ResumePdfContent";
-import type { ResumeData } from "@/types/resume";
+import { createClient } from "@/lib/supabase/client";
 
-interface PdfExportButtonProps {
-  data: ResumeData;
-}
+export function PdfExportButton() {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-export function PdfExportButton({ data }: PdfExportButtonProps) {
-  const pdfContentRef = useRef<HTMLDivElement>(null);
-  const { isGenerating, progress, generatePdf } = useResumePdf();
-  const [showPdfContent, setShowPdfContent] = useState(false);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleExport = async () => {
-    // PDF 컨텐츠를 먼저 렌더링
-    setShowPdfContent(true);
+    if (isGenerating) return;
 
-    // DOM이 업데이트되고 이미지가 로드될 때까지 대기
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // 이미지 로딩 대기
-    if (pdfContentRef.current) {
-      const images = pdfContentRef.current.querySelectorAll("img");
-      await Promise.all(
-        Array.from(images).map(
-          (img) =>
-            new Promise((resolve) => {
-              if (img.complete) {
-                resolve(true);
-              } else {
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(true);
-              }
-            })
-        )
-      );
-    }
+    setIsGenerating(true);
+    setProgress(10);
 
     try {
-      await generatePdf(pdfContentRef);
+      setProgress(20);
+
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+      });
+
+      setProgress(70);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("PDF API 에러:", errorData);
+        throw new Error(errorData.error || "PDF 생성 실패");
+      }
+
+      const blob = await response.blob();
+      setProgress(90);
+
+      // 다운로드
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "이력서_강은빈.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setProgress(100);
+    } catch (error) {
+      console.error("PDF 생성 중 오류:", error);
     } finally {
-      // PDF 생성 완료 후 숨김
-      setTimeout(() => setShowPdfContent(false), 500);
+      setIsGenerating(false);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 
+  // 로그인하지 않은 사용자에게는 버튼을 숨김
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return (
     <>
-      {/* 플로팅 PDF 내보내기 버튼 */}
+      {/* 플로팅 PDF 내보내기 버튼 (로그인 사용자만) */}
       <motion.button
         onClick={handleExport}
         disabled={isGenerating}
@@ -105,21 +129,6 @@ export function PdfExportButton({ data }: PdfExportButtonProps) {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* PDF 렌더링 영역 - 화면 밖에 위치시켜 실제 렌더링되도록 함 */}
-      {showPdfContent && (
-        <div
-          style={{
-            position: "fixed",
-            left: "-10000px",
-            top: 0,
-            width: "800px",
-          }}
-          aria-hidden="true"
-        >
-          <ResumePdfContent ref={pdfContentRef} data={data} />
-        </div>
-      )}
     </>
   );
 }

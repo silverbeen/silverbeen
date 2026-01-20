@@ -228,7 +228,7 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
       </motion.div>
       {profile.photo && (
         <motion.div
-          className="bg-muted relative h-52 w-40 shrink-0 overflow-hidden rounded-lg sm:h-64 sm:w-48"
+          className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full border border-border sm:h-40 sm:w-40"
           variants={imageVariants}
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}

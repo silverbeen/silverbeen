@@ -9,5 +9,3 @@ export { ImageModal } from "./ImageModal";
 export { TableOfContents } from "./TableOfContents";
 export { ResumeSkeleton } from "./ResumeSkeleton";
 export { PdfExportButton } from "./PdfExportButton";
-export { ResumePdfContent } from "./ResumePdfContent";
-export { PageCaptureButton } from "./PageCaptureButton";
