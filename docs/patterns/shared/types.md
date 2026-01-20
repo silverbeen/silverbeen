@@ -228,7 +228,18 @@ type PostWithoutContent = Omit<Post, 'content'>;
 
 ```typescript
 function isPost(item: unknown): item is Post {
-  return typeof item === 'object' && item !== null && 'slug' in item;
+  if (typeof item !== 'object' || item === null) {
+    return false;
+  }
+
+  const obj = item as Record<string, unknown>;
+
+  return (
+    'id' in obj && typeof obj.id === 'number' &&
+    'slug' in obj && typeof obj.slug === 'string' &&
+    'title' in obj && typeof obj.title === 'string' &&
+    'content' in obj && typeof obj.content === 'string'
+  );
 }
 ```
 

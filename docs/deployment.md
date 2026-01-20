@@ -37,8 +37,8 @@ pnpm build
 # 타입 체크
 pnpm type-check
 
-# DB 마이그레이션
-pnpm db:push
+# DB 마이그레이션 (프로덕션에서는 migrate deploy 사용)
+pnpm db:migrate deploy
 ```
 
 ## 배포 체크리스트

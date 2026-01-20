@@ -2,7 +2,7 @@
 
 ## 전체 구조
 
-```
+```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Client    │────▶│  Next.js    │────▶│   NestJS    │
 │  (Browser)  │     │  (apps/web) │     │  (apps/api) │
@@ -16,7 +16,7 @@
 
 ## 모노레포 구조
 
-```
+```text
 silverbeen/
 ├── apps/
 │   ├── web/                 # Next.js 14 프론트엔드
@@ -49,7 +49,7 @@ silverbeen/
 
 ## 모듈 구조 (NestJS)
 
-```
+```text
 AppModule
 ├── PrismaModule          # 싱글톤 DB 연결
 ├── AuthModule            # Supabase JWT 검증
@@ -65,7 +65,7 @@ AppModule
 
 ### 읽기 요청 (공개)
 
-```
+```text
 Browser → Next.js (SSR/SSG) → NestJS API → Prisma → PostgreSQL
                                    ↓
                               캐싱 (ISR)
@@ -73,7 +73,7 @@ Browser → Next.js (SSR/SSG) → NestJS API → Prisma → PostgreSQL
 
 ### 쓰기 요청 (인증 필요)
 
-```
+```text
 Browser → Supabase Auth (로그인)
     ↓
 JWT 토큰 획득
@@ -162,7 +162,7 @@ Browser → Next.js → NestJS API
 
 ### 인증 레이어
 
-```
+```text
 1. Supabase Auth (외부)
    - OAuth, 이메일/비밀번호 인증
    - JWT 토큰 발급
@@ -185,7 +185,7 @@ Browser → Next.js → NestJS API
 | PUT /posts/:id | 필요 | Admin + 소유자 |
 | DELETE /posts/:id | 필요 | Admin + 소유자 |
 | GET /resume | 없음 | 공개 |
-| PUT /resume | 없음 (개선 필요) | - |
+| PUT /resume | 필요 | Admin |
 
 ## 확장 고려사항
 

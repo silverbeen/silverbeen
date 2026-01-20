@@ -13,7 +13,7 @@
 
 보호된 엔드포인트는 Supabase JWT 토큰이 필요합니다.
 
-```
+```http
 Authorization: Bearer <supabase_access_token>
 ```
 
@@ -313,7 +313,7 @@ Authorization: Bearer <supabase_access_token>
 
 이력서 업데이트
 
-**주의**: 현재 인증 없음 (보안 개선 필요)
+**인증**: `@UseGuards(SupabaseGuard, AdminGuard)`
 
 #### 요청 바디
 
@@ -334,7 +334,7 @@ Authorization: Bearer <supabase_access_token>
 
 ### 요청
 
-```
+```http
 GET /posts?page=2&limit=10
 ```
 
@@ -375,7 +375,7 @@ const { posts, totalPages } = await postsApi.getList({
 
 ### 필터링
 
-```
+```http
 GET /posts?tag=React
 ```
 

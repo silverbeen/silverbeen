@@ -10,7 +10,7 @@ Supabase Auth를 사용한 JWT 기반 인증 시스템
 
 ## 인증 플로우
 
-```
+```text
 ┌──────────┐     ┌──────────────┐     ┌──────────────┐
 │  Client  │────▶│ Supabase Auth│────▶│   JWT 발급   │
 └──────────┘     └──────────────┘     └──────────────┘
@@ -329,7 +329,7 @@ const newPost = await postsApi.create(postData, token);
 | POST /tags | ❌ | ❌ | ✅ |
 | DELETE /tags/:id | ❌ | ❌ | ✅ |
 | GET /resume | ✅ | ✅ | ✅ |
-| PUT /resume | ⚠️ 개선 필요 | ⚠️ | ⚠️ |
+| PUT /resume | ❌ | ❌ | ✅ |
 
 ## Supabase 관리자 설정
 
