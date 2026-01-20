@@ -404,6 +404,31 @@ if (item.authorId !== authorId) {
 
 ---
 
+## 로깅
+
+```typescript
+import { Logger } from '@nestjs/common';
+
+@Injectable()
+export class EntityService {
+  private readonly logger = new Logger(EntityService.name);
+
+  async create(...) {
+    this.logger.log(`Creating entity: ${dto.title}`);
+    // ...
+  }
+}
+```
+
+## 트랜잭션 (관계 변경)
+
+```typescript
+await this.prisma.$transaction(async (tx) => {
+  await tx.entity.update({ where: { id }, data: { tags: { set: [] } } });
+  await tx.entity.update({ where: { id }, data: { tags: { connect: tagIds.map(id => ({ id })) } } });
+});
+```
+
 ## 체크리스트
 
 - [ ] 모듈 생성 및 app.module.ts에 등록
@@ -412,3 +437,4 @@ if (item.authorId !== authorId) {
 - [ ] DTO에 class-validator 데코레이터 적용
 - [ ] barrel export 추가 (index.ts)
 - [ ] 인증이 필요한 엔드포인트에 가드 적용
+- [ ] 주요 작업에 로깅 추가

@@ -177,6 +177,32 @@ const url = `/endpoint${query ? `?${query}` : ''}`;
 
 ---
 
+## 에러 응답 타입
+
+```typescript
+interface ApiError {
+  statusCode: number;
+  message: string | string[];
+  error: string;
+}
+
+// fetcher에서 에러 처리
+if (!response.ok) {
+  const error: ApiError = await response.json();
+  throw new Error(Array.isArray(error.message) ? error.message[0] : error.message);
+}
+```
+
+## 타임아웃 처리
+
+```typescript
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 10000);
+
+const response = await fetch(url, { signal: controller.signal });
+clearTimeout(timeout);
+```
+
 ## 체크리스트
 
 - [ ] fetcher 함수 사용
@@ -185,3 +211,4 @@ const url = `/endpoint${query ? `?${query}` : ''}`;
 - [ ] 인증 필요 메서드에 token 파라미터
 - [ ] barrel export 추가 (index.ts)
 - [ ] api 객체에 등록
+- [ ] 에러 응답 파싱

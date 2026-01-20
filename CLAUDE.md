@@ -89,3 +89,17 @@
 | 새 API 모듈 만들기 | `docs/patterns/backend/module.md` |
 | DB 테이블 추가 | `docs/patterns/database/schema.md` |
 | 타입 정의 추가 | `docs/patterns/shared/types.md` |
+
+## 시스템 문서 활용
+
+프로젝트 맥락 파악이 필요할 때 참조하세요.
+
+| 상황 | 참조 파일 |
+|------|----------|
+| 시스템 구조 이해 | `docs/architecture.md` |
+| API 작업 | `docs/api.md` |
+| DB 작업 | `docs/database.md` |
+| 인증 관련 | `docs/auth.md` |
+| 테스트 작성 | `docs/patterns/testing.md` |
+| 배포 | `docs/deployment.md` |
+| 에러 해결 | `docs/troubleshooting.md` |

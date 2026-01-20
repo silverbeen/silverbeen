@@ -211,6 +211,27 @@ import type {
 
 ---
 
+## Utility Types 활용
+
+```typescript
+// 부분 타입 (수정용)
+type UpdatePostDto = Partial<CreatePostDto>;
+
+// 필수 필드만 선택
+type PostSummary = Pick<Post, 'id' | 'title' | 'slug'>;
+
+// 특정 필드 제외
+type PostWithoutContent = Omit<Post, 'content'>;
+```
+
+## 타입 가드
+
+```typescript
+function isPost(item: unknown): item is Post {
+  return typeof item === 'object' && item !== null && 'slug' in item;
+}
+```
+
 ## 체크리스트
 
 - [ ] 기본 Entity 타입 정의
@@ -219,3 +240,4 @@ import type {
 - [ ] Response 타입 정의 (페이지네이션)
 - [ ] 관계 타입 정의 (Tag 등)
 - [ ] `type` 키워드로 import (import type)
+- [ ] 필요시 Utility Types 활용
