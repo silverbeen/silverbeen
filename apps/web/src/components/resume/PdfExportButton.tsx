@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 
@@ -9,6 +9,7 @@ export function PdfExportButton() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -30,6 +31,7 @@ export function PdfExportButton() {
 
     setIsGenerating(true);
     setProgress(10);
+    setError(null);
 
     try {
       setProgress(20);
@@ -60,8 +62,10 @@ export function PdfExportButton() {
       URL.revokeObjectURL(url);
 
       setProgress(100);
-    } catch (error) {
-      console.error("PDF 생성 중 오류:", error);
+    } catch (err) {
+      console.error("PDF 생성 중 오류:", err);
+      const message = err instanceof Error ? err.message : "PDF 생성에 실패했습니다";
+      setError(message);
     } finally {
       setIsGenerating(false);
       setTimeout(() => setProgress(0), 500);
@@ -126,6 +130,29 @@ export function PdfExportButton() {
               </div>
               <p className="text-sm text-muted-foreground">{progress}% 완료</p>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 에러 토스트 */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-24 right-6 z-50 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 shadow-lg dark:border-red-800 dark:bg-red-950"
+          >
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <p className="text-sm font-medium text-red-800 dark:text-red-200">
+              {error}
+            </p>
+            <button
+              onClick={() => setError(null)}
+              className="ml-2 rounded p-1 hover:bg-red-100 dark:hover:bg-red-900"
+            >
+              <X className="h-4 w-4 text-red-600 dark:text-red-400" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

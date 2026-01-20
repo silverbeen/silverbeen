@@ -379,7 +379,16 @@ function generateResumeHtml(data: ResumeData): string {
 </html>`;
 }
 
+// 에러 메시지 안전하게 추출
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "알 수 없는 오류";
+}
+
 export async function POST() {
+  let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
+
   try {
     // 인증 확인
     const supabase = await createClient();
@@ -397,8 +406,9 @@ export async function POST() {
     // 서버에서 이력서 데이터 가져오기
     const data = await getResumeData();
 
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       headless: true,
+      timeout: 30000,
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -408,6 +418,8 @@ export async function POST() {
     });
 
     const page = await browser.newPage();
+    page.setDefaultTimeout(30000);
+    page.setDefaultNavigationTimeout(30000);
 
     // 뷰포트 설정
     await page.setViewport({
@@ -431,6 +443,7 @@ export async function POST() {
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
+      timeout: 30000,
       margin: {
         top: "15mm",
         right: "15mm",
@@ -440,10 +453,8 @@ export async function POST() {
       preferCSSPageSize: false,
     });
 
-    await browser.close();
-
-    // 한글 파일명을 위한 RFC 5987 인코딩
-    const filename = "이력서_강은빈.pdf";
+    // 파일명을 profile.name에서 동적 생성
+    const filename = `이력서_${data.profile.name}.pdf`;
     const encodedFilename = encodeURIComponent(filename);
 
     return new NextResponse(Buffer.from(pdfBuffer), {
@@ -455,9 +466,17 @@ export async function POST() {
     });
   } catch (error) {
     console.error("PDF 생성 오류:", error);
-    return NextResponse.json(
-      { error: "PDF 생성 중 오류가 발생했습니다" },
-      { status: 500 }
-    );
+
+    const isDev = process.env.NODE_ENV === "development";
+    const errorMessage = isDev
+      ? getErrorMessage(error)
+      : "PDF 생성 중 오류가 발생했습니다";
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
+  } finally {
+    // 리소스 정리 보장
+    if (browser) {
+      await browser.close().catch(console.error);
+    }
   }
 }
