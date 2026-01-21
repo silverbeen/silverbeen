@@ -207,6 +207,7 @@ export const createClient = async () => {
 ```typescript
 // apps/web/src/middleware.ts
 export async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
   const supabase = createMiddlewareClient({ req: request, res: response });
   const { data: { session } } = await supabase.auth.getSession();
 

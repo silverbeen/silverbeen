@@ -199,8 +199,12 @@ if (!response.ok) {
 const controller = new AbortController();
 const timeout = setTimeout(() => controller.abort(), 10000);
 
-const response = await fetch(url, { signal: controller.signal });
-clearTimeout(timeout);
+try {
+  const response = await fetch(url, { signal: controller.signal });
+  return response;
+} finally {
+  clearTimeout(timeout);
+}
 ```
 
 ## 체크리스트

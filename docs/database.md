@@ -8,7 +8,7 @@
 
 ## ERD (Entity Relationship Diagram)
 
-```
+```text
 ┌─────────────────┐
 │      User       │
 ├─────────────────┤
@@ -103,7 +103,7 @@ model Post {
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | id | Int | Auto-increment PK |
-| authorId | String | Supabase Auth 사용자 ID |
+| authorId | String | Supabase Auth 사용자 ID (User와 논리적 관계) |
 | title | String | 포스트 제목 |
 | slug | String | URL 친화적 식별자 (자동 생성) |
 | content | String | 마크다운 본문 |
