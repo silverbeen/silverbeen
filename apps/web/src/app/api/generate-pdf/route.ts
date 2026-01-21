@@ -370,9 +370,9 @@ function generateResumeHtml(data: ResumeData): string {
         ${profile.introduction ? `<div class="profile-intro">${escapeHtml(profile.introduction)}</div>` : ""}
         <div class="profile-contacts">
           ${profile.phone ? `<div class="profile-contact"><span>📞</span> ${escapeHtml(profile.phone)}</div>` : ""}
-          <div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>
-          <div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>
-          <div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>
+          ${profile.email ? `<div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>` : ""}
+          ${profile.github ? `<div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>` : ""}
+          ${profile.blog ? `<div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>` : ""}
         </div>
       </div>
       ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
