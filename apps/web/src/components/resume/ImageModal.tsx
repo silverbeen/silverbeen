@@ -60,20 +60,25 @@ export function ImageModal({
   // 스와이프 임계값
   const SWIPE_THRESHOLD = 50;
   const VELOCITY_THRESHOLD = 0.3;
+  const EDGE_RESISTANCE_FACTOR = 0.3;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const resetSwipeState = useCallback(() => {
+    setSwipeOffset(0);
+    setIsSwiping(false);
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, []);
+
   // 스와이프 종료 시 상태 초기화
   useEffect(() => {
     if (!isOpen) {
-      setSwipeOffset(0);
-      setIsSwiping(false);
-      setTouchStart(null);
-      setTouchEnd(null);
+      resetSwipeState();
     }
-  }, [isOpen]);
+  }, [isOpen, resetSwipeState]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -94,7 +99,7 @@ export function ImageModal({
 
     if (isAtStart || isAtEnd) {
       // 저항감: 실제 이동의 30%만 반영
-      setSwipeOffset(diff * 0.3);
+      setSwipeOffset(diff * EDGE_RESISTANCE_FACTOR);
     } else {
       setSwipeOffset(diff);
     }
@@ -104,8 +109,7 @@ export function ImageModal({
 
   const handleTouchEnd = useCallback(() => {
     if (!touchStart || !touchEnd) {
-      setIsSwiping(false);
-      setSwipeOffset(0);
+      resetSwipeState();
       return;
     }
 
@@ -122,11 +126,8 @@ export function ImageModal({
       onPrev();
     }
 
-    setIsSwiping(false);
-    setSwipeOffset(0);
-    setTouchStart(null);
-    setTouchEnd(null);
-  }, [touchStart, touchEnd, currentIndex, images.length, onNext, onPrev]);
+    resetSwipeState();
+  }, [touchStart, touchEnd, currentIndex, images.length, onNext, onPrev, resetSwipeState]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -211,16 +212,15 @@ export function ImageModal({
           <motion.div
             className="relative z-10 mx-4 w-[90vw] min-w-[50vw] max-h-[90vh] overflow-hidden rounded-lg touch-pan-y"
             initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            animate={{ scale: 1, opacity: 1, x: swipeOffset }}
             exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{
+              duration: 0.2,
+              x: { duration: isSwiping ? 0 : 0.3, ease: "easeOut" },
+            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            style={{
-              transform: isSwiping ? `translateX(${swipeOffset}px)` : undefined,
-              transition: isSwiping ? 'none' : 'transform 0.3s ease-out',
-            }}
           >
             <AnimatePresence mode="wait">
               <motion.div
