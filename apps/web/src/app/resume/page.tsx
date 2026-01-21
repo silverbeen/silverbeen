@@ -33,8 +33,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     profile.introduction || `${profile.title || '개발자'} ${profile.name}의 이력서입니다.`;
 
-  console.log(profile.photo);
-
   return {
     title,
     description,

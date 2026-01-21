@@ -51,11 +51,13 @@ export function PdfExportButton() {
       const blob = await response.blob();
       setProgress(90);
 
-      // 다운로드
+      // 다운로드 - Content-Disposition 헤더에서 동적 파일명 추출
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "이력서_강은빈.pdf";
+      const contentDisposition = response.headers.get("Content-Disposition");
+      const filenameMatch = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/);
+      link.download = filenameMatch ? decodeURIComponent(filenameMatch[1]) : "resume.pdf";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

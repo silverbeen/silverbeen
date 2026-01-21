@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import { config } from "@/config";
 import type { ResumeData, Experience } from "@/types/resume";
 import resumeDataFallback from "@/data/resume.json";
@@ -10,7 +11,8 @@ async function getResumeData(): Promise<ResumeData> {
     const response = await fetch(`${config.apiBaseUrl}/resume`);
     if (!response.ok) throw new Error("API Error");
     return response.json();
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch resume data:", error);
     return resumeDataFallback as ResumeData;
   }
 }
@@ -40,6 +42,18 @@ function calculateDuration(startDate: string, endDate?: string): string {
 
 function formatPeriod(startDate: string, endDate?: string): string {
   return endDate ? `${startDate} - ${endDate}` : `${startDate} - 재직중`;
+}
+
+// XSS 방지를 위한 HTML 이스케이프 헬퍼
+function escapeHtml(text: string): string {
+  const htmlEscapes: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEscapes[char]);
 }
 
 function generateResumeHtml(data: ResumeData): string {
@@ -75,9 +89,9 @@ function generateResumeHtml(data: ResumeData): string {
         const items = skills[key as keyof typeof skills] as string[];
         return `
           <div class="skill-row">
-            <span class="skill-label">${skillLabels[key]}</span>
+            <span class="skill-label">${escapeHtml(skillLabels[key])}</span>
             <div class="skill-tags">
-              ${items.map((skill) => `<span class="skill-tag">${skill}</span>`).join("")}
+              ${items.map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")}
             </div>
           </div>
         `;
@@ -91,7 +105,7 @@ function generateResumeHtml(data: ResumeData): string {
         ?.map((tech) => {
           const techName =
             typeof tech === "string" ? tech : tech.items.join(", ");
-          return `<span class="tech-tag"><span class="tech-dot"></span>${techName}</span>`;
+          return `<span class="tech-tag"><span class="tech-dot"></span>${escapeHtml(techName)}</span>`;
         })
         .join("") || "";
 
@@ -101,10 +115,10 @@ function generateResumeHtml(data: ResumeData): string {
           <div class="task">
             <div class="task-title">
               <div class="task-icon"><div class="task-icon-dot"></div></div>
-              <span>${task.title}</span>
+              <span>${escapeHtml(task.title)}</span>
             </div>
             <div class="task-list">
-              ${task.items.map((item) => `<div class="task-item"><span class="task-item-dot"></span><span>${item}</span></div>`).join("")}
+              ${task.items.map((item) => `<div class="task-item"><span class="task-item-dot"></span><span>${escapeHtml(item)}</span></div>`).join("")}
             </div>
           </div>
         `
@@ -115,13 +129,13 @@ function generateResumeHtml(data: ResumeData): string {
       ? `
         <div class="impact">
           <div class="impact-title">Impact</div>
-          ${project.impact.map((item) => `<div class="impact-item"><span class="impact-dot"></span><span>${item}</span></div>`).join("")}
+          ${project.impact.map((item) => `<div class="impact-item"><span class="impact-dot"></span><span>${escapeHtml(item)}</span></div>`).join("")}
         </div>
       `
       : "";
 
     const linksHtml = project.links?.length
-      ? `<div class="project-links">${project.links.map((link) => `<a href="${link.url}" class="link-badge">${link.label}</a>`).join("")}</div>`
+      ? `<div class="project-links">${project.links.map((link) => `<a href="${escapeHtml(link.url)}" class="link-badge">${escapeHtml(link.label)}</a>`).join("")}</div>`
       : "";
 
     const imagesHtml = project.images?.length
@@ -129,7 +143,7 @@ function generateResumeHtml(data: ResumeData): string {
         <div class="screenshots">
           <div class="screenshots-title">Screenshots</div>
           <div class="screenshots-grid">
-            ${project.images.map((img) => `<img src="${img}" class="screenshot-img" />`).join("")}
+            ${project.images.map((img) => `<img src="${escapeHtml(img)}" class="screenshot-img" />`).join("")}
           </div>
         </div>
       `
@@ -138,11 +152,11 @@ function generateResumeHtml(data: ResumeData): string {
     return `
       <div class="project-card">
         <div class="project-header">
-          <div class="project-name">${project.name}</div>
-          ${project.period ? `<div class="project-period">${project.period}</div>` : ""}
+          <div class="project-name">${escapeHtml(project.name)}</div>
+          ${project.period ? `<div class="project-period">${escapeHtml(project.period)}</div>` : ""}
           ${linksHtml}
-          <div class="project-description">${project.description}</div>
-          <div class="project-role">${project.role}</div>
+          <div class="project-description">${escapeHtml(project.description)}</div>
+          <div class="project-role">${escapeHtml(project.role)}</div>
           ${techStackHtml ? `<div class="tech-stack">${techStackHtml}</div>` : ""}
         </div>
         ${tasksHtml}
@@ -162,8 +176,8 @@ function generateResumeHtml(data: ResumeData): string {
           .map(
             (stack) => `
               <div class="exp-tech-row">
-                <span class="exp-tech-label">${stack.category}</span>
-                <span class="exp-tech-items">${stack.items.join(", ")}</span>
+                <span class="exp-tech-label">${escapeHtml(stack.category)}</span>
+                <span class="exp-tech-items">${stack.items.map((item) => escapeHtml(item)).join(", ")}</span>
               </div>
             `
           )
@@ -174,10 +188,10 @@ function generateResumeHtml(data: ResumeData): string {
         return `
           <div class="experience-card">
             <div class="company-header">
-              <span class="company-name">${exp.company}</span>
-              <span class="company-duration">${duration}</span>
+              <span class="company-name">${escapeHtml(exp.company)}</span>
+              <span class="company-duration">${escapeHtml(duration)}</span>
             </div>
-            <div class="company-period">${period}${exp.description ? ` · ${exp.description}` : ""}</div>
+            <div class="company-period">${escapeHtml(period)}${exp.description ? ` · ${escapeHtml(exp.description)}` : ""}</div>
             <div class="exp-tech-stack">
               <div class="exp-tech-title">기술 스택</div>
               ${techStackHtml}
@@ -199,9 +213,9 @@ function generateResumeHtml(data: ResumeData): string {
           <div class="education-item">
             <div class="education-icon">🎓</div>
             <div class="education-content">
-              <div class="education-school">${edu.school}</div>
-              <div class="education-detail">${edu.major} · ${edu.period}</div>
-              ${edu.description ? `<div class="education-detail">${edu.description}</div>` : ""}
+              <div class="education-school">${escapeHtml(edu.school)}</div>
+              <div class="education-detail">${escapeHtml(edu.major)} · ${escapeHtml(edu.period)}</div>
+              ${edu.description ? `<div class="education-detail">${escapeHtml(edu.description)}</div>` : ""}
             </div>
           </div>
         `
@@ -216,8 +230,8 @@ function generateResumeHtml(data: ResumeData): string {
           <div class="cert-item">
             <span class="cert-icon">🏆</span>
             <div>
-              <div class="cert-name">${cert.name}</div>
-              <div class="cert-date">${cert.date}</div>
+              <div class="cert-name">${escapeHtml(cert.name)}</div>
+              <div class="cert-date">${escapeHtml(cert.date)}</div>
             </div>
           </div>
         `
@@ -233,11 +247,11 @@ function generateResumeHtml(data: ResumeData): string {
             <div class="award-icon">🏅</div>
             <div class="award-content">
               <div class="award-header">
-                <span class="award-date">${award.date}</span>
-                <span class="award-title">${award.title}</span>
-                ${award.link ? `<a href="${award.link}" class="award-link">${award.linkLabel || "링크"}</a>` : ""}
+                <span class="award-date">${escapeHtml(award.date)}</span>
+                <span class="award-title">${escapeHtml(award.title)}</span>
+                ${award.link ? `<a href="${escapeHtml(award.link)}" class="award-link">${escapeHtml(award.linkLabel || "링크")}</a>` : ""}
               </div>
-              ${award.description ? `<div class="award-description">${award.description}</div>` : ""}
+              ${award.description ? `<div class="award-description">${escapeHtml(award.description)}</div>` : ""}
             </div>
           </div>
         `
@@ -245,15 +259,27 @@ function generateResumeHtml(data: ResumeData): string {
       .join("");
   };
 
+  // 로컬 폰트 URL 생성
+  const fontBaseUrl = config.siteUrl;
+
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'Noto Sans KR';
+      font-weight: 400;
+      font-style: normal;
+      src: url('${fontBaseUrl}/fonts/NotoSansKR-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'Noto Sans KR';
+      font-weight: 700;
+      font-style: normal;
+      src: url('${fontBaseUrl}/fonts/NotoSansKR-Bold.ttf') format('truetype');
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Noto Sans KR', sans-serif; background: #fff; color: #111827; line-height: 1.6; font-size: 15px; }
     .container { max-width: 100%; margin: 0 auto; padding: 8px; }
@@ -337,17 +363,17 @@ function generateResumeHtml(data: ResumeData): string {
   <div class="container">
     <div class="section profile">
       <div class="profile-content">
-        ${profile.greeting ? `<div class="profile-greeting">${profile.greeting.replace(".", '<span class="dot">.</span>')}</div>` : ""}
-        ${profile.tagline ? `<div class="profile-tagline">${profile.tagline}</div>` : ""}
-        ${profile.introduction ? `<div class="profile-intro">${profile.introduction}</div>` : ""}
+        ${profile.greeting ? `<div class="profile-greeting">${escapeHtml(profile.greeting).replace(".", '<span class="dot">.</span>')}</div>` : ""}
+        ${profile.tagline ? `<div class="profile-tagline">${escapeHtml(profile.tagline)}</div>` : ""}
+        ${profile.introduction ? `<div class="profile-intro">${escapeHtml(profile.introduction)}</div>` : ""}
         <div class="profile-contacts">
-          ${profile.phone ? `<div class="profile-contact"><span>📞</span> ${profile.phone}</div>` : ""}
-          <div class="profile-contact"><span>✉️</span> ${profile.email}</div>
-          <div class="profile-contact"><span>🔗</span> ${profile.github}</div>
-          <div class="profile-contact"><span>📝</span> ${profile.blog}</div>
+          ${profile.phone ? `<div class="profile-contact"><span>📞</span> ${escapeHtml(profile.phone)}</div>` : ""}
+          <div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>
+          <div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>
+          <div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>
         </div>
       </div>
-      ${profile.photo ? `<img src="${profile.photo}" class="profile-photo" />` : ""}
+      ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
     </div>
     <hr />
     <div class="section">
@@ -406,13 +432,14 @@ export async function POST() {
     // 서버에서 이력서 데이터 가져오기
     const data = await getResumeData();
 
+    // 서버리스 환경에서 Chromium 실행 경로 설정
+    const executablePath = await chromium.executablePath();
+
     browser = await puppeteer.launch({
-      headless: true,
-      timeout: 30000,
+      executablePath,
+      headless: chromium.headless,
       args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
+        ...chromium.args,
         "--font-render-hinting=none",
       ],
     });
@@ -437,7 +464,10 @@ export async function POST() {
 
     // 폰트 및 이미지 로딩 대기
     await page.evaluate(() => document.fonts.ready);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // 페이지 로드 완료까지 대기 (setTimeout 대신 더 견고한 방식)
+    await page.waitForFunction(() => document.readyState === "complete", {
+      timeout: 30000,
+    });
 
     // PDF 생성
     const pdfBuffer = await page.pdf({
