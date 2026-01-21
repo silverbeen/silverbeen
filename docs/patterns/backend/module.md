@@ -404,6 +404,45 @@ if (item.authorId !== authorId) {
 
 ---
 
+## 로깅
+
+```typescript
+import { Logger } from '@nestjs/common';
+
+@Injectable()
+export class EntityService {
+  private readonly logger = new Logger(EntityService.name);
+
+  async create(...) {
+    this.logger.log(`Creating entity: ${dto.title}`);
+    // ...
+  }
+}
+```
+
+## 트랜잭션 (관계 변경)
+
+Prisma의 `set` 연산자를 사용하면 기존 연결 해제와 새 연결을 단일 연산으로 처리할 수 있습니다:
+
+```typescript
+// 권장: 단일 update로 처리
+await this.prisma.entity.update({
+  where: { id },
+  data: {
+    tags: { set: tagIds.map(id => ({ id })) }
+  }
+});
+```
+
+명시적 트랜잭션이 필요한 경우 (여러 모델 동시 수정 등):
+
+```typescript
+await this.prisma.$transaction(async (tx) => {
+  await tx.entity.update({ where: { id }, data: { status: 'processing' } });
+  await tx.relatedEntity.create({ data: { entityId: id, ... } });
+});
+```
+
 ## 체크리스트
 
 - [ ] 모듈 생성 및 app.module.ts에 등록
@@ -412,3 +451,4 @@ if (item.authorId !== authorId) {
 - [ ] DTO에 class-validator 데코레이터 적용
 - [ ] barrel export 추가 (index.ts)
 - [ ] 인증이 필요한 엔드포인트에 가드 적용
+- [ ] 주요 작업에 로깅 추가

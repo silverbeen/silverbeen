@@ -126,6 +126,29 @@ export function PostCard({ post }: PostCardProps) {
 }
 ```
 
+## 접근성 (a11y)
+
+```typescript
+// 이미지 alt 텍스트
+<img src={src} alt={`${post.title} 커버 이미지`} />
+
+// 버튼 aria-label (아이콘만 있는 경우)
+<button aria-label="메뉴 열기"><MenuIcon /></button>
+
+// 링크 설명
+<Link href={url} aria-label={`${post.title} 상세 보기`}>
+```
+
+## 메모이제이션
+
+```typescript
+import { memo } from 'react';
+
+export const PostCard = memo(function PostCard({ post }: PostCardProps) {
+  return <div>...</div>;
+});
+```
+
 ## 체크리스트
 
 - [ ] Props 인터페이스 정의
@@ -133,3 +156,4 @@ export function PostCard({ post }: PostCardProps) {
 - [ ] barrel export 추가 (index.ts)
 - [ ] 다크모드 지원
 - [ ] 반응형 디자인 (md:, lg: 브레이크포인트)
+- [ ] 이미지 alt, 버튼 aria-label

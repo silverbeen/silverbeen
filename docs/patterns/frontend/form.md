@@ -242,6 +242,31 @@ className="rounded-lg bg-red-500 px-4 py-2 text-white transition-colors hover:bg
 
 ---
 
+## 접근성 (label-input 연결)
+
+```typescript
+<div>
+  <label htmlFor="title" className="...">제목</label>
+  <input id="title" type="text" ... />
+</div>
+```
+
+## 중복 제출 방지
+
+```typescript
+const [isSubmitting, setIsSubmitting] = useState(false);
+
+const handleSubmit = async () => {
+  if (isSubmitting) return;
+  setIsSubmitting(true);
+  try {
+    await onSave(data);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+```
+
 ## 체크리스트
 
 - [ ] Props 인터페이스 정의 (initialData, onSave, saving)
@@ -249,3 +274,5 @@ className="rounded-lg bg-red-500 px-4 py-2 text-white transition-colors hover:bg
 - [ ] 검증 로직 구현
 - [ ] 저장 버튼 disabled 처리
 - [ ] 다크모드 스타일 적용
+- [ ] label-input htmlFor/id 연결
+- [ ] 중복 제출 방지
