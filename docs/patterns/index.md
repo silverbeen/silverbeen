@@ -32,3 +32,37 @@
 ### CRUD 폼 추가
 1. `frontend/form.md` - 폼 컴포넌트
 2. `frontend/component.md` - 관련 UI 컴포넌트
+
+## 시스템 문서
+
+| 상황 | 참조 파일 |
+|------|----------|
+| 시스템 구조 이해 | [architecture.md](../architecture.md) |
+| API 엔드포인트 확인 | [api.md](../api.md) |
+| DB 구조 확인 | [database.md](../database.md) |
+| 인증/인가 | [auth.md](../auth.md) |
+| 테스트 작성 | [testing.md](testing.md) |
+| 배포 | [deployment.md](../deployment.md) |
+| 문제 해결 | [troubleshooting.md](../troubleshooting.md) |
+
+## 개발 가이드
+
+| 상황                     | 참조 파일                                            |
+|--------------------------|------------------------------------------------------|
+| Git Worktree 다중 작업   | [guides/git-worktree.md](../guides/git-worktree.md)  |
+
+## Decision Tree
+
+### 컴포넌트에 'use client' 필요한가?
+
+- 이벤트 핸들러 (onClick, onChange) → 필요
+- 상태 (useState, useReducer) → 필요
+- 브라우저 API (localStorage, window) → 필요
+- 위 조건 없음 → 불필요 (Server Component)
+
+### 어떤 테스트를 작성할까?
+
+- 비즈니스 로직 → 서비스 단위 테스트
+- API 응답 → 컨트롤러 통합 테스트
+- UI 인터랙션 → 컴포넌트 테스트
+- 사용자 플로우 → E2E 테스트

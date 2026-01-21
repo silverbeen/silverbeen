@@ -9,6 +9,7 @@ import {
   CertificationSection,
   AwardSection,
   TableOfContents,
+  PdfExportButton,
 } from "@/components/resume";
 import type { ResumeData } from "@/types/resume";
 
@@ -44,7 +45,8 @@ export function ResumeContent({ data }: ResumeContentProps) {
   return (
     <div className="min-h-screen bg-background">
       <TableOfContents experience={data.experience} />
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <PdfExportButton />
+      <main id="resume-content" className="mx-auto max-w-4xl px-6 py-16">
         <div className="flex flex-col gap-12">
           <ProfileSection profile={data.profile} ImageComponent={NextImage} />
 

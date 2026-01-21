@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(git:*)",
+      "Bash(cat:*)",
+      "Read",
+      "Write(**/silverbeen*/**)",
+      "Edit(**/silverbeen*/**)"
+    ]
+  }
+}

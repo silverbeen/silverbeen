@@ -201,6 +201,28 @@ setItems((prev) => prev.filter((item) => item.id !== id));
 
 ---
 
+## 요청 취소 (AbortController)
+
+```typescript
+useEffect(() => {
+  const controller = new AbortController();
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      // ...
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err);
+      }
+    }
+  };
+
+  fetchData();
+  return () => controller.abort();
+}, [url]);
+```
+
 ## 체크리스트
 
 - [ ] 'use client' 추가
@@ -209,3 +231,4 @@ setItems((prev) => prev.filter((item) => item.id !== id));
 - [ ] refetch 함수 반환
 - [ ] barrel export 추가 (index.ts)
 - [ ] CRUD 함수에서 인증 토큰 처리
+- [ ] 필요시 AbortController로 요청 취소
