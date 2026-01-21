@@ -8,7 +8,9 @@ import { createClient } from "@/lib/supabase/server";
 
 async function getResumeData(): Promise<ResumeData> {
   try {
-    const response = await fetch(`${config.apiBaseUrl}/resume`);
+    const response = await fetch(`${config.apiBaseUrl}/resume`, {
+      signal: AbortSignal.timeout(5000),
+    });
     if (!response.ok) throw new Error("API Error");
     return response.json();
   } catch (error) {
@@ -492,6 +494,9 @@ export async function POST() {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="resume.pdf"; filename*=UTF-8''${encodedFilename}`,
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   } catch (error) {
