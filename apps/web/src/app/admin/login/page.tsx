@@ -57,7 +57,7 @@ function LoginForm() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${config.siteUrl}/auth/callback`,
+          redirectTo: new URL('/auth/callback', config.siteUrl).href,
         },
       });
 
