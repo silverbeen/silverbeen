@@ -81,7 +81,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   }
 
   return (
-    <nav className="hidden xl:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto">
+    <nav className="hidden xl:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
       <div className="border-l-2 border-gray-200 dark:border-gray-700 pl-4">
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
           목차
