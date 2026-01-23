@@ -19,6 +19,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
 
   @@map("users")
 }
@@ -36,7 +37,8 @@ model Resume {
 // Post model - for blog
 model Post {
   id         Int      @id @default(autoincrement())
-  authorId   String   @map("author_id") // Supabase Auth user ID
+  authorId   String   @map("author_id")
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title      String
   slug       String   @unique
   content    String   // Markdown content
