@@ -39,6 +39,10 @@ export class UsersService {
           data: {
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name ?? existingUser.name,
+            role:
+              supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
+                ? 'ADMIN'
+                : 'USER',
           },
         });
         updated++;
@@ -87,6 +91,10 @@ export class UsersService {
       update: {
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
+        role:
+          supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
+            ? 'ADMIN'
+            : 'USER',
       },
     });
   }
