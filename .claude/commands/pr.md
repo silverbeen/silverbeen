@@ -60,10 +60,24 @@ git log [타겟브랜치]..HEAD --oneline
 
 ### 5단계: PR 제목 생성 규칙
 
+- **필수: PR 제목에 이슈 번호 포함** (예: `feat: #1 이력서 컴포넌트 생성`)
 - 브랜치명에서 타입과 이슈 번호 추출
-- 예: `feat/#1-createComponentForResume` → `feat(web): #1 이력서 컴포넌트 생성`
+- 예: `feat/#1-createComponentForResume` → `feat: #1 이력서 컴포넌트 생성`
 - 사용자가 선택한 PR 타입 우선 적용
 - 제목은 한국어로 작성
+- **이슈 번호가 브랜치명에 없으면 AskUser로 이슈 번호 질문**
+
+#### PR 제목 형식
+
+```
+[타입]: #[이슈번호] [설명]
+```
+
+예시:
+
+- `[Feature]: #1 이력서 컴포넌트 생성`
+- `[Fix]]: #25 로그인 버그 수정`
+- `[Refactor]: #36 AdminGuard 리팩토링`
 
 ### 6단계: PR 본문 자동 생성
 
@@ -127,6 +141,7 @@ gh pr create \
 ## 에러 처리
 
 ### gh CLI 미설치
+
 ```text
 GitHub CLI(gh)가 설치되어 있지 않습니다.
 설치: brew install gh
@@ -134,6 +149,7 @@ GitHub CLI(gh)가 설치되어 있지 않습니다.
 ```
 
 ### 인증 안됨
+
 ```text
 GitHub 인증이 필요합니다.
 실행: gh auth login
