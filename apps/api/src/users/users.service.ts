@@ -103,22 +103,23 @@ export class UsersService {
       select: { id: true, authorId: true },
     });
 
-    const invalidAuthorIds: string[] = [];
+    const postAuthorIds = new Set(posts.map((post) => post.authorId));
 
-    for (const post of posts) {
-      const user = await this.prisma.user.findUnique({
-        where: { id: post.authorId },
-      });
+    const existingUsers = await this.prisma.user.findMany({
+      where: { id: { in: Array.from(postAuthorIds) } },
+      select: { id: true },
+    });
 
-      if (!user) {
-        invalidAuthorIds.push(post.authorId);
-      }
-    }
+    const existingUserIds = new Set(existingUsers.map((user) => user.id));
+
+    const invalidAuthorIds = Array.from(postAuthorIds).filter(
+      (id) => !existingUserIds.has(id),
+    );
 
     return {
       total: posts.length,
       valid: posts.length - invalidAuthorIds.length,
-      invalid: [...new Set(invalidAuthorIds)],
+      invalid: invalidAuthorIds,
     };
   }
 
