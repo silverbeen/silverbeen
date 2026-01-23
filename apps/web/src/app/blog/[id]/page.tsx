@@ -78,7 +78,7 @@ function BlogJsonLd({ blog }: { blog: Post }) {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: blog.title,
-    description: blog.excerpt || blog.content.slice(0, 160),
+    description: blog.excerpt || blog.content.slice(0, 160).replace(/\n/g, ' '),
     image: blog.coverImage || undefined,
     datePublished: blog.createdAt,
     dateModified: blog.updatedAt,

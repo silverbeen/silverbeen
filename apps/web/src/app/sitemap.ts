@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { config } from '@/config';
+import { api } from '@/lib/api';
 
 interface PostForSitemap {
   id: number;
@@ -9,15 +10,10 @@ interface PostForSitemap {
 
 async function getAllPosts(): Promise<PostForSitemap[]> {
   try {
-    const response = await fetch(`${config.apiBaseUrl}/posts?limit=1000`, {
-      next: { revalidate: 3600 },
-    });
-
-    if (!response.ok) return [];
-
-    const data = await response.json();
-    return data.posts || [];
-  } catch {
+    const { posts } = await api.blogs.getList({ limit: 1000 }, { revalidate: 3600 });
+    return posts || [];
+  } catch (error) {
+    console.error('Failed to fetch posts for sitemap:', error);
     return [];
   }
 }
