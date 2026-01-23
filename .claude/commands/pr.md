@@ -75,9 +75,9 @@ git log [타겟브랜치]..HEAD --oneline
 
 예시:
 
-- `[Feature]: #1 이력서 컴포넌트 생성`
-- `[Fix]]: #25 로그인 버그 수정`
-- `[Refactor]: #36 AdminGuard 리팩토링`
+- `[Feature] #1 이력서 컴포넌트 생성`
+- `[Fix]] #25 로그인 버그 수정`
+- `[Refactor] #36 AdminGuard 리팩토링`
 
 ### 6단계: PR 본문 자동 생성
 
