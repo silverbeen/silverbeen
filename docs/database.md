@@ -355,6 +355,60 @@ model Post {
 }
 ```
 
+### Post-User FK 적용 시 데이터 동기화
+
+Post.authorId에 User 참조 FK를 적용하기 전에 Supabase Auth 사용자를 로컬 User 테이블에 동기화해야 합니다.
+
+#### 1. 사용자 동기화 API 호출
+
+```bash
+# Supabase Admin API에서 사용자 목록 가져오기
+curl -X GET "https://<project>.supabase.co/auth/v1/admin/users" \
+  -H "Authorization: Bearer <service_role_key>" \
+  -H "apikey: <service_role_key>"
+```
+
+#### 2. 로컬 DB에 동기화
+
+```bash
+# POST /users/sync (Admin 권한 필요)
+curl -X POST "http://localhost:3001/users/sync" \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "users": [
+      {
+        "id": "supabase-user-id",
+        "email": "user@example.com",
+        "user_metadata": { "name": "User Name", "role": "admin" }
+      }
+    ]
+  }'
+```
+
+#### 3. authorId 유효성 검사
+
+```bash
+# GET /users/validate-authors (Admin 권한 필요)
+curl -X GET "http://localhost:3001/users/validate-authors" \
+  -H "Authorization: Bearer <admin_token>"
+
+# 응답 예시
+{
+  "total": 10,
+  "valid": 8,
+  "invalid": ["missing-user-id-1", "missing-user-id-2"]
+}
+```
+
+#### 4. 마이그레이션 순서
+
+1. `pnpm db:generate` - Prisma 클라이언트 생성
+2. Supabase Auth 사용자를 `/users/sync` API로 동기화
+3. `/users/validate-authors`로 무효한 authorId 확인
+4. 무효한 데이터 수정 (Prisma Studio 또는 스크립트)
+5. `pnpm db:push` - FK 제약조건 적용
+
 ## 성능 최적화
 
 ### 인덱스 전략

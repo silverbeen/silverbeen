@@ -6,9 +6,17 @@ import { ResumeModule } from './resume';
 import { AuthModule } from './auth';
 import { PostsModule } from './posts';
 import { TagsModule } from './tags';
+import { UsersModule } from './users';
 
 @Module({
-  imports: [PrismaModule, ResumeModule, AuthModule, PostsModule, TagsModule],
+  imports: [
+    PrismaModule,
+    ResumeModule,
+    AuthModule,
+    PostsModule,
+    TagsModule,
+    UsersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
