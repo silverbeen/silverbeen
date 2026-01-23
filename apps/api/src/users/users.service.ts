@@ -137,7 +137,6 @@ export class UsersService {
   async findById(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      include: { posts: true },
     });
   }
 
