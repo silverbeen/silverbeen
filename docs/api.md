@@ -72,27 +72,25 @@ Authorization: Bearer <supabase_access_token>
 
 ```json
 {
-  "data": {
-    "posts": [
-      {
-        "id": 1,
-        "slug": "hello-world",
-        "title": "Hello World",
-        "excerpt": "첫 번째 포스트입니다",
-        "coverImage": "https://...",
-        "published": true,
-        "viewCount": 100,
-        "createdAt": "2024-01-01T00:00:00.000Z",
-        "updatedAt": "2024-01-01T00:00:00.000Z",
-        "tags": [
-          { "id": "uuid", "name": "React" }
-        ]
-      }
-    ],
-    "total": 50,
-    "page": 1,
-    "totalPages": 5
-  }
+  "posts": [
+    {
+      "id": 1,
+      "slug": "hello-world",
+      "title": "Hello World",
+      "excerpt": "첫 번째 포스트입니다",
+      "coverImage": "https://...",
+      "published": true,
+      "viewCount": 100,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "tags": [
+        { "id": "uuid", "name": "React" }
+      ]
+    }
+  ],
+  "total": 50,
+  "page": 1,
+  "totalPages": 5
 }
 ```
 
@@ -344,12 +342,10 @@ GET /posts?page=2&limit=10
 
 ```json
 {
-  "data": {
-    "posts": [...],
-    "total": 50,
-    "page": 2,
-    "totalPages": 5
-  }
+  "posts": [...],
+  "total": 50,
+  "page": 2,
+  "totalPages": 5
 }
 ```
 
