@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BadgeCheck } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import type { Certification } from '@/types/portfolio';
 
@@ -49,7 +49,7 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
             className="flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-background to-primary/5 p-4 transition-colors hover:border-primary/30"
           >
             <div className="rounded-full bg-primary/10 p-2 text-primary">
-              <BadgeCheck className="h-5 w-5" />
+              <Award className="h-5 w-5" />
             </div>
             <div>
               <h3 className="font-medium text-foreground">{cert.name}</h3>

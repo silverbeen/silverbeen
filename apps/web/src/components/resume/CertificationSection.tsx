@@ -48,13 +48,15 @@ export function CertificationSection({
         {certifications.map((cert) => (
           <motion.div
             key={cert.name}
-            className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3"
+            className="flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-background to-primary/5 p-4 transition-colors hover:border-primary/30"
             variants={itemVariants}
           >
-            <Award className="h-5 w-5 text-primary" />
+            <div className="rounded-full bg-primary/10 p-2 text-primary">
+              <Award className="h-5 w-5" />
+            </div>
             <div>
-              <p className="font-medium text-foreground">{cert.name}</p>
-              <p className="text-xs text-muted-foreground">{cert.date}</p>
+              <h3 className="font-medium text-foreground">{cert.name}</h3>
+              <p className="text-sm text-muted-foreground">{cert.date}</p>
             </div>
           </motion.div>
         ))}

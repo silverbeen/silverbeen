@@ -41,8 +41,8 @@ interface PortfolioContentProps {
 
 export function PortfolioContent({ data }: PortfolioContentProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="mx-auto max-w-5xl px-6 py-16">
+    <div className="bg-background min-h-screen">
+      <main className="mx-auto max-w-4xl px-6 py-16">
         <div className="flex flex-col gap-12">
           <ProfileSection profile={data.profile} ImageComponent={NextImage} />
 

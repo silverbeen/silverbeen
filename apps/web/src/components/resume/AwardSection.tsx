@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Trophy } from "lucide-react";
+import { ExternalLink, Trophy, Medal, Award as AwardIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Award } from "@/types/resume";
 import { SectionTitle } from "./SectionTitle";
@@ -31,6 +31,31 @@ const itemVariants = {
   },
 };
 
+const extractPrize = (title: string) => {
+  const prizePatterns = ["대상", "금상", "은상", "동상", "인기상", "장려상", "은메달", "금메달", "동메달"];
+  for (const prize of prizePatterns) {
+    if (title.includes(prize)) {
+      return prize;
+    }
+  }
+  return null;
+};
+
+const getPrizeIcon = (prize: string | null) => {
+  if (!prize) return AwardIcon;
+  if (prize.includes("대상") || prize.includes("금")) return Trophy;
+  if (prize.includes("은") || prize.includes("인기")) return Medal;
+  return AwardIcon;
+};
+
+const getPrizeColor = (prize: string | null) => {
+  if (!prize) return "text-primary";
+  if (prize.includes("대상") || prize.includes("금")) return "text-yellow-500";
+  if (prize.includes("은")) return "text-gray-400";
+  if (prize.includes("인기")) return "text-pink-500";
+  return "text-primary";
+};
+
 export function AwardSection({ awards }: AwardSectionProps) {
   return (
     <section id="awards">
@@ -42,50 +67,53 @@ export function AwardSection({ awards }: AwardSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
       >
-        {awards.map((award) => (
-          <motion.div
-            key={`${award.date}-${award.title}`}
-            className="group flex gap-4 rounded-lg border border-primary/20 bg-card p-4"
-            variants={itemVariants}
-            whileHover={{ x: 4, borderColor: "var(--primary)" }}
-            transition={{ duration: 0.2 }}
-          >
+        {awards.map((award) => {
+          const prize = extractPrize(award.title);
+          const Icon = getPrizeIcon(prize);
+          const iconColor = getPrizeColor(prize);
+
+          return (
             <motion.div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent"
-              whileHover={{ scale: 1.1, rotate: -10 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              key={`${award.date}-${award.title}`}
+              className="flex items-start gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-background to-primary/5 p-4 transition-colors hover:border-primary/30"
+              variants={itemVariants}
             >
-              <Trophy className="h-5 w-5 text-accent-foreground" />
-            </motion.div>
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {award.date}
-                </span>
-                <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                  {award.title}
-                </h3>
-                {award.link && (
-                  <motion.a
-                    href={award.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-primary hover:underline"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {award.linkLabel || "링크"}
-                    <ExternalLink className="h-3 w-3" />
-                  </motion.a>
+              <div className={`rounded-full bg-background p-2 shadow-sm ${iconColor}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-foreground">{award.title}</h3>
+                    {prize && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        {prize}
+                      </span>
+                    )}
+                    {award.link && (
+                      <a
+                        href={award.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {award.date}
+                  </span>
+                </div>
+                {award.description && (
+                  <p className="mt-1 text-sm text-foreground/70">
+                    {award.description}
+                  </p>
                 )}
               </div>
-              {award.description && (
-                <p className="text-sm text-muted-foreground">
-                  {award.description}
-                </p>
-              )}
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </motion.div>
     </section>
   );

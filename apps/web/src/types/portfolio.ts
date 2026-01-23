@@ -48,9 +48,10 @@ export interface Certification {
 }
 
 export interface Activity {
-  name: string;
   date: string;
+  title: string;
   description?: string;
+  link?: string;
 }
 
 export interface PortfolioData {

@@ -1,65 +1,30 @@
 @import "tailwindcss";
 
-/* 전역 스크롤바 스타일 */
-@layer base {
-  /* Webkit 브라우저 (Chrome, Safari, Edge) */
-  *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.2);
-    border-radius: 9999px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    transition: background-color 0.2s ease;
-  }
-
-  *::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.4);
-  }
-
-  *::-webkit-scrollbar-corner {
-    background: transparent;
-  }
-
-  /* Firefox 지원 */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
-  }
+/* 전역 스크롤바 스타일 - Webkit 브라우저 (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
+*::-webkit-scrollbar-thumb {
+  background-color: oklch(0.546 0.245 262.881 / 0.15);
+  border-radius: 9999px;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray-300);
-    border-radius: 9999px;
-  }
+*::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(0.546 0.245 262.881 / 0.3);
+}
 
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray-600);
-  }
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
 
-  /* Firefox 지원 */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-gray-300) transparent;
-  }
-
-  .dark .custom-scrollbar {
-    scrollbar-color: var(--color-gray-600) transparent;
-  }
+/* Firefox 지원 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.546 0.245 262.881 / 0.15) transparent;
 }

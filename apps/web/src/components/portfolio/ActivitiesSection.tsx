@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, ExternalLink } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import type { Activity } from '@/types/portfolio';
 
@@ -53,7 +53,19 @@ export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-medium text-foreground">{activity.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-foreground">{activity.title}</h3>
+                  {activity.link && (
+                    <a
+                      href={activity.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
                 <span className="text-sm text-muted-foreground">{activity.date}</span>
               </div>
               {activity.description && (
