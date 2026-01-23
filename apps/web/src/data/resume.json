@@ -397,9 +397,14 @@
   ],
   "education": [
     {
+      "school": "서울과학기술대학교",
+      "major": "자유전공",
+      "period": "2026.03(입학예정)"
+    },
+    {
       "school": "University of California, Irvine",
       "major": "Individualized Study Program - English Language & TEFL Programs",
-      "period": "2025 (1 Month)"
+      "period": "2025.07 - 2025.08"
     },
     {
       "school": "대덕소프트웨어마이스터고등학교",
