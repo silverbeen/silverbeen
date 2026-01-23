@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { Post, PostListResponse, CreatePostDto, UpdatePostDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
@@ -17,7 +17,7 @@ export function usePosts(
   const [data, setData] = useState<PostListResponse | null>(initialData ?? null);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<Error | null>(null);
-  const [isInitial, setIsInitial] = useState(!!initialData);
+  const isInitialRef = useRef(!!initialData);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -41,12 +41,12 @@ export function usePosts(
   }, [params?.page, params?.tag, params?.sortBy, params?.order]);
 
   useEffect(() => {
-    if (isInitial) {
-      setIsInitial(false);
+    if (isInitialRef.current) {
+      isInitialRef.current = false;
       return;
     }
     fetchPosts();
-  }, [fetchPosts, isInitial]);
+  }, [fetchPosts]);
 
   return { data, loading, error, refetch: fetchPosts };
 }
