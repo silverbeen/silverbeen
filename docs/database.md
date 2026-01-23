@@ -218,7 +218,7 @@ interface ResumeContent {
 posts Post[]
 
 // Post
-authorId String
+authorId String @map("author_id")
 author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 ```
 
