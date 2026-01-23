@@ -51,7 +51,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
       {
         rootMargin: '-80px 0px -80% 0px',
         threshold: 0,
-      }
+      },
     );
 
     const headingElements = document.querySelectorAll('h1[id], h2[id], h3[id]');
@@ -81,11 +81,9 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   }
 
   return (
-    <nav className="hidden xl:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600">
-      <div className="border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-          목차
-        </h4>
+    <nav className="sticky top-24 hidden max-h-[calc(100vh-30rem)] w-64 overflow-y-auto xl:block custom-scrollbar">
+      <div className="border-l-2 border-gray-200 pl-4 dark:border-gray-700">
+        <h4 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white">목차</h4>
         <ul className="space-y-2">
           {headings.map((heading, index) => (
             <li
@@ -94,7 +92,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
             >
               <button
                 onClick={() => handleClick(heading.id)}
-                className={`cursor-pointer text-left text-sm leading-relaxed transition-colors duration-200 hover:text-primary-500 ${
+                className={`hover:text-primary-500 cursor-pointer text-left text-sm leading-relaxed transition-colors duration-200 ${
                   activeId === heading.id
                     ? 'text-primary-500 font-medium'
                     : 'text-gray-500 dark:text-gray-400'
