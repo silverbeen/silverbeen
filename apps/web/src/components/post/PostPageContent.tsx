@@ -1,34 +1,34 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TagFilter } from './TagFilter';
 import { SortSelector, type SortByType, type OrderType } from './SortSelector';
 import { PostsGrid } from './PostsGrid';
 import { Pagination } from './Pagination';
 import type { PostListResponse } from '@/types/post';
 
-export function PostPageContent() {
+interface PostPageContentProps {
+  initialData: PostListResponse | null;
+  initialTag: string | null;
+  initialPage: number;
+  initialSortBy: SortByType;
+  initialOrder: OrderType;
+}
+
+export function PostPageContent({
+  initialData,
+  initialTag,
+  initialPage,
+  initialSortBy,
+  initialOrder,
+}: PostPageContentProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [postsData, setPostsData] = useState<PostListResponse | null>(null);
-
-  const tag = searchParams.get('tag');
-
-  const rawPage = parseInt(searchParams.get('page') || '1', 10);
-  const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
-
-  const validSortBy: SortByType[] = ['createdAt', 'viewCount', 'title'];
-  const rawSortBy = searchParams.get('sortBy');
-  const sortBy: SortByType = validSortBy.includes(rawSortBy as SortByType)
-    ? (rawSortBy as SortByType)
-    : 'createdAt';
-
-  const validOrder: OrderType[] = ['asc', 'desc'];
-  const rawOrder = searchParams.get('order');
-  const order: OrderType = validOrder.includes(rawOrder as OrderType)
-    ? (rawOrder as OrderType)
-    : 'desc';
+  const [postsData, setPostsData] = useState<PostListResponse | null>(initialData);
+  const [tag, setTag] = useState<string | null>(initialTag);
+  const [page, setPage] = useState(initialPage);
+  const [sortBy, setSortBy] = useState<SortByType>(initialSortBy);
+  const [order, setOrder] = useState<OrderType>(initialOrder);
 
   const handleDataLoaded = useCallback((data: PostListResponse | null) => {
     setPostsData(data);
@@ -37,14 +37,19 @@ export function PostPageContent() {
   const updateParams = (
     newTag: string | null,
     newPage: number,
-    newSortBy?: SortByType,
-    newOrder?: OrderType
+    newSortBy: SortByType,
+    newOrder: OrderType,
   ) => {
+    setTag(newTag);
+    setPage(newPage);
+    setSortBy(newSortBy);
+    setOrder(newOrder);
+
     const params = new URLSearchParams();
     if (newTag) params.set('tag', newTag);
     if (newPage > 1) params.set('page', newPage.toString());
-    if (newSortBy && newSortBy !== 'createdAt') params.set('sortBy', newSortBy);
-    if (newOrder && newOrder !== 'desc') params.set('order', newOrder);
+    if (newSortBy !== 'createdAt') params.set('sortBy', newSortBy);
+    if (newOrder !== 'desc') params.set('order', newOrder);
 
     const queryString = params.toString();
     router.push(queryString ? `/blog?${queryString}` : '/blog', { scroll: false });
@@ -68,7 +73,14 @@ export function PostPageContent() {
         <TagFilter currentTag={tag} onTagChange={handleTagChange} />
         <SortSelector sortBy={sortBy} order={order} onSortChange={handleSortChange} />
       </div>
-      <PostsGrid tag={tag || undefined} page={page} sortBy={sortBy} order={order} onDataLoaded={handleDataLoaded} />
+      <PostsGrid
+        tag={tag || undefined}
+        page={page}
+        sortBy={sortBy}
+        order={order}
+        initialData={initialData}
+        onDataLoaded={handleDataLoaded}
+      />
       {postsData && (
         <Pagination
           currentPage={page}

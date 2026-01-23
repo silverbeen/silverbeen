@@ -2,11 +2,37 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { PostPageContent } from '@/components/post/PostPageContent';
 import { WritePostButton } from '@/components/post/WritePostButton';
+import { api } from '@/lib/api';
+import { config } from '@/config';
+import type { SortByType, OrderType } from '@/components/post/SortSelector';
 
 export const metadata: Metadata = {
-  title: '블로그 | Silverbeen',
+  title: '블로그',
   description: '개발 관련 글과 경험을 공유합니다.',
+  openGraph: {
+    title: `블로그 | ${config.siteName}`,
+    description: '개발 관련 글과 경험을 공유합니다.',
+    url: `${config.siteUrl}/blog`,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `블로그 | ${config.siteName}`,
+    description: '개발 관련 글과 경험을 공유합니다.',
+  },
+  alternates: {
+    canonical: `${config.siteUrl}/blog`,
+  },
 };
+
+interface BlogPageProps {
+  searchParams: Promise<{
+    tag?: string;
+    page?: string;
+    sortBy?: string;
+    order?: string;
+  }>;
+}
 
 function BlogPageSkeleton() {
   return (
@@ -44,7 +70,27 @@ function BlogPageSkeleton() {
   );
 }
 
-export default function BlogPage() {
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const params = await searchParams;
+
+  const tag = params.tag || null;
+  const rawPage = parseInt(params.page || '1', 10);
+  const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+
+  const validSortBy: SortByType[] = ['createdAt', 'viewCount', 'title'];
+  const sortBy: SortByType = validSortBy.includes(params.sortBy as SortByType)
+    ? (params.sortBy as SortByType)
+    : 'createdAt';
+
+  const validOrder: OrderType[] = ['asc', 'desc'];
+  const order: OrderType = validOrder.includes(params.order as OrderType)
+    ? (params.order as OrderType)
+    : 'desc';
+
+  const initialData = await api.blogs
+    .getList({ tag: tag || undefined, page, sortBy, order }, { revalidate: 60 })
+    .catch(() => null);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -58,7 +104,13 @@ export default function BlogPage() {
         </header>
 
         <Suspense fallback={<BlogPageSkeleton />}>
-          <PostPageContent />
+          <PostPageContent
+            initialData={initialData}
+            initialTag={tag}
+            initialPage={page}
+            initialSortBy={sortBy}
+            initialOrder={order}
+          />
         </Suspense>
       </div>
 

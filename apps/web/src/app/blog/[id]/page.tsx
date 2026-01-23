@@ -7,6 +7,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 import remarkGfm from 'remark-gfm';
 import 'highlight.js/styles/github-dark.css';
 import { api } from '@/lib/api';
+import { config } from '@/config';
 import { GiscusComments } from '@/components/post/GiscusComments';
 import { TableOfContents } from '@/components/post/TableOfContents';
 import { BlogPostHeader } from '@/components/post/BlogPostHeader';
@@ -18,6 +19,7 @@ import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
 import { formatDateKorean } from '@/utils/date';
 import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
+import type { Post } from '@/types/post';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -33,13 +35,33 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   try {
     const blog = await api.blogs.getById(blogId);
+    const description = blog.excerpt || blog.content.slice(0, 160).replace(/\n/g, ' ');
+    const url = `${config.siteUrl}/blog/${blog.id}`;
+
     return {
-      title: `${blog.title} | Silverbeen Blog`,
-      description: blog.excerpt || blog.content.slice(0, 160),
+      title: blog.title,
+      description,
       openGraph: {
         title: blog.title,
-        description: blog.excerpt || blog.content.slice(0, 160),
-        images: blog.coverImage ? [{ url: blog.coverImage }] : undefined,
+        description,
+        url,
+        type: 'article',
+        publishedTime: blog.createdAt,
+        modifiedTime: blog.updatedAt,
+        authors: [config.author.name],
+        tags: blog.tags.map((tag) => tag.name),
+        images: blog.coverImage
+          ? [{ url: blog.coverImage, width: 1200, height: 630, alt: blog.title }]
+          : undefined,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: blog.title,
+        description,
+        images: blog.coverImage ? [blog.coverImage] : undefined,
+      },
+      alternates: {
+        canonical: url,
       },
     };
   } catch {
@@ -47,6 +69,75 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: '글을 찾을 수 없습니다',
     };
   }
+}
+
+function BlogJsonLd({ blog }: { blog: Post }) {
+  const url = `${config.siteUrl}/blog/${blog.id}`;
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: blog.title,
+    description: blog.excerpt || blog.content.slice(0, 160),
+    image: blog.coverImage || undefined,
+    datePublished: blog.createdAt,
+    dateModified: blog.updatedAt,
+    url,
+    author: {
+      '@type': 'Person',
+      name: config.author.name,
+      email: config.author.email,
+      url: config.author.url,
+    },
+    publisher: {
+      '@type': 'Person',
+      name: config.author.name,
+      url: config.siteUrl,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    keywords: blog.tags.map((tag) => tag.name).join(', '),
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: config.siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '블로그',
+        item: `${config.siteUrl}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: blog.title,
+        item: url,
+      },
+    ],
+  };
+
+  const safeArticleJson = JSON.stringify(articleSchema).replace(/</g, '\\u003c');
+  const safeBreadcrumbJson = JSON.stringify(breadcrumbSchema).replace(/</g, '\\u003c');
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeArticleJson }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeBreadcrumbJson }}
+      />
+    </>
+  );
 }
 
 export default async function BlogPage({ params }: PageProps) {
@@ -76,6 +167,7 @@ export default async function BlogPage({ params }: PageProps) {
 
   return (
     <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900">
+      <BlogJsonLd blog={blog} />
       {/* Sticky Title Header with Mobile ToC */}
       <BlogPostHeader postId={blog.id} postTitle={blog.title} />
 
