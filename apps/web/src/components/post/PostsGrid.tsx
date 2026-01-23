@@ -11,11 +11,12 @@ interface PostsGridProps {
   page: number;
   sortBy: SortByType;
   order: OrderType;
+  initialData?: PostListResponse | null;
   onDataLoaded?: (data: PostListResponse | null) => void;
 }
 
-export function PostsGrid({ tag, page, sortBy, order, onDataLoaded }: PostsGridProps) {
-  const { data, loading, error } = usePosts({ tag, page, sortBy, order });
+export function PostsGrid({ tag, page, sortBy, order, initialData, onDataLoaded }: PostsGridProps) {
+  const { data, loading, error } = usePosts({ tag, page, sortBy, order }, initialData);
 
   useEffect(() => {
     if (onDataLoaded) {

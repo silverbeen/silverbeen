@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { Post, PostListResponse, CreatePostDto, UpdatePostDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
 
-export function usePosts(params?: {
-  tag?: string;
-  page?: number;
-  sortBy?: 'createdAt' | 'viewCount' | 'title';
-  order?: 'asc' | 'desc';
-}) {
-  const [data, setData] = useState<PostListResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+export function usePosts(
+  params?: {
+    tag?: string;
+    page?: number;
+    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    order?: 'asc' | 'desc';
+  },
+  initialData?: PostListResponse | null
+) {
+  const [data, setData] = useState<PostListResponse | null>(initialData ?? null);
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<Error | null>(null);
+  const isInitialRef = useRef(!!initialData);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -37,6 +41,10 @@ export function usePosts(params?: {
   }, [params?.page, params?.tag, params?.sortBy, params?.order]);
 
   useEffect(() => {
+    if (isInitialRef.current) {
+      isInitialRef.current = false;
+      return;
+    }
     fetchPosts();
   }, [fetchPosts]);
 
