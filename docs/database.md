@@ -18,14 +18,16 @@
 │ role (ENUM)     │
 │ createdAt       │
 │ updatedAt       │
-└─────────────────┘
-
-┌─────────────────┐         ┌─────────────────┐
-│      Post       │         │      Tag        │
-├─────────────────┤         ├─────────────────┤
-│ id (PK)         │◄──n:m──►│ id (PK)         │
-│ authorId        │         │ name (UNIQUE)   │
-│ title           │         └─────────────────┘
+│ posts[]         │──────┐
+└─────────────────┘      │
+                         │ 1:N
+┌─────────────────┐      │    ┌─────────────────┐
+│      Post       │◄─────┘    │      Tag        │
+├─────────────────┤           ├─────────────────┤
+│ id (PK)         │◄───n:m───►│ id (PK)         │
+│ authorId (FK)   │           │ name (UNIQUE)   │
+│ author          │           └─────────────────┘
+│ title           │
 │ slug (UNIQUE)   │
 │ content         │
 │ excerpt         │
@@ -60,6 +62,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  posts     Post[]
 }
 
 enum Role {
@@ -74,6 +77,7 @@ enum Role {
 | email | String | 로그인 이메일 (고유) |
 | name | String? | 표시 이름 |
 | role | Role | USER 또는 ADMIN |
+| posts | Post[] | 작성한 포스트 목록 (1:N) |
 
 ### Post
 
@@ -83,6 +87,7 @@ enum Role {
 model Post {
   id         Int      @id @default(autoincrement())
   authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title      String
   slug       String   @unique
   content    String
@@ -103,7 +108,8 @@ model Post {
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | id | Int | Auto-increment PK |
-| authorId | String | Supabase Auth 사용자 ID (User와 논리적 관계) |
+| authorId | String | User ID (외래 키) |
+| author | User | 작성자 (1:N 관계) |
 | title | String | 포스트 제목 |
 | slug | String | URL 친화적 식별자 (자동 생성) |
 | content | String | 마크다운 본문 |
@@ -204,6 +210,35 @@ interface ResumeContent {
 ```
 
 ## 관계
+
+### User ↔ Post (일대다)
+
+```prisma
+// User
+posts Post[]
+
+// Post
+authorId String
+author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+```
+
+User 삭제 시 연관된 Post도 함께 삭제됨 (`onDelete: Cascade`)
+
+#### 조회 예시
+
+```typescript
+// 사용자와 작성한 포스트 함께 조회
+const userWithPosts = await prisma.user.findUnique({
+  where: { id: userId },
+  include: { posts: true }
+});
+
+// 포스트와 작성자 함께 조회
+const postWithAuthor = await prisma.post.findUnique({
+  where: { id: postId },
+  include: { author: true }
+});
+```
 
 ### Post ↔ Tag (다대다)
 
