@@ -1,15 +1,33 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { config } from '@/config';
 import type { PortfolioData } from '@/types/portfolio';
 import portfolioData from '@/data/portfolio.json';
 import { PortfolioContent } from './PortfolioContent';
+import { api, ApiError } from '@/lib/api';
 
-function getPortfolioData(): PortfolioData {
-  return portfolioData as PortfolioData;
+async function getPortfolioData(): Promise<PortfolioData | null> {
+  try {
+    return await api.portfolio.get({ revalidate: 60 });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+    console.warn('API unavailable, using fallback data');
+    return portfolioData as PortfolioData;
+  }
 }
 
-export function generateMetadata(): Metadata {
-  const data = getPortfolioData();
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getPortfolioData();
+
+  if (!data) {
+    return {
+      title: '포트폴리오를 찾을 수 없습니다',
+      description: '요청하신 포트폴리오가 아직 발행되지 않았습니다.',
+    };
+  }
+
   const { profile } = data;
   const title = `포트폴리오 | ${profile.name}`;
   const description = `${profile.title || '개발자'} ${profile.name}의 포트폴리오입니다. 프로젝트 경험과 기술 스택을 확인하세요.`;
@@ -38,8 +56,12 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function PortfolioPage() {
-  const data = getPortfolioData();
+export default async function PortfolioPage() {
+  const data = await getPortfolioData();
+
+  if (!data) {
+    notFound();
+  }
 
   return (
     <>
