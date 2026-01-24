@@ -37,14 +37,29 @@ export default async function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <Link
+            href="/admin/resume"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 hover:shadow-lg transition-shadow block"
+          >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               이력서 관리
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               이력서 내용을 수정하고 관리합니다.
             </p>
-          </div>
+          </Link>
+
+          <Link
+            href="/admin/portfolio"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 hover:shadow-lg transition-shadow block"
+          >
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              포트폴리오 관리
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              포트폴리오 내용을 수정하고 관리합니다.
+            </p>
+          </Link>
 
           <Link
             href="/admin/posts"
