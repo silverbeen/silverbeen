@@ -5,8 +5,8 @@ import * as path from 'path';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Read resume.json from web app
-  const resumePath = path.join(__dirname, '../../../apps/web/src/data/resume.json');
+  // Read resume.json from api project's data directory
+  const resumePath = path.join(__dirname, './data/resume.json');
   const resumeData = JSON.parse(fs.readFileSync(resumePath, 'utf-8'));
 
   // Upsert resume data
@@ -16,8 +16,8 @@ async function main() {
     create: { id: 'main', content: resumeData },
   });
 
-  // Read portfolio.json from web app
-  const portfolioPath = path.join(__dirname, '../../../apps/web/src/data/portfolio.json');
+  // Read portfolio.json from api project's data directory
+  const portfolioPath = path.join(__dirname, './data/portfolio.json');
   const portfolioData = JSON.parse(fs.readFileSync(portfolioPath, 'utf-8'));
 
   // Upsert portfolio data

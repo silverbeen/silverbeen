@@ -11,10 +11,15 @@ export const portfolioApi = {
       body: JSON.stringify({ content }),
     }),
 
-  // Legacy aliases
+  /**
+   * @deprecated Use `getPortfolio` instead
+   */
   get: (options?: { revalidate?: number }) =>
     fetcher<PortfolioData>('/portfolio', { revalidate: options?.revalidate }),
 
+  /**
+   * @deprecated Use `updatePortfolio` instead
+   */
   update: (content: PortfolioData) =>
     fetcher<PortfolioData>('/portfolio', {
       method: 'PUT',

@@ -11,10 +11,15 @@ export const resumeApi = {
       body: JSON.stringify({ content }),
     }),
 
-  // Legacy aliases
+  /**
+   * @deprecated Use `getResume` instead
+   */
   get: (options?: { revalidate?: number }) =>
     fetcher<ResumeData>('/resume', { revalidate: options?.revalidate }),
 
+  /**
+   * @deprecated Use `updateResume` instead
+   */
   update: (content: ResumeData) =>
     fetcher<ResumeData>('/resume', {
       method: 'PUT',
