@@ -19,9 +19,10 @@ const categories: { value: ProjectCategory | 'all'; label: string; icon: React.E
   { value: 'club', label: '동아리', icon: FolderGit2 },
 ];
 
-type SortOrder = 'newest' | 'oldest';
+type SortOrder = 'recommended' | 'newest' | 'oldest';
 
 const sortOptions: { value: SortOrder; label: string }[] = [
+  { value: 'recommended', label: '추천순' },
   { value: 'newest', label: '최신순' },
   { value: 'oldest', label: '오래된순' },
 ];
@@ -57,7 +58,7 @@ const itemVariants = {
 export function ProjectSection({ projects }: ProjectSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<ProjectCategory | 'all'>('all');
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('recommended');
 
   const filteredAndSortedProjects = useMemo(() => {
     // hidden이 아닌 프로젝트만 필터링
@@ -66,6 +67,11 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
     const filtered = selectedCategory === 'all'
       ? visibleProjects
       : visibleProjects.filter((p) => p.category === selectedCategory);
+
+    // 추천순은 원본 배열 순서 유지 (JSON에 정의된 순서)
+    if (sortOrder === 'recommended') {
+      return filtered;
+    }
 
     return [...filtered].sort((a, b) => {
       const dateA = parseDate(a.period);

@@ -15,6 +15,19 @@ async function main() {
     update: { content: resumeData },
     create: { id: 'main', content: resumeData },
   });
+
+  // Read portfolio.json from web app
+  const portfolioPath = path.join(__dirname, '../../../apps/web/src/data/portfolio.json');
+  const portfolioData = JSON.parse(fs.readFileSync(portfolioPath, 'utf-8'));
+
+  // Upsert portfolio data
+  await prisma.portfolio.upsert({
+    where: { id: 'main' },
+    update: { content: portfolioData },
+    create: { id: 'main', content: portfolioData },
+  });
+
+  console.log('Seeded resume and portfolio data');
 }
 
 main()
