@@ -3,12 +3,12 @@
     "name": "강은빈",
     "greeting": "안녕하세요, 강은빈입니다.",
     "title": "Frontend Developer",
-    "tagline": "개발 생산성과 UX를 개선하는 4년차 프론트엔드 개발자입니다.",
+    "tagline": "비즈니스 확장성과 개발 생산성의 최적점을 찾는 4년 차 프론트엔드 개발자 강은빈입니다.",
     "email": "kub9722@gmail.com",
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
     "photo": "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/resume/profile.jpeg",
-    "introduction": "AI 캐릭터 챗 서비스 회사에서 버블챗, 팅글챗, 백오피스 개발을 담당하고 있습니다.\n여러 프로젝트의 초기 개발부터 참여해 Turborepo 기반 모노레포 구축, 화이트 레이블 서비스 구조 설계,\n디자인 시스템과 React Query 도입을 주도했습니다.\nAI를 활용해 개발 효율을 높이는 것에 관심이 많습니다.\nFigma MCP를 도입해 디자인→코드 워크플로우를 자동화하고,\nClaude Code 기반 MR 자동 리뷰 시스템을 구축하는 등 개발 생산성 개선을 주도하고 있습니다."
+    "introduction": "화이트 레이블 아키텍처 설계와 AI 자동화 구축으로 비즈니스의 병목을 해결하는 프론트엔드 개발자입니다.\nTurborepo 기반 멀티 브랜드 서비스 구조 설계로 4개국 글로벌 확장을 지원했고, Figma MCP 디자인-코드 자동화(80% 단축)와 Claude Code MR 자동 리뷰(90% 단축)를 직접 구축하여 팀 전체의 DX를 혁신했습니다."
   },
   "skills": {
     "languages": ["TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS"],
@@ -27,11 +27,25 @@
     "infrastructure": ["Vercel", "Railway", "AWS EC2", "AWS S3", "CloudFront"],
     "testing": ["Jest", "Vitest", "React Testing Library"]
   },
+  "coreCompetencies": [
+    {
+      "title": "Scalable Architecture",
+      "description": "Turborepo 기반 화이트 레이블 아키텍처 설계로 멀티 브랜드 서비스 확장 및 유지보수 효율화"
+    },
+    {
+      "title": "AI-Driven Development",
+      "description": "Figma MCP 및 Claude Code 자동 리뷰 시스템 구축을 통한 디자인-코드 워크플로우 자동화 (퍼블리싱 80%, 리뷰 90% 단축)"
+    },
+    {
+      "title": "High-Quality UX",
+      "description": "SSE 스트리밍 최적화 및 양방향 무한 스크롤 엔진 구현을 통한 끊김 없는 실시간 대화 경험 제공"
+    }
+  ],
   "experience": [
     {
-      "company": "(주) 버블탭",
+      "company": "(주) 버블탭 (구 아데나소프트웨어)",
       "startDate": "2022.07",
-      "description": "주식회사 아데나소프트웨어 입사 → (주) 버블탭 자회사로 분사",
+      "description": "2022년 아데나소프트웨어 입사 → 2024년 버블탭으로 분사",
       "techStack": [
         { "category": "Core", "items": ["React", "TypeScript", "pnpm"] },
         { "category": "Architecture", "items": ["Turborepo", "Storybook"] },
@@ -62,7 +76,7 @@
             "Clarity"
           ],
           "description": "사용자가 다양한 AI 캐릭터와 1:1 실시간 채팅을 즐기는 B2C 서비스입니다.\nSSE 기반 스트리밍 응답으로 자연스러운 대화 경험을 제공하며, 북마크, 채팅 히스토리, 캐릭터 즐겨찾기 등 개인화 기능을 지원합니다.\nBubbleChat(2024.10), TingleChat(2025.04) 런칭 후 태국, 대만, 일본으로 글로벌 확장했습니다.",
-          "role": "프론트엔드 개발, 기술적 의사결정 및 팀 문서화 주도",
+          "role": "프론트엔드 개발 / 아키텍처 설계 및 DX 개선 주도",
           "tasks": [
             {
               "title": "[서비스 개발] 프론트엔드 개발 및 2.0 개편",
@@ -70,7 +84,7 @@
                 "PoC 단계부터 프론트엔드 단독 개발로 서비스 런칭 주도",
                 "Web 2.0 전면 개편: 메인/상세 페이지 UX 개선, 성능 최적화",
                 "양방향 무한 스크롤 채팅: 커서 기반 페이지네이션, 앵커 기준 스크롤 복원으로 점프/깜빡임 해결",
-                "SSE 기반 실시간 AI 채팅 시스템 개발 (연결 끊김 시 자동 재연결 처리)",
+                "SSE 기반 실시간 AI 채팅 시스템 개발",
                 "알림 시스템 WebSocket(Socket.IO) 아키텍처 리팩토링: 범용 소켓 모듈로 재설계"
               ]
             },
@@ -79,43 +93,45 @@
               "items": [
                 "[배경] TingleChat 화이트 레이블링 서비스 도입으로 기존 단일 React 구조의 한계",
                 "[선택 이유] 멀티 브랜딩 지원, 코드 중복 제거, 일관된 배포 파이프라인",
-                "[결과] BubbleChat/TingleChat 동시 유지보수, 신규 브랜드 추가 시 중복 작업 제거",
+                "[결과] BubbleChat/TingleChat 동시 유지보수, 신규 브랜드 추가 시 중복 작업 70% 제거",
                 "글로벌 서비스(태국, 대만, 일본) 대응: 시간대/통화 처리, CDN 최적화"
               ]
             },
             {
               "title": "[아키텍처] 디자인 시스템 구축",
               "items": [
+                "[배경] 화이트 레이블 서비스 확장에 따른 일관된 UI/UX 필요",
                 "디자이너와 협업하여 프로젝트 디자인 시스템 정립 및 문서화",
                 "다크모드 컬러셋 구성: 라이트/다크 테마별 컬러 토큰 설계 및 CSS 변수 기반 통합 관리",
-                "화이트 레이블 서비스(BubbleChat/TingleChat, Reward)에 적합하도록 원소스 멀티 브랜드 아키텍처 설계",
-                "Button, Input, Modal 등 30개 이상 공통 컴포넌트 라이브러리 구축"
+                "[결과] Button, Input, Modal 등 30개 이상 공통 컴포넌트 라이브러리 구축"
               ]
             },
             {
-              "title": "[DX 개선] Figma MCP 디자인 자동화 (80% 단축)",
+              "title": "[DX 개선] Figma MCP 디자인 자동화",
               "items": [
+                "[배경] 반복적인 퍼블리싱 작업으로 인한 개발 생산성 저하",
                 "[계기] 우아콘 디자인 자동화 세션 참석 후 사내 발표 및 도입 제안",
                 "[구현] Figma MCP 연동으로 디자인→코드 워크플로우 자동화",
-                "[결과] 퍼블리싱 작업 시간 80% 이상 단축, 디자인 피그마 작업 최소화"
+                "[결과] 퍼블리싱 작업 시간 80% 단축, 디자인-개발 간 커뮤니케이션 비용 최소화"
               ]
             },
             {
-              "title": "[DX 개선] Claude Code MR 자동 리뷰 (90% 단축)",
+              "title": "[DX 개선] Claude Code MR 자동 리뷰",
               "items": [
-                "[배경] 회사 보안 정책상 CodeRabbit 사용 불가",
-                "[구현] CodeRabbit 구조 기반 프롬프팅, MR 생성 시 자동 리뷰 달리도록 구축",
-                "[결과] 코드 리뷰 시간 90% 이상 단축, GitLab API 연동 이슈 생성 자동화",
+                "[배경] 회사 보안 정책상 CodeRabbit 사용 불가, 수동 리뷰로 인한 병목",
+                "[구현] CodeRabbit 구조 기반 프롬프팅, MR 생성 시 자동 리뷰 시스템 구축",
+                "[결과] 코드 리뷰 시간 90% 단축, GitLab API 연동 이슈 생성 자동화",
                 "팀 개발 워크플로우 문서화 및 Claude Code 활용 가이드라인 작성"
               ]
             },
             {
-              "title": "[운영] 서비스 운영 및 장애 대응",
+              "title": "[DevOps] CI/CD 파이프라인 개선",
               "items": [
-                "배포 후 버그/장애 실시간 대응 및 핫픽스 배포",
-                "트래픽 급증 대응 경험 (이벤트/프로모션)",
-                "CS 이슈 대응을 위한 문의하기 기능 개발",
-                "GA4, Airbridge 연동 종합 로깅 시스템으로 사용자 행동 분석 기반 UX 개선"
+                "[배경] 서비스 증가(web, reward, design-system)에 따른 단일 파이프라인 구조의 한계",
+                "[구현] Parent-Child Pipeline 구조로 서비스별 독립 배포 파이프라인 설계",
+                "공통 변수/캐시 설정을 common.yml로 분리하여 중복 코드 제거",
+                "YAML Anchor 기반 변경 감지 로직으로 해당 서비스 파일 변경 시에만 Job 실행",
+                "[결과] 빌드 시간 감소, 서비스별 독립 배포 가능, 유지보수성 향상"
               ]
             },
             {
@@ -128,19 +144,18 @@
               ]
             },
             {
-              "title": "[DevOps] CI/CD 파이프라인 개선",
+              "title": "[운영] 서비스 운영 및 장애 대응",
               "items": [
-                "[배경] 서비스 증가(web, reward, design-system)에 따른 단일 파이프라인 구조의 한계",
-                "[구현] Parent-Child Pipeline 구조로 서비스별 독립 배포 파이프라인 설계",
-                "공통 변수/캐시 설정을 common.yml로 분리하여 중복 코드 제거",
-                "YAML Anchor 기반 변경 감지 로직으로 해당 서비스 파일 변경 시에만 Job 실행",
-                "[결과] 빌드 시간 감소, 서비스별 독립 배포 가능, 유지보수성 향상"
+                "배포 후 버그/장애 실시간 대응 및 핫픽스 배포",
+                "트래픽 급증 대응 경험 (이벤트/프로모션)",
+                "CS 이슈 대응을 위한 문의하기 기능 개발",
+                "GA4, Airbridge 연동 종합 로깅 시스템으로 사용자 행동 분석 기반 UX 개선"
               ]
             }
           ],
           "impact": [
-            "BubbleChat(2024.10), TingleChat(2025.04) 성공적 글로벌 런칭",
-            "태국, 대만, 일본 4개국 서비스 확장",
+            "글로벌 4개국(한국, 태국, 대만, 일본) 대응을 위한 화이트 레이블 아키텍처 구축 및 런칭",
+            "BubbleChat(2024.10), TingleChat(2025.04) 글로벌 서비스 런칭 주도",
             "Figma MCP 도입으로 퍼블리싱 시간 80% 단축",
             "Claude Code MR 자동 리뷰로 코드 리뷰 시간 90% 단축",
             "화이트 레이블링 구조로 신규 브랜드 중복 작업 제거"

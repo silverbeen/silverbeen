@@ -1,5 +1,7 @@
 import type { Profile } from './resume';
 
+export type { Profile };
+
 export interface Club {
   name: string;
   role: string;
@@ -33,6 +35,7 @@ export interface PortfolioProject {
     url: string;
   }[];
   images?: string[];
+  hidden?: boolean;
 }
 
 export interface Award {

@@ -1,3 +1,4 @@
+export { ProfileSection } from './ProfileSection';
 export { ClubSection } from './ClubSection';
 export { ProjectCard } from './ProjectCard';
 export { ProjectSection } from './ProjectSection';

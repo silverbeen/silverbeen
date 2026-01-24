@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { ProfileSection } from '@/components/resume';
 import {
+  ProfileSection,
   ClubSection,
   ProjectSection,
   AwardsSection,

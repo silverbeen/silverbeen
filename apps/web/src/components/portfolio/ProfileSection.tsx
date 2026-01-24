@@ -1,0 +1,170 @@
+'use client';
+
+import { Mail, Github, BookOpen, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { Profile } from '@/types/portfolio';
+
+interface ProfileSectionProps {
+  profile: Profile;
+  ImageComponent?: React.ComponentType<{
+    src: string;
+    alt: string;
+    fill?: boolean;
+    className?: string;
+    priority?: boolean;
+  }>;
+}
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
+function DefaultImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  className?: string;
+  priority?: boolean;
+}) {
+  return <img src={src} alt={alt} className={`${className || ''} h-full w-full object-cover`} />;
+}
+
+export function ProfileSection({ profile, ImageComponent = DefaultImage }: ProfileSectionProps) {
+  return (
+    <motion.section
+      id="profile"
+      className="relative"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-8">
+        {/* 프로필 이미지 */}
+        {profile.photo && (
+          <motion.div className="group relative mx-auto shrink-0 md:mx-0" variants={imageVariants}>
+            <div className="relative h-36 w-36 overflow-hidden rounded-3xl md:h-44 md:w-44">
+              <ImageComponent
+                src={profile.photo}
+                alt={profile.name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                priority
+              />
+              {/* 미묘한 오버레이 */}
+              <div className="from-primary/10 absolute inset-0 bg-gradient-to-tr via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </div>
+            {/* 장식 요소 */}
+            <div className="border-primary/20 absolute -right-2 -bottom-2 -z-10 h-20 w-20 rounded-2xl border" />
+          </motion.div>
+        )}
+
+        {/* 정보 영역 */}
+        <div className="flex flex-1 flex-col gap-5 text-center md:text-left">
+          {/* 이름 & 타이틀 */}
+          <motion.div variants={itemVariants} className="space-y-1">
+            <h1 className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
+              {profile.name}
+              {/* <span className="text-primary">.</span> */}
+            </h1>
+            {profile.title && (
+              <p className="text-primary/90 text-base font-medium">{profile.title}</p>
+            )}
+          </motion.div>
+
+          {/* 태그라인 */}
+          {profile.tagline && (
+            <motion.p
+              className="text-foreground/70 text-[15px] leading-relaxed"
+              variants={itemVariants}
+            >
+              {profile.tagline}
+            </motion.p>
+          )}
+
+          {/* 연락처 링크 */}
+          <motion.div
+            className="flex flex-wrap justify-center gap-2.5 md:justify-start"
+            variants={itemVariants}
+          >
+            <a
+              href={`mailto:${profile.email}`}
+              className="group/link border-primary/20 bg-primary/5 text-primary hover:border-primary/40 hover:bg-primary/10 hover:shadow-primary/10 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+            >
+              <Mail className="h-4 w-4" />
+              <span>Email</span>
+            </a>
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+            >
+              <Github className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+              <span>GitHub</span>
+              <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+            </a>
+            <a
+              href={profile.blog}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+            >
+              <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+              <span>Blog</span>
+              <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+            </a>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* 소개글 */}
+      {profile.introduction && (
+        <motion.div
+          className="border-border/50 from-muted/30 to-muted/10 mt-8 rounded-2xl border bg-gradient-to-br p-6"
+          variants={itemVariants}
+        >
+          <div className="text-foreground/75 space-y-3 text-[15px] leading-[1.8]">
+            {profile.introduction.split('\n').map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </motion.section>
+  );
+}
