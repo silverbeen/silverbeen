@@ -3,30 +3,21 @@
 import { motion } from 'framer-motion';
 import { Award } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
+import { containerVariants } from './constants';
 import type { Certification } from '@/types/portfolio';
 
 interface CertificationsSectionProps {
   certifications: Certification[];
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
+const certItemVariants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
     scale: 1,
     transition: { duration: 0.3, ease: 'easeOut' as const },
   },
-};
+} as const;
 
 export function CertificationsSection({ certifications }: CertificationsSectionProps) {
   if (certifications.length === 0) return null;
@@ -42,10 +33,10 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
       >
-        {certifications.map((cert, index) => (
+        {certifications.map((cert) => (
           <motion.div
-            key={index}
-            variants={itemVariants}
+            key={`${cert.name}-${cert.date}`}
+            variants={certItemVariants}
             className="flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-background to-primary/5 p-4 transition-colors hover:border-primary/30"
           >
             <div className="rounded-full bg-primary/10 p-2 text-primary">

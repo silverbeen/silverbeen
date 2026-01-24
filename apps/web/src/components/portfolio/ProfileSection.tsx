@@ -2,6 +2,7 @@
 
 import { Mail, Github, BookOpen, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { containerVariants, itemVariants, imageVariants } from './constants';
 import type { Profile } from '@/types/portfolio';
 
 interface ProfileSectionProps {
@@ -14,41 +15,6 @@ interface ProfileSectionProps {
     priority?: boolean;
   }>;
 }
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-const imageVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
 
 function DefaultImage({
   src,
@@ -97,7 +63,6 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
           <motion.div variants={itemVariants} className="space-y-1">
             <h1 className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
               {profile.name}
-              {/* <span className="text-primary">.</span> */}
             </h1>
             {profile.title && (
               <p className="text-primary/90 text-base font-medium">{profile.title}</p>
@@ -164,7 +129,7 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
         >
           <div className="text-foreground/75 space-y-3 text-[15px] leading-[1.8]">
             {profile.introduction.split('\n').map((paragraph, idx) => (
-              <p key={idx}>{paragraph}</p>
+              <p key={`intro-${idx}`}>{paragraph}</p>
             ))}
           </div>
         </motion.div>

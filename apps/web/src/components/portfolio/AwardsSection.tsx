@@ -3,30 +3,21 @@
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Award as AwardIcon, Sparkles } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
+import { containerVariants } from './constants';
 import type { Award } from '@/types/portfolio';
 
 interface AwardsSectionProps {
   awards: Award[];
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-    },
-  },
-};
-
-const itemVariants = {
+const awardItemVariants = {
   hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const },
   },
-};
+} as const;
 
 const getPrizeConfig = (prize: string) => {
   if (prize.includes('대상') || prize.includes('금')) {
@@ -75,14 +66,14 @@ export function AwardsSection({ awards }: AwardsSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
       >
-        {awards.map((award, index) => {
+        {awards.map((award) => {
           const config = getPrizeConfig(award.prize);
           const Icon = config.icon;
 
           return (
             <motion.div
-              key={index}
-              variants={itemVariants}
+              key={`${award.name}-${award.date}`}
+              variants={awardItemVariants}
               className="group flex items-start gap-4 rounded-xl border border-border/60 bg-background p-4 transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5"
             >
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${config.iconBg}`}>

@@ -3,30 +3,21 @@
 import { motion } from 'framer-motion';
 import { CalendarDays, ExternalLink } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
+import { containerVariants } from './constants';
 import type { Activity } from '@/types/portfolio';
 
 interface ActivitiesSectionProps {
   activities: Activity[];
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
+const activityItemVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
     transition: { duration: 0.3, ease: 'easeOut' as const },
   },
-};
+} as const;
 
 export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
   if (activities.length === 0) return null;
@@ -42,10 +33,10 @@ export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
       >
-        {activities.map((activity, index) => (
+        {activities.map((activity) => (
           <motion.div
-            key={index}
-            variants={itemVariants}
+            key={`${activity.title}-${activity.date}`}
+            variants={activityItemVariants}
             className="flex items-start gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-background to-primary/5 p-4 transition-colors hover:border-primary/30"
           >
             <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -60,6 +51,7 @@ export function ActivitiesSection({ activities }: ActivitiesSectionProps) {
                       href={activity.link}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`${activity.title} 링크`}
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />

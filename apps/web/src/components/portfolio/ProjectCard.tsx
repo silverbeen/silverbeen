@@ -1,34 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ExternalLink, Github, Users, Briefcase, FolderGit2, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, Github, Users, ArrowUpRight } from 'lucide-react';
+import { categoryConfig } from './constants';
 import type { PortfolioProject } from '@/types/portfolio';
 
 interface ProjectCardProps {
   project: PortfolioProject;
   onClick?: () => void;
 }
-
-const categoryConfig = {
-  personal: {
-    label: '개인',
-    icon: Briefcase,
-    gradient: 'from-blue-500/5 via-transparent to-transparent',
-    accent: 'border border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-400',
-  },
-  team: {
-    label: '팀',
-    icon: Users,
-    gradient: 'from-emerald-500/5 via-transparent to-transparent',
-    accent: 'border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400',
-  },
-  club: {
-    label: '동아리',
-    icon: FolderGit2,
-    gradient: 'from-violet-500/5 via-transparent to-transparent',
-    accent: 'border border-violet-500/20 bg-violet-500/5 text-violet-600 dark:text-violet-400',
-  },
-};
 
 export function ProjectCard({ project, onClick }: ProjectCardProps) {
   const config = categoryConfig[project.category];
@@ -50,7 +30,7 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         <div className="flex items-center gap-2">
           <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium ${config.accent}`}>
             <CategoryIcon className="h-3.5 w-3.5" />
-            {config.label}
+            {config.shortLabel}
           </span>
           {project.clubName && (
             <span className="text-xs text-muted-foreground/80">@ {project.clubName}</span>
@@ -81,9 +61,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
 
       {/* 기술 스택 */}
       <div className="mb-4 flex flex-wrap gap-1.5">
-        {project.techStack.slice(0, 5).map((tech, idx) => (
+        {project.techStack.slice(0, 5).map((tech) => (
           <span
-            key={idx}
+            key={tech}
             className="rounded-md bg-muted/60 px-2 py-1 text-xs font-medium text-foreground/70"
           >
             {tech}
@@ -106,9 +86,9 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       {/* 하단 링크 & 더보기 */}
       <div className="mt-auto flex items-center justify-between pt-4 border-t border-border/40">
         <div className="flex gap-2">
-          {project.links?.slice(0, 2).map((link, idx) => (
+          {project.links?.slice(0, 2).map((link) => (
             <motion.a
-              key={idx}
+              key={link.url}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"

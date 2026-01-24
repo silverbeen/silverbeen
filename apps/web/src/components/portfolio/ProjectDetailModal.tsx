@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Github, Users, Briefcase, FolderGit2, Calendar, Sparkles, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ExternalLink, Github, Users, Calendar, Sparkles, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { categoryConfig } from './constants';
 import type { PortfolioProject } from '@/types/portfolio';
 
 interface ProjectDetailModalProps {
@@ -12,24 +13,6 @@ interface ProjectDetailModalProps {
   projects?: PortfolioProject[];
   onNavigate?: (project: PortfolioProject) => void;
 }
-
-const categoryConfig = {
-  personal: {
-    label: '개인 프로젝트',
-    icon: Briefcase,
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  },
-  team: {
-    label: '팀 프로젝트',
-    icon: Users,
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  },
-  club: {
-    label: '동아리 프로젝트',
-    icon: FolderGit2,
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  },
-};
 
 function NavigationCard({
   project,
@@ -47,6 +30,7 @@ function NavigationCard({
   return (
     <button
       onClick={onClick}
+      aria-label={isPrev ? `이전 프로젝트: ${project.name}` : `다음 프로젝트: ${project.name}`}
       className={`group fixed top-1/2 -translate-y-1/2 z-60 hidden md:flex items-center gap-2 ${
         isPrev ? 'left-4 flex-row-reverse' : 'right-4'
       }`}
@@ -70,7 +54,7 @@ function NavigationCard({
         <div className={`mb-1 flex items-center gap-1.5 ${isPrev ? 'justify-end' : ''}`}>
           <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${config.color}`}>
             <CategoryIcon className="h-2.5 w-2.5" />
-            {categoryConfig[project.category].label.replace(' 프로젝트', '')}
+            {config.shortLabel}
           </span>
         </div>
         <p className="text-sm font-semibold text-foreground line-clamp-1">{project.name}</p>
@@ -87,6 +71,9 @@ export function ProjectDetailModal({
   projects = [],
   onNavigate,
 }: ProjectDetailModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
   const currentIndex = project ? projects.findIndex(p => p.name === project.name) : -1;
   const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : null;
   const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : null;
@@ -109,17 +96,28 @@ export function ProjectDetailModal({
     }
   }, [isOpen, prevProject, nextProject, handleNavigate, onClose]);
 
-  // 모달 오픈 시 스크롤 락 및 키보드 이벤트 등록
+  // 모달 오픈 시 스크롤 락, 키보드 이벤트, 포커스 트랩
   useEffect(() => {
     if (!isOpen) return;
+
+    // 현재 포커스된 요소 저장
+    previousActiveElement.current = document.activeElement as HTMLElement;
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
 
+    // 모달에 포커스 이동
+    setTimeout(() => {
+      modalRef.current?.focus();
+    }, 0);
+
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
+
+      // 이전 포커스 요소로 복귀
+      previousActiveElement.current?.focus();
     };
   }, [isOpen, handleKeyDown]);
 
@@ -138,6 +136,7 @@ export function ProjectDetailModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+            aria-hidden="true"
           />
           {prevProject && (
             <NavigationCard
@@ -156,8 +155,13 @@ export function ProjectDetailModal({
 
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
+              ref={modalRef}
               key={project.name}
-              className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-primary/20 bg-background shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-title"
+              tabIndex={-1}
+              className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-primary/20 bg-background shadow-2xl focus:outline-none"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -182,6 +186,7 @@ export function ProjectDetailModal({
                   )}
                   <button
                     onClick={onClose}
+                    aria-label="모달 닫기"
                     className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                   >
                     <X className="h-5 w-5" />
@@ -190,7 +195,7 @@ export function ProjectDetailModal({
               </div>
 
               <div className="p-6">
-                <h2 className="mb-2 text-2xl font-bold text-foreground">{project.name}</h2>
+                <h2 id="modal-title" className="mb-2 text-2xl font-bold text-foreground">{project.name}</h2>
 
                 <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">
@@ -211,9 +216,9 @@ export function ProjectDetailModal({
                 <div className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold text-foreground">기술 스택</h3>
                   <div className="flex flex-wrap gap-2">
-                    {project.techStack.map((tech, idx) => (
+                    {project.techStack.map((tech) => (
                       <span
-                        key={idx}
+                        key={tech}
                         className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-3 py-1.5 text-sm font-medium text-foreground/80"
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
@@ -227,8 +232,8 @@ export function ProjectDetailModal({
                   <div className="mb-6">
                     <h3 className="mb-3 text-sm font-semibold text-foreground">담당 업무</h3>
                     <ul className="space-y-2">
-                      {project.tasks.map((task, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-foreground/80">
+                      {project.tasks.map((task) => (
+                        <li key={task} className="flex items-start gap-2 text-sm text-foreground/80">
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                           <span>{task}</span>
                         </li>
@@ -244,9 +249,9 @@ export function ProjectDetailModal({
                       성과
                     </h3>
                     <div className="space-y-2">
-                      {project.impact.map((item, idx) => (
+                      {project.impact.map((item) => (
                         <div
-                          key={idx}
+                          key={item}
                           className="rounded-lg bg-primary/5 p-3 text-sm text-primary"
                         >
                           {item}
@@ -263,9 +268,9 @@ export function ProjectDetailModal({
                       성장 경험
                     </h3>
                     <div className="space-y-4">
-                      {project.growthExperience.map((exp, idx) => (
+                      {project.growthExperience.map((exp) => (
                         <div
-                          key={idx}
+                          key={exp.title}
                           className="rounded-xl border border-amber-200/50 bg-gradient-to-br from-amber-50/50 to-orange-50/30 p-4 dark:border-amber-900/30 dark:from-amber-900/10 dark:to-orange-900/10"
                         >
                           <h4 className="mb-2 font-semibold text-amber-700 dark:text-amber-400">
@@ -284,9 +289,9 @@ export function ProjectDetailModal({
                   <div className="border-t border-primary/10 pt-4">
                     <h3 className="mb-3 text-sm font-semibold text-foreground">링크</h3>
                     <div className="flex flex-wrap gap-2">
-                      {project.links.map((link, idx) => (
+                      {project.links.map((link) => (
                         <a
-                          key={idx}
+                          key={link.url}
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -311,6 +316,7 @@ export function ProjectDetailModal({
                   <button
                     onClick={() => prevProject && handleNavigate(prevProject)}
                     disabled={!prevProject}
+                    aria-label={prevProject ? `이전 프로젝트: ${prevProject.name}` : '이전 프로젝트 없음'}
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent"
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -319,6 +325,7 @@ export function ProjectDetailModal({
                   <button
                     onClick={() => nextProject && handleNavigate(nextProject)}
                     disabled={!nextProject}
+                    aria-label={nextProject ? `다음 프로젝트: ${nextProject.name}` : '다음 프로젝트 없음'}
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent"
                   >
                     <span className="max-w-24 truncate">{nextProject?.name || '다음'}</span>

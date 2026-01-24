@@ -6,6 +6,7 @@ import { ChevronDown, Briefcase, Users, FolderGit2, Layers } from 'lucide-react'
 import { SectionTitle } from '../resume/SectionTitle';
 import { ProjectCard } from './ProjectCard';
 import { ProjectDetailModal } from './ProjectDetailModal';
+import { containerVariants, scaleItemVariants } from './constants';
 import type { PortfolioProject, ProjectCategory } from '@/types/portfolio';
 
 interface ProjectSectionProps {
@@ -34,26 +35,6 @@ function parseDate(dateStr: string): Date {
   }
   return new Date(0);
 }
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
 
 export function ProjectSection({ projects }: ProjectSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<ProjectCategory | 'all'>('all');
@@ -153,8 +134,8 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
           exit="hidden"
           key={`${selectedCategory}-${sortOrder}`}
         >
-          {filteredAndSortedProjects.map((project, index) => (
-            <motion.div key={`${project.name}-${index}`} variants={itemVariants}>
+          {filteredAndSortedProjects.map((project) => (
+            <motion.div key={project.name} variants={scaleItemVariants}>
               <ProjectCard project={project} onClick={() => setSelectedProject(project)} />
             </motion.div>
           ))}

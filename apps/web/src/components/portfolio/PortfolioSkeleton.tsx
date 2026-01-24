@@ -1,3 +1,5 @@
+'use client';
+
 export function PortfolioSkeleton() {
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +33,7 @@ export function PortfolioSkeleton() {
             <div className="space-y-4">
               {[1, 2].map((i) => (
                 <div
-                  key={i}
+                  key={`club-skeleton-${i}`}
                   className="h-32 animate-pulse rounded-xl border border-border bg-muted"
                 />
               ))}
@@ -49,7 +51,7 @@ export function PortfolioSkeleton() {
             <div className="mb-6 flex gap-2">
               {[1, 2, 3, 4].map((i) => (
                 <div
-                  key={i}
+                  key={`filter-skeleton-${i}`}
                   className="h-10 w-20 animate-pulse rounded-full bg-muted"
                 />
               ))}
@@ -57,7 +59,7 @@ export function PortfolioSkeleton() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
-                  key={i}
+                  key={`project-skeleton-${i}`}
                   className="h-64 animate-pulse rounded-xl border border-border bg-muted"
                 />
               ))}
