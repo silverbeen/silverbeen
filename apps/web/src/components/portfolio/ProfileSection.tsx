@@ -88,8 +88,6 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
               {/* 미묘한 오버레이 */}
               <div className="from-primary/10 absolute inset-0 bg-gradient-to-tr via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
-            {/* 장식 요소 */}
-            <div className="border-primary/20 absolute -right-2 -bottom-2 -z-10 h-20 w-20 rounded-2xl border" />
           </motion.div>
         )}
 
