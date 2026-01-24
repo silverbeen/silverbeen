@@ -119,33 +119,39 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
             className="flex flex-wrap justify-center gap-2.5 md:justify-start"
             variants={itemVariants}
           >
-            <a
-              href={`mailto:${profile.email}`}
-              className="group/link border-primary/20 bg-primary/5 text-primary hover:border-primary/40 hover:bg-primary/10 hover:shadow-primary/10 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-            >
-              <Mail className="h-4 w-4" />
-              <span>Email</span>
-            </a>
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-            >
-              <Github className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
-              <span>GitHub</span>
-              <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
-            </a>
-            <a
-              href={profile.blog}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-            >
-              <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
-              <span>Blog</span>
-              <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
-            </a>
+            {profile.email && (
+              <a
+                href={`mailto:${profile.email}`}
+                className="group/link border-primary/20 bg-primary/5 text-primary hover:border-primary/40 hover:bg-primary/10 hover:shadow-primary/10 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+              >
+                <Mail className="h-4 w-4" />
+                <span>Email</span>
+              </a>
+            )}
+            {profile.github && (
+              <a
+                href={profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+              >
+                <Github className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+                <span>GitHub</span>
+                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+              </a>
+            )}
+            {profile.blog && (
+              <a
+                href={profile.blog}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+              >
+                <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+                <span>Blog</span>
+                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+              </a>
+            )}
           </motion.div>
         </div>
       </div>

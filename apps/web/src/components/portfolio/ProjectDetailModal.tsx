@@ -109,10 +109,19 @@ export function ProjectDetailModal({
     }
   }, [isOpen, prevProject, nextProject, handleNavigate, onClose]);
 
+  // 모달 오픈 시 스크롤 락 및 키보드 이벤트 등록
   useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, handleKeyDown]);
 
   if (!project) return null;
 
