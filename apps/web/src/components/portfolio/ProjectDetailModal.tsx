@@ -138,14 +138,14 @@ export function ProjectDetailModal({
             onClick={onClose}
             aria-hidden="true"
           />
-          {prevProject && (
+          {onNavigate && prevProject && (
             <NavigationCard
               project={prevProject}
               direction="prev"
               onClick={() => handleNavigate(prevProject)}
             />
           )}
-          {nextProject && (
+          {onNavigate && nextProject && (
             <NavigationCard
               project={nextProject}
               direction="next"

@@ -57,9 +57,12 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
             </>
           )}
 
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <ClubSection clubs={data.clubs} />
+          {data.clubs && data.clubs.length > 0 && (
+            <>
+              <hr className="border-sky-100 dark:border-sky-900/30" />
+              <ClubSection clubs={data.clubs} />
+            </>
+          )}
 
           {data.activities && data.activities.length > 0 && (
             <>

@@ -95,6 +95,7 @@ export function AwardSection({ awards }: AwardSectionProps) {
                         href={award.link}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label={`${award.title} 관련 링크 (새 탭에서 열림)`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />

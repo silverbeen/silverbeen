@@ -18,12 +18,23 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
     e.stopPropagation();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
     <motion.div
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${config.gradient} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5`}
+      role="button"
+      tabIndex={0}
+      aria-label={`${project.name} 프로젝트 상세보기`}
+      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${config.gradient} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50`}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
     >
       {/* 상단 메타 정보 */}
       <div className="mb-4 flex items-center justify-between">
