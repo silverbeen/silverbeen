@@ -90,6 +90,37 @@
       "links": [{ "label": "GitHub", "url": "https://github.com/silverbeen/silverbeen" }]
     },
     {
+      "name": "PICK (온라인 출석부)",
+      "category": "club",
+      "clubName": "PICK",
+      "period": "2020.12 - 2023.01",
+      "description": "교내 야간 자율학습 시간에 사용되는 온라인 출석부 서비스입니다. 기존 종이 출석부의 비효율성(분실, 수기 집계 오류)을 개선하여 태블릿과 PC에서 실시간 출석 체크가 가능합니다. 2년간 교내 선생님들이 실제로 사용하며 지속적으로 피드백을 반영해 개선했습니다.",
+      "role": "프론트엔드 개발",
+      "teamSize": 5,
+      "techStack": ["React", "TypeScript", "Recoil", "React-Query"],
+      "tasks": [
+        "태블릿/PC 반응형 UI 개발 및 터치 최적화",
+        "Recoil 기반 전역 상태 관리 설계 (출석 상태, 학생 목록)",
+        "React-Query로 출석 데이터 실시간 동기화 및 캐싱 처리",
+        "PICK V2 개발 - 일정 관리, 캘린더, 외출/조퇴 신청 기능 추가"
+      ],
+      "impact": [
+        "2년간 교내 선생님들 실서비스 사용",
+        "종이 출석부 대비 출석 집계 및 전산 관리 시간 대폭 단축"
+      ],
+      "growthExperience": [
+        {
+          "title": "실사용자 피드백 기반 지속적 개선",
+          "content": "매일 사용하는 선생님들로부터 직접 피드백을 받으며 서비스를 개선했습니다. '학생 이름이 작아서 안 보인다', '버튼이 너무 작아 터치가 어렵다' 등 실제 사용 환경에서 나오는 문제를 해결하며, 개발자 관점이 아닌 사용자 관점에서 UI/UX를 설계��는 습관을 기르게 되었습니다."
+        },
+        {
+          "title": "반응형 설계와 터치 인터랙션 최적화",
+          "content": "선생님들이 태블릿과 PC를 번갈아 사용하는 환경을 고려해 반응형 UI를 설계했습니다. 태블릿에서는 터치 영역을 크게, PC에서는 정보 밀도를 높이는 등 디바이스별 최적화를 경험했고, 이를 통해 다양한 사용 환경을 고려한 설계의 중요성을 배웠습니다."
+        }
+      ],
+      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-PICK" }]
+    },
+    {
       "name": "Portfolist",
       "category": "team",
       "period": "2021.09 - 2021.11",
@@ -124,6 +155,22 @@
       ]
     },
     {
+      "name": "마이스터고 모의 면접 서비스",
+      "category": "team",
+      "period": "2022.02",
+      "description": "7th HighThon 해커톤 대상 수상작입니다. '취업 성공할 수 있는 학교'를 주제로 마이스터고/특성화고 학생들이 면접 질문을 공유하고 TTS, STT 기술로 모의 면접을 볼 수 있는 서비스를 개발했습니다.",
+      "role": "프론트엔드 리더",
+      "teamSize": 4,
+      "techStack": ["React", "TypeScript", "TTS", "STT"],
+      "tasks": [
+        "TTS 기반 면접 질문 음성 출력 기능 구현",
+        "STT 기반 답변 인식 및 저장 기능 개발",
+        "면접 결과 분석 및 피드백 UI 구현"
+      ],
+      "impact": ["7th HighThon 해커톤 대상 수상"],
+      "links": [{ "label": "GitHub", "url": "https://github.com/Highthon-EASY" }]
+    },
+    {
       "name": "PMS (학부모 자녀 관리 서비스)",
       "category": "club",
       "clubName": "DMS",
@@ -153,6 +200,41 @@
         }
       ],
       "links": [{ "label": "GitHub", "url": "https://github.com/DSM-DMS/PMS-Front-V2" }]
+    },
+    {
+      "name": "XD (AI 모의 면접)",
+      "category": "team",
+      "period": "2022.03 - 2022.06",
+      "description": "마이스터고 학생들의 취업 성공을 돕기 위한 AI 모의 면접 서비스입니다. TTS/STT 및 미디어 녹화 기술을 활용하여 실전과 유사한 면접 환경을 제공합니다.",
+      "role": "풀스택 개발",
+      "teamSize": 4,
+      "techStack": [
+        "Next.js",
+        "React-Query",
+        "Kakao TTS",
+        "MediaRecorder API",
+        "Nest.js",
+        "TypeORM",
+        "AWS RDS/EC2"
+      ],
+      "tasks": [
+        "MySQL 데이터베이스 스키마 설계 및 REST API 개발",
+        "AWS RDS/EC2 기반 인프라 구축 및 자동 배포 파이프라인 구성",
+        "Kakao TTS/STT를 활용한 음성 기반 대화 인터랙션 구현",
+        "MediaRecorder API를 이용한 카메라/화면 실시간 녹화 및 저장 기능 개발",
+        "Naver Map API를 연동한 기업 위치 시각화 서비스 구현"
+      ],
+      "impact": [
+        "TTS/STT 및 영상 녹화 기술을 결합한 고도화된 인터랙션 구현",
+        "풀스택 개발자로서 DB 설계부터 AWS 배포까지 서비스 전체 레이어 경험"
+      ],
+      "growthExperience": [
+        {
+          "title": "실감형 인터랙션을 위한 기술 선택과 최적화",
+          "content": "실제 면접과 같은 몰입도를 위해 다양한 TTS API를 비교 분석하여 품질과 속도가 가장 우수한 Kakao TTS를 채택했습니다. 미디어 장치 접근 및 데이터 스트림 처리를 통해 녹화 기능을 구현하며 브라우저 API에 대한 깊은 이해를 얻었습니다."
+        }
+      ],
+      "links": [{ "label": "GitHub", "url": "https://github.com/AI-Meeting" }]
     },
     {
       "name": "SMail",
@@ -197,72 +279,6 @@
       "links": [{ "label": "GitHub", "url": "https://github.com/silverbeen/Smail" }]
     },
     {
-      "name": "XD (AI 모의 면접)",
-      "category": "team",
-      "period": "2022.03 - 2022.06",
-      "description": "마이스터고 학생들의 취업 성공을 돕기 위한 AI 모의 면접 서비스입니다. TTS/STT 및 미디어 녹화 기술을 활용하여 실전과 유사한 면접 환경을 제공합니다.",
-      "role": "풀스택 개발",
-      "teamSize": 4,
-      "techStack": [
-        "Next.js",
-        "React-Query",
-        "Kakao TTS",
-        "MediaRecorder API",
-        "Nest.js",
-        "TypeORM",
-        "AWS RDS/EC2"
-      ],
-      "tasks": [
-        "MySQL 데이터베이스 스키마 설계 및 REST API 개발",
-        "AWS RDS/EC2 기반 인프라 구축 및 자동 배포 파이프라인 구성",
-        "Kakao TTS/STT를 활용한 음성 기반 대화 인터랙션 구현",
-        "MediaRecorder API를 이용한 카메라/화면 실시간 녹화 및 저장 기능 개발",
-        "Naver Map API를 연동한 기업 위치 시각화 서비스 구현"
-      ],
-      "impact": [
-        "TTS/STT 및 영상 녹화 기술을 결합한 고도화된 인터랙션 구현",
-        "풀스택 개발자로서 DB 설계부터 AWS 배포까지 서비스 전체 레이어 경험"
-      ],
-      "growthExperience": [
-        {
-          "title": "실감형 인터랙션을 위한 기술 선택과 최적화",
-          "content": "실제 면접과 같은 몰입도를 위해 다양한 TTS API를 비교 분석하여 품질과 속도가 가장 우수한 Kakao TTS를 채택했습니다. 미디어 장치 접근 및 데이터 스트림 처리를 통해 녹화 기능을 구현하며 브라우저 API에 대한 깊은 이해를 얻었습니다."
-        }
-      ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/AI-Meeting" }]
-    },
-    {
-      "name": "마이스터고 모의 면접 서비스",
-      "category": "team",
-      "period": "2022.02",
-      "description": "7th HighThon 해커톤 대상 수상작입니다. '취업 성공할 수 있는 학교'를 주제로 마이스터고/특성화고 학생들이 면접 질문을 공유하고 TTS, STT 기술로 모의 면접을 볼 수 있는 서비스를 개발했습니다.",
-      "role": "프론트엔드 리더",
-      "teamSize": 4,
-      "techStack": ["React", "TypeScript", "TTS", "STT"],
-      "tasks": [
-        "TTS 기반 면접 질문 음성 출력 기능 구현",
-        "STT 기반 답변 인식 및 저장 기능 개발",
-        "면접 결과 분석 및 피드백 UI 구현"
-      ],
-      "impact": ["7th HighThon 해커톤 대상 수상"],
-      "links": [{ "label": "GitHub", "url": "https://github.com/Highthon-EASY" }]
-    },
-    {
-      "name": "MBTI 오픈채팅 서비스",
-      "category": "team",
-      "period": "2023.01",
-      "description": "8th HighThon 해커톤 참여작입니다. 'MZ'를 주제로 MBTI 성향에 따라 오픈채팅방을 매칭해주는 서비스를 개발했습니다. 위치 기반으로 가까운 사람들과 모임을 만들 수 있습니다.",
-      "role": "프론트엔드 개발",
-      "teamSize": 4,
-      "techStack": ["React", "TypeScript", "WebSocket", "Naver Map API"],
-      "tasks": [
-        "WebSocket을 활용한 실시간 채팅 기능 구현",
-        "Naver Map API를 활용한 위치 기반 모임 생성 기능 개발"
-      ],
-      "impact": ["8th HighThon 해커톤 참여"],
-      "hidden": true
-    },
-    {
       "name": "소상공인 악성 리뷰 솔루션",
       "category": "team",
       "period": "2021.11",
@@ -285,35 +301,19 @@
       "links": [{ "label": "GitHub", "url": "https://github.com/BongManYoung" }]
     },
     {
-      "name": "PICK (온라인 출석부)",
-      "category": "club",
-      "clubName": "PICK",
-      "period": "2020.12 - 2023.01",
-      "description": "교내 야간 자율학습 시간에 사용되는 온라인 출석부 서비스입니다. 기존 종이 출석부의 비효율성(분실, 수기 집계 오류)을 개선하여 태블릿과 PC에서 실시간 출석 체크가 가능합니다. 2년간 교내 선생님들이 실제로 사용하며 지속적으로 피드백을 반영해 개선했습니다.",
+      "name": "MBTI 오픈채팅 서비스",
+      "category": "team",
+      "period": "2023.01",
+      "description": "8th HighThon 해커톤 참여작입니다. 'MZ'를 주제로 MBTI 성향에 따라 오픈채팅방을 매칭해주는 서비스를 개발했습니다. 위치 기반으로 가까운 사람들과 모임을 만들 수 있습니다.",
       "role": "프론트엔드 개발",
-      "teamSize": 5,
-      "techStack": ["React", "TypeScript", "Recoil", "React-Query"],
+      "teamSize": 4,
+      "techStack": ["React", "TypeScript", "WebSocket", "Naver Map API"],
       "tasks": [
-        "태블릿/PC 반응형 UI 개발 및 터치 최적화",
-        "Recoil 기반 전역 상태 관리 설계 (출석 상태, 학생 목록)",
-        "React-Query로 출석 데이터 실시간 동기화 및 캐싱 처리",
-        "PICK V2 개발 - 일정 관리, 캘린더, 외출/조퇴 신청 기능 추가"
+        "WebSocket을 활용한 실시간 채팅 기능 구현",
+        "Naver Map API를 활용한 위치 기반 모임 생성 기능 개발"
       ],
-      "impact": [
-        "2년간 교내 선생님들 실서비스 사용",
-        "종이 출석부 대비 출석 집계 및 전산 관리 시간 대폭 단축"
-      ],
-      "growthExperience": [
-        {
-          "title": "실사용자 피드백 기반 지속적 개선",
-          "content": "매일 사용하는 선생님들로부터 직접 피드백을 받으며 서비스를 개선했습니다. '학생 이름이 작아서 안 보인다', '버튼이 너무 작아 터치가 어렵다' 등 실제 사용 환경에서 나오는 문제를 해결하며, 개발자 관점이 아닌 사용자 관점에서 UI/UX를 설계하는 습관을 기르게 되었습니다."
-        },
-        {
-          "title": "반응형 설계와 터치 인터랙션 최적화",
-          "content": "선생님들이 태블릿과 PC를 번갈아 사용하는 환경을 고려해 반응형 UI를 설계했습니다. 태블릿에서는 터치 영역을 크게, PC에서는 정보 밀도를 높이는 등 디바이스별 최적화를 경험했고, 이를 통해 다양한 사용 환경을 고려한 설계의 중요성을 배웠습니다."
-        }
-      ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-PICK" }]
+      "impact": ["8th HighThon 해커톤 참여"],
+      "hidden": true
     }
   ],
   "awards": [
