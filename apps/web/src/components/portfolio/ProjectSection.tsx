@@ -45,9 +45,10 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
     // hidden이 아닌 프로젝트만 필터링
     const visibleProjects = projects.filter((p) => !p.hidden);
 
-    const filtered = selectedCategory === 'all'
-      ? visibleProjects
-      : visibleProjects.filter((p) => p.category === selectedCategory);
+    const filtered =
+      selectedCategory === 'all'
+        ? visibleProjects
+        : visibleProjects.filter((p) => p.category === selectedCategory);
 
     // 추천순은 원본 배열 순서 유지 (JSON에 정의된 순서)
     if (sortOrder === 'recommended') {
@@ -70,7 +71,7 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
       {/* 필터 & 정렬 컨트롤 */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* 카테고리 탭 */}
-        <div className="relative flex gap-1 rounded-xl bg-muted/50 p-1">
+        <div className="bg-muted/50 relative flex gap-1 rounded-xl p-1">
           {categories.map((cat) => {
             const Icon = cat.icon;
             const isSelected = selectedCategory === cat.value;
@@ -79,15 +80,13 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
                 key={cat.value}
                 onClick={() => setSelectedCategory(cat.value)}
                 className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                  isSelected
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
+                  isSelected ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {isSelected && (
                   <motion.div
                     layoutId="activeCategory"
-                    className="absolute inset-0 rounded-lg bg-background shadow-sm"
+                    className="bg-background absolute inset-0 rounded-lg shadow-sm"
                     transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                   />
                 )}
@@ -105,7 +104,7 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-            className="cursor-pointer appearance-none rounded-lg border border-border/60 bg-background/80 py-2 pr-9 pl-4 text-sm font-medium text-foreground/80 backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="border-border/60 bg-background/80 text-foreground/80 hover:border-primary/30 hover:bg-background focus:border-primary focus:ring-primary/20 cursor-pointer appearance-none rounded-lg border py-2 pr-9 pl-4 text-sm font-medium backdrop-blur-sm transition-all focus:ring-2 focus:outline-none"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -113,14 +112,16 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-foreground/40" />
+          <ChevronDown className="text-foreground/40 pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
         </div>
       </div>
 
       {/* 프로젝트 카운트 */}
       <div className="mb-6 flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
-          총 <span className="font-semibold text-foreground">{filteredAndSortedProjects.length}</span>개의 프로젝트
+        <span className="text-muted-foreground text-sm">
+          총{' '}
+          <span className="text-foreground font-semibold">{filteredAndSortedProjects.length}</span>
+          개의 프로젝트
         </span>
       </div>
 
@@ -148,12 +149,10 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16"
         >
-          <div className="mb-4 rounded-full bg-muted/50 p-4">
-            <Layers className="h-8 w-8 text-muted-foreground/50" />
+          <div className="bg-muted/50 mb-4 rounded-full p-4">
+            <Layers className="text-muted-foreground/50 h-8 w-8" />
           </div>
-          <p className="text-center text-muted-foreground">
-            해당 카테고리의 프로젝트가 없습니다.
-          </p>
+          <p className="text-muted-foreground text-center">해당 카테고리의 프로젝트가 없습니다.</p>
         </motion.div>
       )}
 
