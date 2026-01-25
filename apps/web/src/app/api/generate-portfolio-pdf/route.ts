@@ -5,10 +5,15 @@ import { config } from "@/config";
 import type { PortfolioData, PortfolioProject } from "@/types/portfolio";
 import portfolioDataFallback from "@/data/portfolio.json";
 import { createClient } from "@/lib/supabase/server";
+import { portfolioApi } from "@/lib/api/portfolio";
 
 async function getPortfolioData(): Promise<PortfolioData> {
-  // TODO: API에서 가져오도록 복원 필요
-  return portfolioDataFallback as PortfolioData;
+  try {
+    return await portfolioApi.getPortfolio({ revalidate: 0 });
+  } catch (error) {
+    console.warn("API error, using fallback data:", error);
+    return portfolioDataFallback as PortfolioData;
+  }
 }
 
 // XSS 방지를 위한 HTML 이스케이프 헬퍼
@@ -29,11 +34,81 @@ const categoryLabels: Record<string, string> = {
   club: "동아리",
 };
 
-function generatePortfolioHtml(data: PortfolioData): string {
-  const { profile, projects, clubs, awards, certifications, activities } = data;
+const skillLabels: Record<string, string> = {
+  languages: "Core",
+  stateManagement: "상태 관리",
+  libraries: "모노레포 & 라이브러리",
+  tools: "개발 도구 & CI/CD",
+  collaboration: "협업",
+  integrations: "연동",
+  infrastructure: "인프라",
+  testing: "테스트",
+};
 
-  // hidden이 아닌 프로젝트만 필터링
-  const visibleProjects = projects.filter((p) => !p.hidden);
+const skillOrder = [
+  "languages",
+  "stateManagement",
+  "libraries",
+  "tools",
+  "collaboration",
+  "integrations",
+  "infrastructure",
+  "testing",
+];
+
+function generatePortfolioHtml(data: PortfolioData): string {
+  const { profile, skills, education, projects, clubs, awards, certifications, activities } = data;
+
+  // hidden 또는 pdfHidden이 아닌 프로젝트만 필터링
+  const visibleProjects = projects.filter((p) => !p.hidden && !p.pdfHidden);
+
+  const renderSkills = () => {
+    if (!skills) return "";
+    return skillOrder
+      .filter((key) => {
+        const items = skills[key as keyof typeof skills];
+        return items && items.length > 0;
+      })
+      .map((key) => {
+        const items = skills[key as keyof typeof skills] as string[];
+        return `
+          <div class="skill-row">
+            <span class="skill-label">${escapeHtml(skillLabels[key])}</span>
+            <div class="skill-tags">
+              ${items.map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")}
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  };
+
+  const renderEducation = () => {
+    if (!education || education.length === 0) return "";
+    return `
+      <div class="section">
+        <div class="section-title"><div class="section-title-bar"></div><div class="section-title-text">학력</div></div>
+        <div class="education-list">
+          ${education
+            .map(
+              (edu) => `
+            <div class="education-item">
+              <div class="education-icon">E</div>
+              <div class="education-content">
+                <div class="education-school">${escapeHtml(edu.school)}</div>
+                <div class="education-major">${escapeHtml(edu.major)}</div>
+                <div class="education-period">${escapeHtml(edu.period)}</div>
+                ${edu.description ? `<div class="education-description">${escapeHtml(edu.description)}</div>` : ""}
+              </div>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+      <hr />
+    `;
+  };
 
   const renderProject = (project: PortfolioProject) => {
     const techStackHtml = project.techStack
@@ -105,7 +180,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
           </div>
           <div class="project-name">${escapeHtml(project.name)}</div>
           <div class="project-info">
-            <span class="project-period">${escapeHtml(project.period)}</span>
+            <span class="project-period">개발기간: ${escapeHtml(project.period)}</span>
             <span class="project-role">${escapeHtml(project.role)}</span>
             ${project.teamSize ? `<span class="project-team">${project.teamSize}명</span>` : ""}
           </div>
@@ -163,7 +238,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
             .map(
               (award) => `
             <div class="award-item">
-              <div class="award-icon">🏆</div>
+              <div class="award-icon">A</div>
               <div class="award-content">
                 <div class="award-name">${escapeHtml(award.name)}</div>
                 <div class="award-prize">${escapeHtml(award.prize)}</div>
@@ -190,7 +265,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
             .map(
               (cert) => `
             <div class="cert-item">
-              <span class="cert-icon">📜</span>
+              <span class="cert-icon">C</span>
               <div>
                 <div class="cert-name">${escapeHtml(cert.name)}</div>
                 <div class="cert-date">${escapeHtml(cert.date)}</div>
@@ -255,21 +330,30 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .section-title-text { font-size: 18px; font-weight: 700; color: #111827; }
     hr { border: none; border-top: 1px solid #e0f2fe; margin: 24px 0; }
 
+    /* Skills */
+    .skill-row { display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start; }
+    .skill-label { width: 130px; font-size: 12px; font-weight: 600; color: #111827; flex-shrink: 0; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .skill-tag { border: 1px solid rgba(81, 78, 246, 0.2); background: rgba(81, 78, 246, 0.05); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: #374151; }
+
     /* Profile */
-    .profile { display: flex; gap: 24px; margin-bottom: 24px; }
+    .profile { display: flex; gap: 20px; margin-bottom: 16px; align-items: flex-start; }
+    .profile-photo { width: 110px; height: 110px; border-radius: 20px; object-fit: cover; flex-shrink: 0; }
     .profile-content { flex: 1; }
-    .profile-greeting { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 6px; }
-    .profile-greeting .dot { color: #514EF6; }
-    .profile-tagline { font-size: 15px; font-weight: 500; color: rgba(17, 24, 39, 0.9); margin-bottom: 10px; }
-    .profile-intro { font-size: 13px; color: rgba(17, 24, 39, 0.7); line-height: 1.7; margin-bottom: 10px; white-space: pre-line; }
-    .profile-contacts { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6b7280; }
-    .profile-contact { display: flex; align-items: center; gap: 6px; }
-    .profile-photo { width: 120px; height: 160px; border-radius: 8px; object-fit: cover; box-shadow: 0 10px 25px -5px rgba(81, 78, 246, 0.15); }
+    .profile-header { margin-bottom: 8px; }
+    .profile-name { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 2px; }
+    .profile-title { font-size: 14px; font-weight: 500; color: rgba(81, 78, 246, 0.9); margin-bottom: 6px; }
+    .profile-tagline { font-size: 13px; color: rgba(17, 24, 39, 0.7); line-height: 1.6; margin-bottom: 10px; }
+    .profile-contacts { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+    .contact-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280; }
+    .contact-icon { width: 18px; height: 18px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .profile-intro-box { background: linear-gradient(135deg, #f8fafc, #f1f5f9); border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 12px; }
+    .profile-intro { font-size: 13px; color: rgba(17, 24, 39, 0.75); line-height: 1.8; white-space: pre-line; }
 
     /* Projects */
     .projects-grid { display: flex; flex-direction: column; gap: 16px; }
-    .project-card { border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 12px; padding: 16px; background: linear-gradient(to bottom right, #ffffff, #ffffff, rgba(81, 78, 246, 0.02)); box-shadow: 0 4px 15px -3px rgba(81, 78, 246, 0.08); page-break-inside: avoid; }
-    .project-header { border-bottom: 1px solid rgba(81, 78, 246, 0.1); padding-bottom: 12px; margin-bottom: 12px; }
+    .project-card { padding: 16px; page-break-inside: avoid; }
+    .project-header { padding-bottom: 12px; margin-bottom: 12px; }
     .project-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .project-category { background: linear-gradient(135deg, #514EF6, #706FFA); color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
     .project-club { font-size: 12px; color: #6b7280; }
@@ -300,7 +384,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Growth */
     .growth { margin-top: 12px; }
     .growth-title { font-size: 12px; font-weight: 700; color: #d97706; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .growth-title::before { content: '💡'; font-size: 12px; }
+    .growth-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 50%; flex-shrink: 0; }
     .growth-item { background: linear-gradient(to right, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05), transparent); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
     .growth-item-title { font-size: 12px; font-weight: 600; color: #b45309; margin-bottom: 4px; }
     .growth-item-content { font-size: 11px; color: #6b7280; line-height: 1.6; }
@@ -308,7 +392,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Screenshots */
     .screenshots { margin-top: 12px; }
     .screenshots-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .screenshots-title::before { content: '📷'; font-size: 12px; }
+    .screenshots-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-radius: 4px; flex-shrink: 0; }
     .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
 
@@ -322,10 +406,20 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .club-activities { display: flex; flex-wrap: wrap; gap: 4px; }
     .activity-tag { background: #f3f4f6; border-radius: 4px; padding: 2px 8px; font-size: 10px; color: #374151; }
 
+    /* Education */
+    .education-list { display: flex; flex-direction: column; gap: 10px; }
+    .education-item { display: flex; gap: 12px; align-items: flex-start; }
+    .education-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .education-content { flex: 1; }
+    .education-school { font-size: 14px; font-weight: 600; color: #111827; }
+    .education-major { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .education-period { font-size: 11px; color: #514EF6; font-weight: 500; margin-top: 2px; }
+    .education-description { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
     /* Awards */
-    .awards-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-    .award-item { display: flex; gap: 10px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 10px; flex: 1; min-width: 200px; }
-    .award-icon { font-size: 20px; }
+    .awards-grid { display: flex; flex-direction: column; gap: 8px; }
+    .award-item { display: flex; gap: 10px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 10px; }
+    .award-icon { width: 28px; height: 28px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .award-name { font-size: 13px; font-weight: 600; color: #111827; }
     .award-prize { font-size: 12px; font-weight: 500; color: #514EF6; }
     .award-date { font-size: 11px; color: #6b7280; }
@@ -334,7 +428,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Certifications */
     .cert-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .cert-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; }
-    .cert-icon { font-size: 14px; }
+    .cert-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
     .cert-name { font-size: 12px; font-weight: 500; color: #111827; }
     .cert-date { font-size: 11px; color: #6b7280; }
 
@@ -353,18 +447,29 @@ function generatePortfolioHtml(data: PortfolioData): string {
 <body>
   <div class="container">
     <div class="profile">
+      ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
       <div class="profile-content">
-        ${profile.greeting ? `<div class="profile-greeting">${escapeHtml(profile.greeting).replace(".", '<span class="dot">.</span>')}</div>` : ""}
+        <div class="profile-header">
+          <div class="profile-name">${escapeHtml(profile.name || "")}</div>
+          ${profile.title ? `<div class="profile-title">${escapeHtml(profile.title)}</div>` : ""}
+        </div>
         ${profile.tagline ? `<div class="profile-tagline">${escapeHtml(profile.tagline)}</div>` : ""}
-        ${profile.introduction ? `<div class="profile-intro">${escapeHtml(profile.introduction)}</div>` : ""}
         <div class="profile-contacts">
-          ${profile.email ? `<div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>` : ""}
-          ${profile.github ? `<div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>` : ""}
-          ${profile.blog ? `<div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>` : ""}
+          ${profile.email ? `<div class="contact-item"><span class="contact-icon">@</span> ${escapeHtml(profile.email)}</div>` : ""}
+          ${profile.github ? `<div class="contact-item"><span class="contact-icon">G</span> ${escapeHtml(profile.github)}</div>` : ""}
+          ${profile.blog ? `<div class="contact-item"><span class="contact-icon">B</span> ${escapeHtml(profile.blog)}</div>` : ""}
         </div>
       </div>
-      ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
     </div>
+    ${profile.introduction ? `<div class="profile-intro-box"><div class="profile-intro">${escapeHtml(profile.introduction)}</div></div>` : ""}
+
+    ${skills ? `
+    <hr />
+    <div class="section">
+      <div class="section-title"><div class="section-title-bar"></div><div class="section-title-text">보유 기술</div></div>
+      ${renderSkills()}
+    </div>
+    ` : ""}
     <hr />
 
     <div class="section">
@@ -377,8 +482,9 @@ function generatePortfolioHtml(data: PortfolioData): string {
 
     ${renderAwards()}
     ${renderClubs()}
-    ${renderCertifications()}
     ${renderActivities()}
+    ${renderEducation()}
+    ${renderCertifications()}
   </div>
 </body>
 </html>`;
@@ -389,6 +495,34 @@ function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return "알 수 없는 오류";
+}
+
+// 로컬 개발 환경에서 Chrome 경로 찾기
+async function getLocalChromePath(): Promise<string | null> {
+  const paths = [
+    // macOS
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    // Linux
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+    // Windows
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  ];
+
+  for (const p of paths) {
+    try {
+      const fs = await import("fs");
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
 
 export async function POST() {
@@ -411,16 +545,42 @@ export async function POST() {
     // 포트폴리오 데이터 가져오기
     const data = await getPortfolioData();
 
-    // 서버리스 환경에서 Chromium 실행 경로 설정
-    const executablePath = await chromium.executablePath();
+    // 환경에 따라 Chromium 설정 분기
+    const isVercel = process.env.VERCEL === "1";
+    let executablePath: string;
+    let launchArgs: string[];
 
-    // headless 모드를 명시적으로 설정 (true: full Chrome, "shell": lighter)
-    const headlessMode = chromium.headless === "shell" ? "shell" : true;
+    console.log("PDF 생성 환경:", { isVercel, NODE_ENV: process.env.NODE_ENV });
+
+    if (isVercel) {
+      // Vercel 환경: @sparticuz/chromium 사용
+      executablePath = await chromium.executablePath();
+      launchArgs = [...chromium.args, "--font-render-hinting=none"];
+      console.log("Vercel Chromium 경로:", executablePath);
+    } else {
+      // 로컬 개발: 시스템 Chrome 사용
+      const localPath = await getLocalChromePath();
+      console.log("로컬 Chrome 경로:", localPath);
+      if (!localPath) {
+        return NextResponse.json(
+          { error: "로컬에 Chrome이 설치되어 있지 않습니다. Chrome을 설치해주세요." },
+          { status: 500 }
+        );
+      }
+      executablePath = localPath;
+      launchArgs = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--font-render-hinting=none",
+      ];
+    }
 
     browser = await puppeteer.launch({
       executablePath,
-      headless: headlessMode,
-      args: [...chromium.args, "--font-render-hinting=none"],
+      headless: true,
+      args: launchArgs,
     });
 
     const page = await browser.newPage();

@@ -1,6 +1,6 @@
-import type { Profile } from './resume';
+import type { Profile, Skills, Education } from './resume';
 
-export type { Profile };
+export type { Profile, Skills, Education };
 
 export interface Club {
   name: string;
@@ -36,6 +36,7 @@ export interface PortfolioProject {
   }[];
   images?: string[];
   hidden?: boolean;
+  pdfHidden?: boolean;
 }
 
 export interface Award {
@@ -59,6 +60,8 @@ export interface Activity {
 
 export interface PortfolioData {
   profile: Profile;
+  skills?: Skills;
+  education?: Education[];
   clubs: Club[];
   projects: PortfolioProject[];
   awards?: Award[];

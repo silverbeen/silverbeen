@@ -8,4 +8,5 @@ export { AwardSection } from "./AwardSection";
 export { ImageModal } from "./ImageModal";
 export { TableOfContents } from "./TableOfContents";
 export { ResumeSkeleton } from "./ResumeSkeleton";
+export { ResumeSections } from "./ResumeSections";
 export { PdfExportButton } from "./PdfExportButton";

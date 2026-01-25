@@ -2,12 +2,7 @@
 
 import Image from "next/image";
 import {
-  ProfileSection,
-  SkillsSection,
-  ExperienceSection,
-  EducationSection,
-  CertificationSection,
-  AwardSection,
+  ResumeSections,
   TableOfContents,
   PdfExportButton,
 } from "@/components/resume";
@@ -48,30 +43,7 @@ export function ResumeContent({ data }: ResumeContentProps) {
       <PdfExportButton />
       <main id="resume-content" className="mx-auto max-w-4xl px-6 py-16">
         <div className="flex flex-col gap-12">
-          <ProfileSection profile={data.profile} ImageComponent={NextImage} />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <SkillsSection skills={data.skills} />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <ExperienceSection
-            experience={data.experience}
-            ImageComponent={NextImage}
-          />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <EducationSection education={data.education} />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <AwardSection awards={data.awards} />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <CertificationSection certifications={data.certifications} />
+          <ResumeSections data={data} ImageComponent={NextImage} />
         </div>
       </main>
     </div>

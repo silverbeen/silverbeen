@@ -5,10 +5,11 @@ export const portfolioApi = {
   getPortfolio: (options?: { revalidate?: number }) =>
     fetcher<PortfolioData>('/portfolio', { revalidate: options?.revalidate }),
 
-  updatePortfolio: (content: PortfolioData) =>
+  updatePortfolio: (content: PortfolioData, token: string) =>
     fetcher<PortfolioData>('/portfolio', {
       method: 'PUT',
       body: JSON.stringify({ content }),
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   /**
@@ -20,9 +21,10 @@ export const portfolioApi = {
   /**
    * @deprecated Use `updatePortfolio` instead
    */
-  update: (content: PortfolioData) =>
+  update: (content: PortfolioData, token: string) =>
     fetcher<PortfolioData>('/portfolio', {
       method: 'PUT',
       body: JSON.stringify({ content }),
+      headers: { Authorization: `Bearer ${token}` },
     }),
 };

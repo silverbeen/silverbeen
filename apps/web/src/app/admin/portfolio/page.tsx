@@ -3,50 +3,19 @@
 import { useCallback } from 'react';
 import { portfolioApi } from '@/lib/api/portfolio';
 import { JsonEditorPage, NextImage } from '@/components/admin';
-import {
-  ProfileSection,
-  ClubSection,
-  ProjectSection,
-  AwardsSection,
-  CertificationsSection,
-  ActivitiesSection,
-} from '@/components/portfolio';
+import { PortfolioSections } from '@/components/portfolio';
 import type { PortfolioData } from '@/types/portfolio';
 
 export default function AdminPortfolioPage() {
   const fetchPortfolio = useCallback(() => portfolioApi.getPortfolio(), []);
   const savePortfolio = useCallback(
-    (data: PortfolioData) => portfolioApi.updatePortfolio(data),
+    (data: PortfolioData, token: string) => portfolioApi.updatePortfolio(data, token),
     []
   );
 
   const renderPreview = useCallback(
     (data: PortfolioData) => (
-      <>
-        <ProfileSection profile={data.profile} ImageComponent={NextImage} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <ProjectSection projects={data.projects} />
-        {data.awards && data.awards.length > 0 && (
-          <>
-            <hr className="border-sky-100 dark:border-sky-900/30" />
-            <AwardsSection awards={data.awards} />
-          </>
-        )}
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <ClubSection clubs={data.clubs} />
-        {data.activities && data.activities.length > 0 && (
-          <>
-            <hr className="border-sky-100 dark:border-sky-900/30" />
-            <ActivitiesSection activities={data.activities} />
-          </>
-        )}
-        {data.certifications && data.certifications.length > 0 && (
-          <>
-            <hr className="border-sky-100 dark:border-sky-900/30" />
-            <CertificationsSection certifications={data.certifications} />
-          </>
-        )}
-      </>
+      <PortfolioSections data={data} ImageComponent={NextImage} />
     ),
     []
   );

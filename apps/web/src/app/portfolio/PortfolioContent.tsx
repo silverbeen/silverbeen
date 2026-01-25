@@ -1,14 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import {
-  ProfileSection,
-  ClubSection,
-  ProjectSection,
-  AwardsSection,
-  CertificationsSection,
-  ActivitiesSection,
-} from '@/components/portfolio';
+import { PortfolioSections } from '@/components/portfolio';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { PortfolioPdfExportButton } from '@/components/portfolio/PortfolioPdfExportButton';
 import type { PortfolioData } from '@/types/portfolio';
@@ -45,39 +38,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
     <div className="bg-background min-h-screen">
       <main className="mx-auto max-w-4xl px-6 py-16">
         <div className="flex flex-col gap-12">
-          <ProfileSection profile={data.profile} ImageComponent={NextImage} />
-
-          <hr className="border-sky-100 dark:border-sky-900/30" />
-
-          <ProjectSection projects={data.projects} />
-
-          {data.awards && data.awards.length > 0 && (
-            <>
-              <hr className="border-sky-100 dark:border-sky-900/30" />
-              <AwardsSection awards={data.awards} />
-            </>
-          )}
-
-          {data.clubs && data.clubs.length > 0 && (
-            <>
-              <hr className="border-sky-100 dark:border-sky-900/30" />
-              <ClubSection clubs={data.clubs} />
-            </>
-          )}
-
-          {data.activities && data.activities.length > 0 && (
-            <>
-              <hr className="border-sky-100 dark:border-sky-900/30" />
-              <ActivitiesSection activities={data.activities} />
-            </>
-          )}
-
-          {data.certifications && data.certifications.length > 0 && (
-            <>
-              <hr className="border-sky-100 dark:border-sky-900/30" />
-              <CertificationsSection certifications={data.certifications} />
-            </>
-          )}
+          <PortfolioSections data={data} ImageComponent={NextImage} />
         </div>
       </main>
       <ScrollToTopButton />
