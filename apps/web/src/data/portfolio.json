@@ -3,12 +3,29 @@
     "name": "강은빈",
     "greeting": "안녕하세요, 강은빈입니다.",
     "title": "Frontend Developer",
-    "tagline": "새로운 기술에 도전하며, UI/UX 아이디어를 현실적인 서비스로 구현하는 것에 가치를 둡니다.",
+    "tagline": "새로운 기술에 도전하는 것을 좋아하고, UI/UX 아이디어를 현실적인 서비스로 구현하는 것에 가치를 둡니다.",
     "email": "kub9722@gmail.com",
     "github": "https://github.com/silverbeen",
     "blog": "https://velog.io/@silverbeen",
     "photo": "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/resume/profile.jpeg",
-    "introduction": "일상의 불편함을 발견하면 코드로 직접 해결책을 만드는 개발자입니다.\n마이스터고 재학 시절부터 2년간 실서비스를 운영하며 유저 피드백을 반영해왔고, 해커톤 대상 및 기능경기대회 은메달을 통해 기술력을 입증했습니다. PM으로서 기획부터 프로젝트 매니지먼트까지 경험하며 넓은 시야를 갖추었으며, 최근에는 AI 도구를 활용해 개발 생산성을 극대화하는 AIDD(AI-Driven Development) 프로세스를 실천하고 있습니다."
+    "introduction": "마이스터고 시절부터 실서비스를 운영하며 유저 피드백을 바탕으로 서비스를 개선하는 즐거움을 배웠습니다. 해커톤 대상과 기능경기대회 은메달을 통해 탄탄한 기술력을 입증했으며, 프론트엔드 개발에 국한되지 않고 PM으로서 기획부터 운영까지 리딩하며 프로젝트의 전체 사이클을 경험했습니다. 최근에는 AIDD(AI-Driven Development) 프로세스를 도입하여 개발 생산성을 높이는 등, 기술을 도구 삼아 최선의 가치를 만드는 데 집중하고 있습니다."
+  },
+  "skills": {
+    "languages": ["TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS"],
+    "stateManagement": ["React Query (TanStack Query)", "Zustand"],
+    "libraries": ["Turborepo", "pnpm", "Storybook", "Framer Motion", "Emotion", "i18next"],
+    "tools": ["Git", "GitLab", "GitHub", "GitHub Actions", "Claude Code", "Cursor", "Figma MCP"],
+    "collaboration": ["Slack", "Figma", "Swagger UI", "Zeplin"],
+    "integrations": [
+      "Firebase (Auth, GA4, FCM)",
+      "Airbridge SDK",
+      "SSE",
+      "Supabase",
+      "Geolocation API",
+      "Naver Map API"
+    ],
+    "infrastructure": ["Vercel", "Railway", "AWS EC2", "AWS S3", "CloudFront"],
+    "testing": ["Jest", "Vitest", "React Testing Library"]
   },
   "clubs": [
     {
@@ -189,7 +206,8 @@
         "면접 결과 분석 및 피드백 UI 구현"
       ],
       "impact": ["7th HighThon 해커톤 대상 수상"],
-      "links": [{ "label": "GitHub", "url": "https://github.com/Highthon-EASY" }]
+      "links": [{ "label": "GitHub", "url": "https://github.com/Highthon-EASY" }],
+      "pdfHidden": true
     },
     {
       "name": "PMS (학부모 자녀 관리 서비스)",
@@ -293,16 +311,16 @@
       ],
       "growthExperience": [
         {
-          "title": "일상의 불편함에서 서비스 아이디어 발굴",
-          "content": "매번 메일을 쓸 때마다 '첫 문장을 어떻게 시작해야 할지 모르겠다', '비즈니스 메일은 너무 딱딱하게 느껴진다'는 불편함을 느꼈습니다. 이 문제를 직접 해결해보고 싶어 서비스를 기획했고, '상황별 문구 추천', '자주 쓰는 표현 저장' 기능을 핵심으로 정했습니다. 개발자로서 기술을 활용해 내가 겪은 일상의 문제를 해결하는 경험을 처음으로 해보았고, 이후에도 불편함을 서비스 아이디어로 연결하는 습관을 갖는 데 도움이 되었습니다."
+          "title": "1. 문제 해결의 시작: 일상의 불편함에서 제품으로",
+          "content": "'첫 문장을 어떻게 시작할까?'라는 사소하지만 보편적인 고민을 서비스로 구체화했습니다. 개발자는 단순히 코드를 짜는 사람이 아니라, 기술로 문제를 해결하는 사람임을 깨닫게 된 프로젝트였습니다. 이후 모든 개발 과정에서 '이 기능이 사용자의 어떤 문제를 해결하는가?'를 먼저 자문하는 습관을 갖게 되었습니다."
         },
         {
-          "title": "풀스택 개발로 서비스 전체 사이클 경험",
-          "content": "프론트엔드만 해왔던 제가 처음으로 DB 설계부터 API 개발, 배포까지 전 과정을 혼자 진행했습니다. TypeORM으로 엔티티 관계를 설계하고, NestJS로 RESTful API를 구현하면서 백엔드 아키텍처에 대한 이해도가 높아졌습니다. Firebase와 GCP를 조합해 배포하면서 프론트-백엔드 분리 배포, 환경 변수 관리, CORS 설정 등 실서비스 운영에 필요한 인프라 지식을 쌓았습니다."
+          "title": "2. 엔지니어링의 확장: 풀스택 경험을 통한 시야 확보",
+          "content": "프론트엔드 영역을 넘어 백엔드와 인프라를 직접 다루며 전체 시스템 구조를 이해하게 되었습니다. 특히 TypeORM을 활용한 DB 설계와 GCP 배포 과정을 통해, 데이터의 흐름과 효율적인 서버 자원 관리에 대한 기술적 기반을 탄탄히 다질 수 있었습니다."
         },
         {
-          "title": "사용자 피드백 기반 반복 개선",
-          "content": "주변 지인들에게 서비스를 공유하고 피드백을 받으며 개선했습니다. '문구를 클릭하면 바로 복사되었으면 좋겠다', '검색 기능이 있으면 좋겠다'는 피드백을 반영해 클립보드 복사, 키워드 검색 기능을 추가했습니다. 직접 사용자가 되어 서비스를 체험하고, 불편한 점을 발견하면 즉시 개선하는 습관을 기르게 되었습니다."
+          "title": "3. 사용자 피드백 개선",
+          "content": "지인 대상 베타 테스트를 통해 '복사 기능이 번거롭다'는 핵심 피드백을 수집했고, 이를 클립보드 API를 활용한 원클릭 복사로 개선했습니다. 사용자의 목소리가 어떻게 프로덕트의 경쟁력이 되는지를 체감하며, 데이터 기반의 UX 개선 역량을 길렀습니다."
         }
       ],
       "links": [{ "label": "GitHub", "url": "https://github.com/silverbeen/Smail" }],
@@ -372,11 +390,6 @@
       "date": "2021.10"
     }
   ],
-  "certifications": [
-    { "name": "정보기기운용기능사", "date": "2022.06" },
-    { "name": "정보처리기능사", "date": "2021.05" },
-    { "name": "웹디자인기능사", "date": "2021.04" }
-  ],
   "activities": [
     {
       "date": "2025.11",
@@ -393,5 +406,27 @@
       "title": "SW 품질 전문가 양성과정 수료",
       "description": "ISTQB 기반 SW 테스팅 및 품질 관리 기초 교육"
     }
+  ],
+  "education": [
+    {
+      "school": "서울과학기술대학교",
+      "major": "자유전공",
+      "period": "2026.03(입학예정)"
+    },
+    {
+      "school": "University of California, Irvine",
+      "major": "Individualized Study Program - English Language & TEFL Programs",
+      "period": "2025.07 - 2025.08"
+    },
+    {
+      "school": "대덕소프트웨어마이스터고등학교",
+      "major": "소프트웨어개발과",
+      "period": "2020.03 - 2023.02"
+    }
+  ],
+  "certifications": [
+    { "name": "정보기기운용기능사", "date": "2022.06" },
+    { "name": "정보처리기능사", "date": "2021.05" },
+    { "name": "웹디자인기능사", "date": "2021.04" }
   ]
 }

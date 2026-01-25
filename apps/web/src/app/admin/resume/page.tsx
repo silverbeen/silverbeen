@@ -3,14 +3,7 @@
 import { useCallback } from 'react';
 import { resumeApi } from '@/lib/api/resume';
 import { JsonEditorPage, NextImage } from '@/components/admin';
-import {
-  ProfileSection,
-  SkillsSection,
-  ExperienceSection,
-  EducationSection,
-  CertificationSection,
-  AwardSection,
-} from '@/components/resume';
+import { ResumeSections } from '@/components/resume';
 import type { ResumeData } from '@/types/resume';
 
 export default function AdminResumePage() {
@@ -22,19 +15,7 @@ export default function AdminResumePage() {
 
   const renderPreview = useCallback(
     (data: ResumeData) => (
-      <>
-        <ProfileSection profile={data.profile} ImageComponent={NextImage} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <SkillsSection skills={data.skills} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <ExperienceSection experience={data.experience} ImageComponent={NextImage} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <EducationSection education={data.education} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <AwardSection awards={data.awards} />
-        <hr className="border-sky-100 dark:border-sky-900/30" />
-        <CertificationSection certifications={data.certifications} />
-      </>
+      <ResumeSections data={data} ImageComponent={NextImage} />
     ),
     []
   );

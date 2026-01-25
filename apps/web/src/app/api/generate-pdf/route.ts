@@ -464,20 +464,24 @@ export async function POST() {
     const data = await getResumeData();
 
     // 환경에 따라 Chromium 설정 분기
-    const isProduction = process.env.NODE_ENV === "production";
+    const isVercel = process.env.VERCEL === "1";
     let executablePath: string;
     let launchArgs: string[];
 
-    if (isProduction) {
-      // 프로덕션(Vercel): @sparticuz/chromium 사용
+    console.log("PDF 생성 환경:", { isVercel, NODE_ENV: process.env.NODE_ENV });
+
+    if (isVercel) {
+      // Vercel 환경: @sparticuz/chromium 사용
       executablePath = await chromium.executablePath();
       launchArgs = [...chromium.args, "--font-render-hinting=none"];
+      console.log("Vercel Chromium 경로:", executablePath);
     } else {
       // 로컬 개발: 시스템 Chrome 사용
       const localPath = await getLocalChromePath();
+      console.log("로컬 Chrome 경로:", localPath);
       if (!localPath) {
         return NextResponse.json(
-          { error: "로컬에 Chrome이 설치되어 있지 않습니다" },
+          { error: "로컬에 Chrome이 설치되어 있지 않습니다. Chrome을 설치해주세요." },
           { status: 500 }
         );
       }
@@ -485,6 +489,8 @@ export async function POST() {
       launchArgs = [
         "--no-sandbox",
         "--disable-setuid-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
         "--font-render-hinting=none",
       ];
     }
