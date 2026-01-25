@@ -5,10 +5,15 @@ import { config } from "@/config";
 import type { PortfolioData, PortfolioProject } from "@/types/portfolio";
 import portfolioDataFallback from "@/data/portfolio.json";
 import { createClient } from "@/lib/supabase/server";
+import { portfolioApi } from "@/lib/api/portfolio";
 
 async function getPortfolioData(): Promise<PortfolioData> {
-  // TODO: API에서 가져오도록 복원 필요
-  return portfolioDataFallback as PortfolioData;
+  try {
+    return await portfolioApi.getPortfolio({ revalidate: 0 });
+  } catch (error) {
+    console.warn("API error, using fallback data:", error);
+    return portfolioDataFallback as PortfolioData;
+  }
 }
 
 // XSS 방지를 위한 HTML 이스케이프 헬퍼

@@ -4,11 +4,12 @@ import { config } from '@/config';
 import type { PortfolioData } from '@/types/portfolio';
 import portfolioData from '@/data/portfolio.json';
 import { PortfolioContent } from './PortfolioContent';
-import { api, ApiError } from '@/lib/api';
+import { portfolioApi } from '@/lib/api/portfolio';
+import { ApiError } from '@/lib/api';
 
 async function getPortfolioData(): Promise<PortfolioData | null> {
   try {
-    return await api.portfolio.get({ revalidate: 60 });
+    return await portfolioApi.getPortfolio({ revalidate: 60 });
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return null;
