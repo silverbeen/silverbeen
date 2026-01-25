@@ -16,7 +16,7 @@ import type { ResumeData } from '@/types/resume';
 export default function AdminResumePage() {
   const fetchResume = useCallback(() => resumeApi.getResume(), []);
   const saveResume = useCallback(
-    (data: ResumeData) => resumeApi.updateResume(data),
+    (data: ResumeData, token: string) => resumeApi.updateResume(data, token),
     []
   );
 

@@ -5,10 +5,11 @@ export const resumeApi = {
   getResume: (options?: { revalidate?: number }) =>
     fetcher<ResumeData>('/resume', { revalidate: options?.revalidate }),
 
-  updateResume: (content: ResumeData) =>
+  updateResume: (content: ResumeData, token: string) =>
     fetcher<ResumeData>('/resume', {
       method: 'PUT',
       body: JSON.stringify({ content }),
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   /**
@@ -20,9 +21,10 @@ export const resumeApi = {
   /**
    * @deprecated Use `updateResume` instead
    */
-  update: (content: ResumeData) =>
+  update: (content: ResumeData, token: string) =>
     fetcher<ResumeData>('/resume', {
       method: 'PUT',
       body: JSON.stringify({ content }),
+      headers: { Authorization: `Bearer ${token}` },
     }),
 };

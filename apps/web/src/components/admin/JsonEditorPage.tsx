@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui';
+import { createClient } from '@/lib/supabase/client';
+import type { OnMount } from '@monaco-editor/react';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
   ssr: false,
@@ -49,7 +51,7 @@ interface JsonEditorPageProps<T> {
   /** 데이터 fetch 함수 */
   fetchData: () => Promise<T>;
   /** 데이터 저장 함수 */
-  saveData: (data: T) => Promise<T>;
+  saveData: (data: T, token: string) => Promise<T>;
   /** 미리보기 렌더링 함수 */
   renderPreview: (data: T) => ReactNode;
 }
@@ -63,20 +65,29 @@ export function JsonEditorPage<T>({
   renderPreview,
 }: JsonEditorPageProps<T>) {
   const [data, setData] = useState<T | null>(null);
-  const [jsonString, setJsonString] = useState<string>('');
+  const [initialJsonString, setInitialJsonString] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const { toast } = useToast();
+  const supabase = useMemo(() => createClient(), []);
+
+  // Monaco Editor 인스턴스 ref
+  type EditorInstance = Parameters<OnMount>[0];
+  const editorRef = useRef<EditorInstance | null>(null);
+
+  const handleEditorMount: OnMount = useCallback((editor) => {
+    editorRef.current = editor;
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const result = await fetchData();
         setData(result);
-        setJsonString(JSON.stringify(result, null, 2));
+        setInitialJsonString(JSON.stringify(result, null, 2));
       } catch (error) {
         console.error('Failed to fetch data:', error);
         toast(fetchErrorMessage, 'error');
@@ -88,9 +99,9 @@ export function JsonEditorPage<T>({
     loadData();
   }, [fetchData, fetchErrorMessage, toast]);
 
+  // 에디터 값 변경 시 data만 업데이트 (커서 위치 유지를 위해 jsonString 상태는 업데이트하지 않음)
   const handleEditorChange = useCallback((value: string | undefined) => {
     if (!value) return;
-    setJsonString(value);
 
     try {
       const parsed = JSON.parse(value);
@@ -113,7 +124,14 @@ export function JsonEditorPage<T>({
 
     setIsSaving(true);
     try {
-      await saveData(data);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      await saveData(data, session.access_token);
       toast(saveSuccessMessage, 'success');
     } catch (error) {
       console.error('Failed to save data:', error);
@@ -124,9 +142,11 @@ export function JsonEditorPage<T>({
   };
 
   const handleFormat = () => {
+    const currentValue = editorRef.current?.getValue() ?? '';
     try {
-      const parsed = JSON.parse(jsonString);
-      setJsonString(JSON.stringify(parsed, null, 2));
+      const parsed = JSON.parse(currentValue);
+      const formatted = JSON.stringify(parsed, null, 2);
+      editorRef.current?.setValue(formatted);
       setHasError(false);
       setErrorMessage('');
     } catch {
@@ -234,8 +254,9 @@ export function JsonEditorPage<T>({
                 height="100%"
                 language="json"
                 theme="vs-dark"
-                value={jsonString}
+                defaultValue={initialJsonString}
                 onChange={handleEditorChange}
+                onMount={handleEditorMount}
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,

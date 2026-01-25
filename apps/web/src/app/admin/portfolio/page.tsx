@@ -16,7 +16,7 @@ import type { PortfolioData } from '@/types/portfolio';
 export default function AdminPortfolioPage() {
   const fetchPortfolio = useCallback(() => portfolioApi.getPortfolio(), []);
   const savePortfolio = useCallback(
-    (data: PortfolioData) => portfolioApi.updatePortfolio(data),
+    (data: PortfolioData, token: string) => portfolioApi.updatePortfolio(data, token),
     []
   );
 
