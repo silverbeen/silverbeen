@@ -5,9 +5,9 @@ import { Download, Loader2, AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === "development";
 
-export function PdfExportButton() {
+export function PortfolioPdfExportButton() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,7 +38,7 @@ export function PdfExportButton() {
     try {
       setProgress(20);
 
-      const response = await fetch("/api/generate-pdf", {
+      const response = await fetch("/api/generate-portfolio-pdf", {
         method: "POST",
       });
 
@@ -69,7 +69,7 @@ export function PdfExportButton() {
       } else if (quotedMatch) {
         link.download = quotedMatch[1].replace(/\\(.)/g, "$1"); // quoted-pair 이스케이프 처리
       } else {
-        link.download = "resume.pdf";
+        link.download = "portfolio.pdf";
       }
       document.body.appendChild(link);
       link.click();
@@ -94,7 +94,7 @@ export function PdfExportButton() {
 
   return (
     <>
-      {/* 플로팅 PDF 내보내기 버튼 (로그인 사용자만) */}
+      {/* 플로팅 PDF 내보내기 버튼 */}
       <motion.button
         onClick={handleExport}
         disabled={isGenerating}
@@ -134,7 +134,7 @@ export function PdfExportButton() {
               className="flex flex-col items-center gap-4 rounded-2xl bg-background p-8 shadow-2xl"
             >
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-lg font-medium text-foreground">PDF 생성 중...</p>
+              <p className="text-lg font-medium text-foreground">포트폴리오 PDF 생성 중...</p>
               <div className="h-2 w-64 overflow-hidden rounded-full bg-muted">
                 <motion.div
                   className="h-full bg-primary"
@@ -159,9 +159,7 @@ export function PdfExportButton() {
             className="fixed bottom-24 right-6 z-50 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 shadow-lg dark:border-red-800 dark:bg-red-950"
           >
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-            <p className="text-sm font-medium text-red-800 dark:text-red-200">
-              {error}
-            </p>
+            <p className="text-sm font-medium text-red-800 dark:text-red-200">{error}</p>
             <button
               onClick={() => setError(null)}
               className="ml-2 rounded p-1 hover:bg-red-100 dark:hover:bg-red-900"

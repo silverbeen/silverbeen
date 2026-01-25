@@ -209,10 +209,10 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
     <AnimatePresence>
       {isVisible && (
         <motion.nav
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="fixed top-1/2 left-[calc(50%-448px-220px-24px)] z-50 hidden max-h-[80vh] w-52 -translate-y-1/2 overflow-y-auto rounded-xl border border-primary/20 bg-background/95 p-4 shadow-xl backdrop-blur-md xl:block"
+          exit={{ opacity: 0, x: 20 }}
+          className="fixed top-1/2 right-[calc(50%-448px-220px-24px)] z-50 hidden max-h-[80vh] w-52 -translate-y-1/2 overflow-y-auto rounded-xl border border-primary/20 bg-background/95 p-4 shadow-xl backdrop-blur-md xl:block"
         >
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
             <span className="h-1 w-1 rounded-full bg-primary" />

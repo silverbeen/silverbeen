@@ -67,11 +67,11 @@ export function ResumeContent({ data }: ResumeContentProps) {
 
           <hr className="border-sky-100 dark:border-sky-900/30" />
 
-          <CertificationSection certifications={data.certifications} />
+          <AwardSection awards={data.awards} />
 
           <hr className="border-sky-100 dark:border-sky-900/30" />
 
-          <AwardSection awards={data.awards} />
+          <CertificationSection certifications={data.certifications} />
         </div>
       </main>
     </div>

@@ -437,9 +437,12 @@ export async function POST() {
     // 서버리스 환경에서 Chromium 실행 경로 설정
     const executablePath = await chromium.executablePath();
 
+    // headless 모드를 명시적으로 설정 (true: full Chrome, "shell": lighter)
+    const headlessMode = chromium.headless === "shell" ? "shell" : true;
+
     browser = await puppeteer.launch({
       executablePath,
-      headless: chromium.headless,
+      headless: headlessMode,
       args: [
         ...chromium.args,
         "--font-render-hinting=none",
@@ -485,8 +488,9 @@ export async function POST() {
       preferCSSPageSize: false,
     });
 
-    // 파일명을 profile.name에서 동적 생성
-    const filename = `이력서_${data.profile.name}.pdf`;
+    // 파일명을 profile.name에서 동적 생성 (빈 값일 경우 기본값 사용)
+    const profileName = data.profile.name?.trim() || "unknown";
+    const filename = `이력서_${profileName}.pdf`;
     const encodedFilename = encodeURIComponent(filename);
 
     return new NextResponse(Buffer.from(pdfBuffer), {

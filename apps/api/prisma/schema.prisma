@@ -34,6 +34,16 @@ model Resume {
   @@map("resumes")
 }
 
+// Portfolio model - singleton for single portfolio management
+model Portfolio {
+  id        String   @id @default("main")
+  content   Json     // Full portfolio data (JSON)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("portfolios")
+}
+
 // Post model - for blog
 model Post {
   id         Int      @id @default(autoincrement())
