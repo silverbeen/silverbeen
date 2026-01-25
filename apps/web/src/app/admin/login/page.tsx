@@ -23,6 +23,8 @@ function LoginForm() {
       setError('접근 권한이 없습니다. 허용된 계정으로 로그인하세요.');
     } else if (errorParam === 'auth_failed') {
       setError('인증에 실패했습니다. 다시 시도해주세요.');
+    } else if (errorParam === 'invalid_reset_link') {
+      setError('비밀번호 재설정 링크가 만료되었거나 유효하지 않습니다.');
     }
 
     if (messageParam === 'password_updated') {

@@ -58,8 +58,19 @@ export function PortfolioPdfExportButton() {
       const link = document.createElement("a");
       link.href = url;
       const contentDisposition = response.headers.get("Content-Disposition");
-      const filenameMatch = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/);
-      link.download = filenameMatch ? decodeURIComponent(filenameMatch[1]) : "portfolio.pdf";
+
+      // RFC5987 형식 (filename*=UTF-8''...) 먼저 시도
+      const utf8Match = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/);
+      // 일반 형식 (filename="...") 폴백
+      const quotedMatch = contentDisposition?.match(/filename="([^"]+)"/);
+
+      if (utf8Match) {
+        link.download = decodeURIComponent(utf8Match[1]);
+      } else if (quotedMatch) {
+        link.download = quotedMatch[1].replace(/\\(.)/g, "$1"); // quoted-pair 이스케이프 처리
+      } else {
+        link.download = "portfolio.pdf";
+      }
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
