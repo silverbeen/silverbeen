@@ -10,6 +10,7 @@ import {
   ActivitiesSection,
 } from '@/components/portfolio';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
+import { PortfolioPdfExportButton } from '@/components/portfolio/PortfolioPdfExportButton';
 import type { PortfolioData } from '@/types/portfolio';
 
 const NextImage = ({
@@ -80,6 +81,7 @@ export function PortfolioContent({ data }: PortfolioContentProps) {
         </div>
       </main>
       <ScrollToTopButton />
+      <PortfolioPdfExportButton />
     </div>
   );
 }

@@ -73,14 +73,17 @@ export default async function AdminPage() {
             </p>
           </Link>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <Link
+            href="/admin/settings"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 hover:shadow-lg transition-shadow block"
+          >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               설정
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              사이트 설정을 변경합니다.
+              비밀번호 변경 등 계정 설정을 관리합니다.
             </p>
-          </div>
+          </Link>
         </div>
       </main>
     </div>

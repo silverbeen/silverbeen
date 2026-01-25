@@ -7,3 +7,4 @@ export { PortfolioSkeleton } from './PortfolioSkeleton';
 export { AwardsSection } from './AwardsSection';
 export { CertificationsSection } from './CertificationsSection';
 export { ActivitiesSection } from './ActivitiesSection';
+export { PortfolioPdfExportButton } from './PortfolioPdfExportButton';

@@ -11,14 +11,22 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
 
   useEffect(() => {
     const errorParam = searchParams.get('error');
+    const messageParam = searchParams.get('message');
+
     if (errorParam === 'unauthorized') {
       setError('접근 권한이 없습니다. 허용된 계정으로 로그인하세요.');
     } else if (errorParam === 'auth_failed') {
       setError('인증에 실패했습니다. 다시 시도해주세요.');
+    }
+
+    if (messageParam === 'password_updated') {
+      setSuccess('비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.');
     }
   }, [searchParams]);
 
@@ -71,6 +79,99 @@ function LoginForm() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('이메일을 입력해주세요.');
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL('/auth/reset-password', config.siteUrl).href,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setSuccess('비밀번호 재설정 링크가 이메일로 전송되었습니다.');
+      setShowResetForm(false);
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setError('비밀번호 재설정 이메일 전송에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (showResetForm) {
+    return (
+      <div className="w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              비밀번호 재설정
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
+              가입한 이메일로 재설정 링크를 보내드립니다
+            </p>
+          </div>
+
+          <form onSubmit={handleResetPassword} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor="reset-email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                이메일
+              </label>
+              <input
+                id="reset-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                placeholder="admin@example.com"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              {isLoading ? '전송 중...' : '재설정 링크 전송'}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowResetForm(false);
+              setError(null);
+            }}
+            className="mt-4 w-full text-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          >
+            로그인으로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-md">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
@@ -87,6 +188,12 @@ function LoginForm() {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm">
+              {success}
             </div>
           )}
 
@@ -109,12 +216,25 @@ function LoginForm() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              비밀번호
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                비밀번호
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowResetForm(true);
+                  setError(null);
+                  setSuccess(null);
+                }}
+                className="text-sm text-primary-500 hover:text-primary-600"
+              >
+                비밀번호 찾기
+              </button>
+            </div>
             <input
               id="password"
               type="password"
