@@ -118,7 +118,11 @@
           "content": "선생님들이 태블릿과 PC를 번갈아 사용하는 환경을 고려해 반응형 UI를 설계했습니다. 태블릿에서는 터치 영역을 크게, PC에서는 정보 밀도를 높이는 등 디바이스별 최적화를 경험했고, 이를 통해 다양한 사용 환경을 고려한 설계의 중요성을 배웠습니다."
         }
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-PICK" }]
+      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-PICK" }],
+      "images": [
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/pick/pick-1.webp",
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/pick/pick-2.webp"
+      ]
     },
     {
       "name": "Portfolist",
@@ -152,6 +156,10 @@
       "links": [
         { "label": "GitHub", "url": "https://github.com/DSM-Portfolist" },
         { "label": "YouTube", "url": "https://www.youtube.com/watch?v=TE1TaYrIe44" }
+      ],
+      "images": [
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/portfolist/portfolist-1.webp",
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/portfolist/portfolist-2.webp"
       ]
     },
     {
@@ -199,7 +207,11 @@
           "content": "학부모님들에게 자녀의 기숙사 상벌점, 외출 내역 등 민감한 정보를 전달하는 서비스였기에 정확성이 중요했습니다. 하지만 충분한 QA 없이 배포를 준비하다가 데이터 표시 오류가 발견되어 출시가 지연되었습니다. 이후 테스트 체크리스트 작성, 크로스 브라우저 테스트, 실제 데이터 기반 QA 등 체계적인 검증 프로세스의 필요성을 깊이 배웠고, 이후 프로젝트에서는 QA 단계를 필수로 포함시키게 되었습니다."
         }
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-DMS/PMS-Front-V2" }]
+      "links": [{ "label": "GitHub", "url": "https://github.com/DSM-DMS/PMS-Front-V2" }],
+      "images": [
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/pms/pms-1.webp",
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/pms/pms-2.webp"
+      ]
     },
     {
       "name": "XD (AI 모의 면접)",
@@ -234,7 +246,11 @@
           "content": "실제 면접과 같은 몰입도를 위해 다양한 TTS API를 비교 분석하여 품질과 속도가 가장 우수한 Kakao TTS를 채택했습니다. 미디어 장치 접근 및 데이터 스트림 처리를 통해 녹화 기능을 구현하며 브라우저 API에 대한 깊은 이해를 얻었습니다."
         }
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/AI-Meeting" }]
+      "links": [{ "label": "GitHub", "url": "https://github.com/AI-Meeting" }],
+      "images": [
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/xd/xd.webp",
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/xd/xd-2.webp"
+      ]
     },
     {
       "name": "SMail",
@@ -276,7 +292,10 @@
           "content": "주변 지인들에게 서비스를 공유하고 피드백을 받으며 개선했습니다. '문구를 클릭하면 바로 복사되었으면 좋겠다', '검색 기능이 있으면 좋겠다'는 피드백을 반영해 클립보드 복사, 키워드 검색 기능을 추가했습니다. 직접 사용자가 되어 서비스를 체험하고, 불편한 점을 발견하면 즉시 개선하는 습관을 기르게 되었습니다."
         }
       ],
-      "links": [{ "label": "GitHub", "url": "https://github.com/silverbeen/Smail" }]
+      "links": [{ "label": "GitHub", "url": "https://github.com/silverbeen/Smail" }],
+      "images": [
+        "https://iwczlmjdxzcitjvcrsvq.supabase.co/storage/v1/object/public/images/portfolio/smail/smail.webp"
+      ]
     },
     {
       "name": "소상공인 악성 리뷰 솔루션",

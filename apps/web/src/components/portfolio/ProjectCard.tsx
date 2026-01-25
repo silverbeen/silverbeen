@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ExternalLink, Github, Users, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 import { categoryConfig } from './constants';
 import type { PortfolioProject } from '@/types/portfolio';
 
@@ -30,12 +31,27 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       role="button"
       tabIndex={0}
       aria-label={`${project.name} 프로젝트 상세보기`}
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${config.gradient} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50`}
+      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${config.gradient} transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50`}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
+      {/* 썸네일 이미지 */}
+      {project.images && project.images.length > 0 && (
+        <div className="relative aspect-video w-full overflow-hidden">
+          <Image
+            src={project.images[0]}
+            alt={`${project.name} 썸네일`}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-background/80 via-transparent to-transparent" />
+        </div>
+      )}
+
+      <div className="flex flex-1 flex-col p-6">
       {/* 상단 메타 정보 */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -120,6 +136,7 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
           상세보기
           <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
+      </div>
       </div>
     </motion.div>
   );

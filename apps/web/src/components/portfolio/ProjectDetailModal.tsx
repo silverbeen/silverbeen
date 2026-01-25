@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Github, Users, Calendar, Sparkles, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ExternalLink, Github, Users, Calendar, Sparkles, Lightbulb, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 import { categoryConfig } from './constants';
+import { ImageModal } from '@/components/resume/ImageModal';
 import type { PortfolioProject } from '@/types/portfolio';
 
 interface ProjectDetailModalProps {
@@ -12,6 +14,62 @@ interface ProjectDetailModalProps {
   onClose: () => void;
   projects?: PortfolioProject[];
   onNavigate?: (project: PortfolioProject) => void;
+}
+
+function ImageGallery({ images, projectName }: { images: string[]; projectName: string }) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const handlePrev = useCallback(() => {
+    setSelectedIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : images.length - 1));
+  }, [images.length]);
+
+  const handleNext = useCallback(() => {
+    setSelectedIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : 0));
+  }, [images.length]);
+
+  return (
+    <>
+      <div className="mb-6">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <ImageIcon className="h-4 w-4 text-primary" />
+          스크린샷
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          {images.map((src, index) => (
+            <button
+              key={src}
+              onClick={() => setSelectedIndex(index)}
+              className="group relative aspect-video overflow-hidden rounded-lg border border-primary/10 bg-muted/30 transition-all hover:border-primary/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+            >
+              <Image
+                src={src}
+                alt={`${projectName} 스크린샷 ${index + 1}`}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 50vw, 300px"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/20">
+                <span className="scale-0 rounded-full bg-white/90 p-2 text-foreground transition-transform group-hover:scale-100">
+                  <ImageIcon className="h-4 w-4" />
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <ImageModal
+        images={images}
+        currentIndex={selectedIndex ?? 0}
+        isOpen={selectedIndex !== null}
+        onClose={() => setSelectedIndex(null)}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        projectName={projectName}
+        ImageComponent={Image}
+      />
+    </>
+  );
 }
 
 function NavigationCard({
@@ -31,8 +89,8 @@ function NavigationCard({
     <button
       onClick={onClick}
       aria-label={isPrev ? `이전 프로젝트: ${project.name}` : `다음 프로젝트: ${project.name}`}
-      className={`group fixed top-1/2 -translate-y-1/2 z-60 hidden md:flex items-center gap-2 ${
-        isPrev ? 'left-4 flex-row-reverse' : 'right-4'
+      className={`group absolute top-1/2 -translate-y-1/2 z-10 hidden md:flex items-center gap-2 ${
+        isPrev ? 'right-full mr-5 flex-row-reverse' : 'left-full ml-5'
       }`}
     >
       <motion.div
@@ -138,30 +196,30 @@ export function ProjectDetailModal({
             onClick={onClose}
             aria-hidden="true"
           />
-          {onNavigate && prevProject && (
-            <NavigationCard
-              project={prevProject}
-              direction="prev"
-              onClick={() => handleNavigate(prevProject)}
-            />
-          )}
-          {onNavigate && nextProject && (
-            <NavigationCard
-              project={nextProject}
-              direction="next"
-              onClick={() => handleNavigate(nextProject)}
-            />
-          )}
-
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              ref={modalRef}
-              key={project.name}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="modal-title"
-              tabIndex={-1}
-              className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-primary/20 bg-background shadow-2xl focus:outline-none"
+            <div className="relative">
+              {onNavigate && prevProject && (
+                <NavigationCard
+                  project={prevProject}
+                  direction="prev"
+                  onClick={() => handleNavigate(prevProject)}
+                />
+              )}
+              {onNavigate && nextProject && (
+                <NavigationCard
+                  project={nextProject}
+                  direction="next"
+                  onClick={() => handleNavigate(nextProject)}
+                />
+              )}
+              <motion.div
+                ref={modalRef}
+                key={project.name}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
+                tabIndex={-1}
+                className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-primary/20 bg-background shadow-2xl focus:outline-none"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -212,6 +270,10 @@ export function ProjectDetailModal({
                 </div>
 
                 <p className="mb-6 text-foreground/80 leading-relaxed">{project.description}</p>
+
+                {project.images && project.images.length > 0 && (
+                  <ImageGallery images={project.images} projectName={project.name} />
+                )}
 
                 <div className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold text-foreground">기술 스택</h3>
@@ -334,6 +396,7 @@ export function ProjectDetailModal({
                 </div>
               )}
             </motion.div>
+            </div>
           </div>
         </>
       )}
