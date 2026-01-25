@@ -18,14 +18,16 @@
 │ role (ENUM)     │
 │ createdAt       │
 │ updatedAt       │
-└─────────────────┘
-
-┌─────────────────┐         ┌─────────────────┐
-│      Post       │         │      Tag        │
-├─────────────────┤         ├─────────────────┤
-│ id (PK)         │◄──n:m──►│ id (PK)         │
-│ authorId        │         │ name (UNIQUE)   │
-│ title           │         └─────────────────┘
+│ posts[]         │──────┐
+└─────────────────┘      │
+                         │ 1:N
+┌─────────────────┐      │    ┌─────────────────┐
+│      Post       │◄─────┘    │      Tag        │
+├─────────────────┤           ├─────────────────┤
+│ id (PK)         │◄───n:m───►│ id (PK)         │
+│ authorId (FK)   │           │ name (UNIQUE)   │
+│ author          │           └─────────────────┘
+│ title           │
 │ slug (UNIQUE)   │
 │ content         │
 │ excerpt         │
@@ -60,6 +62,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  posts     Post[]
 }
 
 enum Role {
@@ -74,6 +77,7 @@ enum Role {
 | email | String | 로그인 이메일 (고유) |
 | name | String? | 표시 이름 |
 | role | Role | USER 또는 ADMIN |
+| posts | Post[] | 작성한 포스트 목록 (1:N) |
 
 ### Post
 
@@ -83,6 +87,7 @@ enum Role {
 model Post {
   id         Int      @id @default(autoincrement())
   authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title      String
   slug       String   @unique
   content    String
@@ -103,7 +108,8 @@ model Post {
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | id | Int | Auto-increment PK |
-| authorId | String | Supabase Auth 사용자 ID (User와 논리적 관계) |
+| authorId | String | User ID (외래 키) |
+| author | User | 작성자 (1:N 관계) |
 | title | String | 포스트 제목 |
 | slug | String | URL 친화적 식별자 (자동 생성) |
 | content | String | 마크다운 본문 |
@@ -204,6 +210,35 @@ interface ResumeContent {
 ```
 
 ## 관계
+
+### User ↔ Post (일대다)
+
+```prisma
+// User
+posts Post[]
+
+// Post
+authorId String @map("author_id")
+author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+```
+
+User 삭제 시 연관된 Post도 함께 삭제됨 (`onDelete: Cascade`)
+
+#### 조회 예시
+
+```typescript
+// 사용자와 작성한 포스트 함께 조회
+const userWithPosts = await prisma.user.findUnique({
+  where: { id: userId },
+  include: { posts: true }
+});
+
+// 포스트와 작성자 함께 조회
+const postWithAuthor = await prisma.post.findUnique({
+  where: { id: postId },
+  include: { author: true }
+});
+```
 
 ### Post ↔ Tag (다대다)
 
@@ -319,6 +354,60 @@ model Post {
   comments Comment[]
 }
 ```
+
+### Post-User FK 적용 시 데이터 동기화
+
+Post.authorId에 User 참조 FK를 적용하기 전에 Supabase Auth 사용자를 로컬 User 테이블에 동기화해야 합니다.
+
+#### 1. 사용자 동기화 API 호출
+
+```bash
+# Supabase Admin API에서 사용자 목록 가져오기
+curl -X GET "https://<project>.supabase.co/auth/v1/admin/users" \
+  -H "Authorization: Bearer <service_role_key>" \
+  -H "apikey: <service_role_key>"
+```
+
+#### 2. 로컬 DB에 동기화
+
+```bash
+# POST /users/sync (Admin 권한 필요)
+curl -X POST "http://localhost:3001/users/sync" \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "users": [
+      {
+        "id": "supabase-user-id",
+        "email": "user@example.com",
+        "user_metadata": { "name": "User Name", "role": "admin" }
+      }
+    ]
+  }'
+```
+
+#### 3. authorId 유효성 검사
+
+```bash
+# GET /users/validate-authors (Admin 권한 필요)
+curl -X GET "http://localhost:3001/users/validate-authors" \
+  -H "Authorization: Bearer <admin_token>"
+
+# 응답 예시
+{
+  "total": 10,
+  "valid": 8,
+  "invalid": ["missing-user-id-1", "missing-user-id-2"]
+}
+```
+
+#### 4. 마이그레이션 순서
+
+1. `pnpm db:generate` - Prisma 클라이언트 생성
+2. Supabase Auth 사용자를 `/users/sync` API로 동기화
+3. `/users/validate-authors`로 무효한 authorId 확인
+4. 무효한 데이터 수정 (Prisma Studio 또는 스크립트)
+5. `pnpm db:push` - FK 제약조건 적용
 
 ## 성능 최적화
 

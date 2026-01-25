@@ -5,6 +5,8 @@ import { Download, Loader2, AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export function PdfExportButton() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -56,8 +58,19 @@ export function PdfExportButton() {
       const link = document.createElement("a");
       link.href = url;
       const contentDisposition = response.headers.get("Content-Disposition");
-      const filenameMatch = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/);
-      link.download = filenameMatch ? decodeURIComponent(filenameMatch[1]) : "resume.pdf";
+
+      // RFC5987 형식 (filename*=UTF-8''...) 먼저 시도
+      const utf8Match = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/);
+      // 일반 형식 (filename="...") 폴백
+      const quotedMatch = contentDisposition?.match(/filename="([^"]+)"/);
+
+      if (utf8Match) {
+        link.download = decodeURIComponent(utf8Match[1]);
+      } else if (quotedMatch) {
+        link.download = quotedMatch[1].replace(/\\(.)/g, "$1"); // quoted-pair 이스케이프 처리
+      } else {
+        link.download = "resume.pdf";
+      }
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -74,8 +87,8 @@ export function PdfExportButton() {
     }
   };
 
-  // 로그인하지 않은 사용자에게는 버튼을 숨김
-  if (!isLoggedIn) {
+  // 로그인하지 않았고 개발 환경도 아니면 버튼을 숨김
+  if (!isLoggedIn && !isDevelopment) {
     return null;
   }
 

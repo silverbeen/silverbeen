@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, FileText, Moon, Sun, LogOut } from "lucide-react";
+import { BookOpen, FileText, FolderKanban, Moon, Sun, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/resume", label: "Resume", icon: FileText },
-  { href: "/blog", label: "Blog", icon: BookOpen},
+  { href: "/portfolio", label: "Portfolio", icon: FolderKanban },
+  { href: "/blog", label: "Blog", icon: BookOpen },
 ];
 
 export function Header() {

@@ -79,9 +79,15 @@ export interface Award {
   linkLabel?: string;
 }
 
+export interface CoreCompetency {
+  title: string;
+  description: string;
+}
+
 export interface ResumeData {
   profile: Profile;
   skills: Skills;
+  coreCompetencies?: CoreCompetency[];
   experience: Experience[];
   education: Education[];
   certifications: Certification[];
