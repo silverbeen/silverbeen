@@ -100,7 +100,7 @@ export function ProjectSection({ projects }: ProjectSectionProps) {
         </div>
 
         {/* 정렬 드롭다운 */}
-        <div className="relative">
+        <div className="relative w-fit">
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as SortOrder)}

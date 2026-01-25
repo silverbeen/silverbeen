@@ -237,6 +237,34 @@ export function ProjectDetailModal({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
+                  {project.links && project.links.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      {project.links.map((link) => {
+                        const isGithub = link.label.toLowerCase().includes('github');
+                        return (
+                          <a
+                            key={link.url}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={link.label}
+                            className={`flex items-center justify-center gap-1 rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground ${
+                              isGithub ? 'h-8 w-8' : 'h-8 px-3'
+                            }`}
+                          >
+                            {isGithub ? (
+                              <Github className="h-4 w-4" />
+                            ) : (
+                              <>
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span className="text-xs font-medium">{link.label}</span>
+                              </>
+                            )}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
                   {projects.length > 1 && (
                     <span className="text-xs text-muted-foreground">
                       {currentIndex + 1} / {projects.length}
@@ -270,10 +298,6 @@ export function ProjectDetailModal({
                 </div>
 
                 <p className="mb-6 text-foreground/80 leading-relaxed">{project.description}</p>
-
-                {project.images && project.images.length > 0 && (
-                  <ImageGallery images={project.images} projectName={project.name} />
-                )}
 
                 <div className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold text-foreground">기술 스택</h3>
@@ -347,28 +371,8 @@ export function ProjectDetailModal({
                   </div>
                 )}
 
-                {project.links && project.links.length > 0 && (
-                  <div className="border-t border-primary/10 pt-4">
-                    <h3 className="mb-3 text-sm font-semibold text-foreground">링크</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.links.map((link) => (
-                        <a
-                          key={link.url}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                        >
-                          {link.label.toLowerCase().includes('github') ? (
-                            <Github className="h-4 w-4" />
-                          ) : (
-                            <ExternalLink className="h-4 w-4" />
-                          )}
-                          {link.label}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
+                {project.images && project.images.length > 0 && (
+                  <ImageGallery images={project.images} projectName={project.name} />
                 )}
               </div>
 
