@@ -213,7 +213,7 @@ function generateResumeHtml(data: ResumeData): string {
       .map(
         (edu) => `
           <div class="education-item">
-            <div class="education-icon">🎓</div>
+            <div class="education-icon">E</div>
             <div class="education-content">
               <div class="education-school">${escapeHtml(edu.school)}</div>
               <div class="education-detail">${escapeHtml(edu.major)} · ${escapeHtml(edu.period)}</div>
@@ -230,7 +230,7 @@ function generateResumeHtml(data: ResumeData): string {
       .map(
         (cert) => `
           <div class="cert-item">
-            <span class="cert-icon">🏆</span>
+            <span class="cert-icon">C</span>
             <div>
               <div class="cert-name">${escapeHtml(cert.name)}</div>
               <div class="cert-date">${escapeHtml(cert.date)}</div>
@@ -246,7 +246,7 @@ function generateResumeHtml(data: ResumeData): string {
       .map(
         (award) => `
           <div class="award-item">
-            <div class="award-icon">🏅</div>
+            <div class="award-icon">A</div>
             <div class="award-content">
               <div class="award-header">
                 <span class="award-date">${escapeHtml(award.date)}</span>
@@ -298,6 +298,7 @@ function generateResumeHtml(data: ResumeData): string {
     .profile-intro { font-size: 14px; color: rgba(17, 24, 39, 0.7); line-height: 1.7; margin-bottom: 12px; white-space: pre-line; }
     .profile-contacts { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: #6b7280; }
     .profile-contact { display: flex; align-items: center; gap: 6px; }
+    .contact-icon { width: 18px; height: 18px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
     .profile-photo { width: 130px; height: 170px; border-radius: 8px; object-fit: cover; box-shadow: 0 10px 25px -5px rgba(81, 78, 246, 0.15); }
     .skill-row { display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start; }
     .skill-label { width: 130px; font-size: 13px; font-weight: 600; color: #111827; flex-shrink: 0; }
@@ -342,16 +343,16 @@ function generateResumeHtml(data: ResumeData): string {
     .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
     .education-item { display: flex; gap: 12px; margin-bottom: 12px; }
-    .education-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .education-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 14px; font-weight: 700; }
     .education-school { font-size: 14px; font-weight: 600; color: #111827; }
     .education-detail { font-size: 13px; color: #6b7280; margin-top: 2px; }
     .cert-container { display: flex; flex-wrap: wrap; gap: 10px; }
     .cert-item { display: flex; align-items: center; gap: 10px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 14px; background: linear-gradient(135deg, #ffffff, #fafafa); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
-    .cert-icon { font-size: 17px; color: #514EF6; }
+    .cert-icon { width: 24px; height: 24px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0; }
     .cert-name { font-size: 13px; font-weight: 500; color: #111827; }
     .cert-date { font-size: 12px; color: #6b7280; }
     .award-item { display: flex; gap: 12px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 6px; padding: 14px; margin-bottom: 10px; background: linear-gradient(135deg, #ffffff, rgba(81, 78, 246, 0.02)); box-shadow: 0 2px 8px rgba(81, 78, 246, 0.06); }
-    .award-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .award-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; flex-shrink: 0; }
     .award-content { flex: 1; }
     .award-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .award-date { font-size: 12px; color: #6b7280; }
@@ -369,10 +370,10 @@ function generateResumeHtml(data: ResumeData): string {
         ${profile.tagline ? `<div class="profile-tagline">${escapeHtml(profile.tagline)}</div>` : ""}
         ${profile.introduction ? `<div class="profile-intro">${escapeHtml(profile.introduction)}</div>` : ""}
         <div class="profile-contacts">
-          ${profile.phone ? `<div class="profile-contact"><span>📞</span> ${escapeHtml(profile.phone)}</div>` : ""}
-          ${profile.email ? `<div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>` : ""}
-          ${profile.github ? `<div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>` : ""}
-          ${profile.blog ? `<div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>` : ""}
+          ${profile.phone ? `<div class="profile-contact"><span class="contact-icon">T</span> ${escapeHtml(profile.phone)}</div>` : ""}
+          ${profile.email ? `<div class="profile-contact"><span class="contact-icon">@</span> ${escapeHtml(profile.email)}</div>` : ""}
+          ${profile.github ? `<div class="profile-contact"><span class="contact-icon">G</span> ${escapeHtml(profile.github)}</div>` : ""}
+          ${profile.blog ? `<div class="profile-contact"><span class="contact-icon">B</span> ${escapeHtml(profile.blog)}</div>` : ""}
         </div>
       </div>
       ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
@@ -414,6 +415,34 @@ function getErrorMessage(error: unknown): string {
   return "알 수 없는 오류";
 }
 
+// 로컬 개발 환경에서 Chrome 경로 찾기
+async function getLocalChromePath(): Promise<string | null> {
+  const paths = [
+    // macOS
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    // Linux
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+    // Windows
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  ];
+
+  for (const p of paths) {
+    try {
+      const fs = await import("fs");
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
 export async function POST() {
   let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
 
@@ -434,19 +463,36 @@ export async function POST() {
     // 서버에서 이력서 데이터 가져오기
     const data = await getResumeData();
 
-    // 서버리스 환경에서 Chromium 실행 경로 설정
-    const executablePath = await chromium.executablePath();
+    // 환경에 따라 Chromium 설정 분기
+    const isProduction = process.env.NODE_ENV === "production";
+    let executablePath: string;
+    let launchArgs: string[];
 
-    // headless 모드를 명시적으로 설정 (true: full Chrome, "shell": lighter)
-    const headlessMode = chromium.headless === "shell" ? "shell" : true;
+    if (isProduction) {
+      // 프로덕션(Vercel): @sparticuz/chromium 사용
+      executablePath = await chromium.executablePath();
+      launchArgs = [...chromium.args, "--font-render-hinting=none"];
+    } else {
+      // 로컬 개발: 시스템 Chrome 사용
+      const localPath = await getLocalChromePath();
+      if (!localPath) {
+        return NextResponse.json(
+          { error: "로컬에 Chrome이 설치되어 있지 않습니다" },
+          { status: 500 }
+        );
+      }
+      executablePath = localPath;
+      launchArgs = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--font-render-hinting=none",
+      ];
+    }
 
     browser = await puppeteer.launch({
       executablePath,
-      headless: headlessMode,
-      args: [
-        ...chromium.args,
-        "--font-render-hinting=none",
-      ],
+      headless: true,
+      args: launchArgs,
     });
 
     const page = await browser.newPage();

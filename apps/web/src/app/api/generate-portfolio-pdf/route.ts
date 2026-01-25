@@ -163,7 +163,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
             .map(
               (award) => `
             <div class="award-item">
-              <div class="award-icon">🏆</div>
+              <div class="award-icon">A</div>
               <div class="award-content">
                 <div class="award-name">${escapeHtml(award.name)}</div>
                 <div class="award-prize">${escapeHtml(award.prize)}</div>
@@ -190,7 +190,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
             .map(
               (cert) => `
             <div class="cert-item">
-              <span class="cert-icon">📜</span>
+              <span class="cert-icon">C</span>
               <div>
                 <div class="cert-name">${escapeHtml(cert.name)}</div>
                 <div class="cert-date">${escapeHtml(cert.date)}</div>
@@ -264,6 +264,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .profile-intro { font-size: 13px; color: rgba(17, 24, 39, 0.7); line-height: 1.7; margin-bottom: 10px; white-space: pre-line; }
     .profile-contacts { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6b7280; }
     .profile-contact { display: flex; align-items: center; gap: 6px; }
+    .contact-icon { width: 16px; height: 16px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: 700; flex-shrink: 0; }
     .profile-photo { width: 120px; height: 160px; border-radius: 8px; object-fit: cover; box-shadow: 0 10px 25px -5px rgba(81, 78, 246, 0.15); }
 
     /* Projects */
@@ -300,7 +301,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Growth */
     .growth { margin-top: 12px; }
     .growth-title { font-size: 12px; font-weight: 700; color: #d97706; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .growth-title::before { content: '💡'; font-size: 12px; }
+    .growth-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 50%; flex-shrink: 0; }
     .growth-item { background: linear-gradient(to right, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05), transparent); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
     .growth-item-title { font-size: 12px; font-weight: 600; color: #b45309; margin-bottom: 4px; }
     .growth-item-content { font-size: 11px; color: #6b7280; line-height: 1.6; }
@@ -308,7 +309,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Screenshots */
     .screenshots { margin-top: 12px; }
     .screenshots-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .screenshots-title::before { content: '📷'; font-size: 12px; }
+    .screenshots-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-radius: 4px; flex-shrink: 0; }
     .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
 
@@ -325,7 +326,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Awards */
     .awards-grid { display: flex; flex-wrap: wrap; gap: 10px; }
     .award-item { display: flex; gap: 10px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 10px; flex: 1; min-width: 200px; }
-    .award-icon { font-size: 20px; }
+    .award-icon { width: 28px; height: 28px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .award-name { font-size: 13px; font-weight: 600; color: #111827; }
     .award-prize { font-size: 12px; font-weight: 500; color: #514EF6; }
     .award-date { font-size: 11px; color: #6b7280; }
@@ -334,7 +335,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Certifications */
     .cert-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .cert-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; }
-    .cert-icon { font-size: 14px; }
+    .cert-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
     .cert-name { font-size: 12px; font-weight: 500; color: #111827; }
     .cert-date { font-size: 11px; color: #6b7280; }
 
@@ -358,9 +359,9 @@ function generatePortfolioHtml(data: PortfolioData): string {
         ${profile.tagline ? `<div class="profile-tagline">${escapeHtml(profile.tagline)}</div>` : ""}
         ${profile.introduction ? `<div class="profile-intro">${escapeHtml(profile.introduction)}</div>` : ""}
         <div class="profile-contacts">
-          ${profile.email ? `<div class="profile-contact"><span>✉️</span> ${escapeHtml(profile.email)}</div>` : ""}
-          ${profile.github ? `<div class="profile-contact"><span>🔗</span> ${escapeHtml(profile.github)}</div>` : ""}
-          ${profile.blog ? `<div class="profile-contact"><span>📝</span> ${escapeHtml(profile.blog)}</div>` : ""}
+          ${profile.email ? `<div class="profile-contact"><span class="contact-icon">@</span> ${escapeHtml(profile.email)}</div>` : ""}
+          ${profile.github ? `<div class="profile-contact"><span class="contact-icon">G</span> ${escapeHtml(profile.github)}</div>` : ""}
+          ${profile.blog ? `<div class="profile-contact"><span class="contact-icon">B</span> ${escapeHtml(profile.blog)}</div>` : ""}
         </div>
       </div>
       ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}
@@ -391,6 +392,34 @@ function getErrorMessage(error: unknown): string {
   return "알 수 없는 오류";
 }
 
+// 로컬 개발 환경에서 Chrome 경로 찾기
+async function getLocalChromePath(): Promise<string | null> {
+  const paths = [
+    // macOS
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    // Linux
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+    // Windows
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  ];
+
+  for (const p of paths) {
+    try {
+      const fs = await import("fs");
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
 export async function POST() {
   let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
 
@@ -411,16 +440,36 @@ export async function POST() {
     // 포트폴리오 데이터 가져오기
     const data = await getPortfolioData();
 
-    // 서버리스 환경에서 Chromium 실행 경로 설정
-    const executablePath = await chromium.executablePath();
+    // 환경에 따라 Chromium 설정 분기
+    const isProduction = process.env.NODE_ENV === "production";
+    let executablePath: string;
+    let launchArgs: string[];
 
-    // headless 모드를 명시적으로 설정 (true: full Chrome, "shell": lighter)
-    const headlessMode = chromium.headless === "shell" ? "shell" : true;
+    if (isProduction) {
+      // 프로덕션(Vercel): @sparticuz/chromium 사용
+      executablePath = await chromium.executablePath();
+      launchArgs = [...chromium.args, "--font-render-hinting=none"];
+    } else {
+      // 로컬 개발: 시스템 Chrome 사용
+      const localPath = await getLocalChromePath();
+      if (!localPath) {
+        return NextResponse.json(
+          { error: "로컬에 Chrome이 설치되어 있지 않습니다" },
+          { status: 500 }
+        );
+      }
+      executablePath = localPath;
+      launchArgs = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--font-render-hinting=none",
+      ];
+    }
 
     browser = await puppeteer.launch({
       executablePath,
-      headless: headlessMode,
-      args: [...chromium.args, "--font-render-hinting=none"],
+      headless: true,
+      args: launchArgs,
     });
 
     const page = await browser.newPage();
