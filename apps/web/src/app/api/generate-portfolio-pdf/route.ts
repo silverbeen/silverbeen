@@ -164,7 +164,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
         ? `
         <div class="screenshots">
           <div class="screenshots-title">스크린샷</div>
-          <div class="screenshots-grid">
+          <div class="screenshots-grid${project.images.length === 1 ? ' screenshots-grid-single' : ''}">
             ${project.images.map((img) => `<img src="${escapeHtml(img)}" class="screenshot-img" />`).join("")}
           </div>
         </div>
@@ -326,7 +326,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .container { max-width: 100%; margin: 0 auto; padding: 8px; }
     .section { margin-bottom: 24px; }
     .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .section-title-bar { width: 4px; height: 22px; background: linear-gradient(to bottom, #514EF6, #706FFA); border-radius: 4px; }
+    .section-title-bar { width: 4px; height: 22px; background: #514EF6; border-radius: 4px; }
     .section-title-text { font-size: 18px; font-weight: 700; color: #111827; }
     hr { border: none; border-top: 1px solid #e0f2fe; margin: 24px 0; }
 
@@ -346,8 +346,8 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .profile-tagline { font-size: 13px; color: rgba(17, 24, 39, 0.7); line-height: 1.6; margin-bottom: 10px; }
     .profile-contacts { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
     .contact-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280; }
-    .contact-icon { width: 18px; height: 18px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
-    .profile-intro-box { background: linear-gradient(135deg, #f8fafc, #f1f5f9); border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 12px; }
+    .contact-icon { width: 18px; height: 18px; background: #514EF6; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .profile-intro-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 12px; }
     .profile-intro { font-size: 13px; color: rgba(17, 24, 39, 0.75); line-height: 1.8; white-space: pre-line; }
 
     /* Projects */
@@ -355,7 +355,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .project-card { padding: 16px; page-break-inside: avoid; }
     .project-header { padding-bottom: 12px; margin-bottom: 12px; }
     .project-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .project-category { background: linear-gradient(135deg, #514EF6, #706FFA); color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+    .project-category { background: #514EF6; color: white; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
     .project-club { font-size: 12px; color: #6b7280; }
     .project-name { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 6px; }
     .project-info { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 12px; color: #6b7280; margin-bottom: 8px; }
@@ -363,38 +363,39 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .project-role { font-weight: 600; color: #111827; }
     .project-team { display: flex; align-items: center; gap: 4px; }
     .project-links { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-    .link-badge { border: 1px solid rgba(81, 78, 246, 0.3); background: linear-gradient(135deg, rgba(81, 78, 246, 0.1), rgba(81, 78, 246, 0.05)); color: #514EF6; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-decoration: none; }
+    .link-badge { border: 1px solid rgba(81, 78, 246, 0.3); background: rgba(81, 78, 246, 0.08); color: #514EF6; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-decoration: none; }
     .project-description { font-size: 12px; color: #6b7280; line-height: 1.6; margin-bottom: 10px; }
     .tech-stack { display: flex; flex-wrap: wrap; gap: 4px; }
-    .tech-tag { display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 12px; padding: 2px 8px; font-size: 10px; font-weight: 500; color: #374151; background: linear-gradient(to right, rgba(81, 78, 246, 0.1), rgba(81, 78, 246, 0.02)); }
-    .tech-dot { width: 4px; height: 4px; border-radius: 50%; background: linear-gradient(135deg, #514EF6, #706FFA); }
+    .tech-tag { display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 12px; padding: 2px 8px; font-size: 10px; font-weight: 500; color: #374151; background: rgba(81, 78, 246, 0.06); }
+    .tech-dot { width: 4px; height: 4px; border-radius: 50%; background: #514EF6; }
 
     /* Tasks */
     .project-tasks { margin-top: 12px; }
     .tasks-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 8px; }
     .task-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #6b7280; margin-bottom: 4px; line-height: 1.5; }
-    .task-dot { width: 4px; height: 4px; background: linear-gradient(135deg, #514EF6, rgba(81, 78, 246, 0.4)); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .task-dot { width: 4px; height: 4px; background: #514EF6; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
 
     /* Impact */
-    .impact { margin-top: 12px; background: linear-gradient(to right, rgba(81, 78, 246, 0.12), rgba(81, 78, 246, 0.06), transparent); border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 12px; }
+    .impact { margin-top: 12px; background: rgba(81, 78, 246, 0.08); border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 12px; }
     .impact-title { font-size: 12px; font-weight: 700; color: #514EF6; margin-bottom: 6px; }
     .impact-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; font-weight: 500; color: #111827; margin-bottom: 4px; }
-    .impact-dot { width: 5px; height: 5px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .impact-dot { width: 5px; height: 5px; background: #514EF6; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
 
     /* Growth */
     .growth { margin-top: 12px; }
     .growth-title { font-size: 12px; font-weight: 700; color: #d97706; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .growth-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 50%; flex-shrink: 0; }
-    .growth-item { background: linear-gradient(to right, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05), transparent); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+    .growth-title::before { content: ''; width: 14px; height: 14px; background: #f59e0b; border-radius: 50%; flex-shrink: 0; }
+    .growth-item { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
     .growth-item-title { font-size: 12px; font-weight: 600; color: #b45309; margin-bottom: 4px; }
     .growth-item-content { font-size: 11px; color: #6b7280; line-height: 1.6; }
 
     /* Screenshots */
     .screenshots { margin-top: 12px; }
     .screenshots-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .screenshots-title::before { content: ''; width: 14px; height: 14px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-radius: 4px; flex-shrink: 0; }
+    .screenshots-title::before { content: ''; width: 14px; height: 14px; background: #0ea5e9; border-radius: 4px; flex-shrink: 0; }
     .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+    .screenshots-grid-single { grid-template-columns: 1fr; }
+    .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; }
 
     /* Clubs */
     .club-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
@@ -409,7 +410,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Education */
     .education-list { display: flex; flex-direction: column; gap: 10px; }
     .education-item { display: flex; gap: 12px; align-items: flex-start; }
-    .education-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .education-icon { width: 32px; height: 32px; background: #514EF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .education-content { flex: 1; }
     .education-school { font-size: 14px; font-weight: 600; color: #111827; }
     .education-major { font-size: 12px; color: #6b7280; margin-top: 2px; }
@@ -419,7 +420,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Awards */
     .awards-grid { display: flex; flex-direction: column; gap: 8px; }
     .award-item { display: flex; gap: 10px; border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 8px; padding: 10px; }
-    .award-icon { width: 28px; height: 28px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .award-icon { width: 28px; height: 28px; background: #514EF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .award-name { font-size: 13px; font-weight: 600; color: #111827; }
     .award-prize { font-size: 12px; font-weight: 500; color: #514EF6; }
     .award-date { font-size: 11px; color: #6b7280; }
@@ -428,7 +429,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
     /* Certifications */
     .cert-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .cert-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; }
-    .cert-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #514EF6, #706FFA); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .cert-icon { width: 20px; height: 20px; background: #514EF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
     .cert-name { font-size: 12px; font-weight: 500; color: #111827; }
     .cert-date { font-size: 11px; color: #6b7280; }
 
