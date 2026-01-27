@@ -459,6 +459,7 @@ function generatePortfolioHtml(data: PortfolioData): string {
           ${profile.email ? `<div class="contact-item"><span class="contact-icon">@</span> ${escapeHtml(profile.email)}</div>` : ""}
           ${profile.github ? `<div class="contact-item"><span class="contact-icon">G</span> ${escapeHtml(profile.github)}</div>` : ""}
           ${profile.blog ? `<div class="contact-item"><span class="contact-icon">B</span> ${escapeHtml(profile.blog)}</div>` : ""}
+          ${profile.linkedin ? `<div class="contact-item"><span class="contact-icon">L</span> ${escapeHtml(profile.linkedin)}</div>` : ""}
         </div>
       </div>
     </div>

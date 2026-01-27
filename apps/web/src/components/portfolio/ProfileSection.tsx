@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, Github, BookOpen, ExternalLink } from 'lucide-react';
+import { Mail, Github, BookOpen, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { containerVariants, itemVariants, imageVariants } from './constants';
 import type { Profile } from '@/types/portfolio';
@@ -114,6 +114,18 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
               >
                 <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
                 <span>Blog</span>
+                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+              </a>
+            )}
+            {profile.linkedin && (
+              <a
+                href={profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+              >
+                <Linkedin className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+                <span>LinkedIn</span>
                 <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
               </a>
             )}

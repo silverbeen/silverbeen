@@ -375,6 +375,7 @@ function generateResumeHtml(data: ResumeData): string {
           ${profile.email ? `<div class="profile-contact"><span class="contact-icon">@</span> ${escapeHtml(profile.email)}</div>` : ""}
           ${profile.github ? `<div class="profile-contact"><span class="contact-icon">G</span> ${escapeHtml(profile.github)}</div>` : ""}
           ${profile.blog ? `<div class="profile-contact"><span class="contact-icon">B</span> ${escapeHtml(profile.blog)}</div>` : ""}
+          ${profile.linkedin ? `<div class="profile-contact"><span class="contact-icon">L</span> ${escapeHtml(profile.linkedin)}</div>` : ""}
         </div>
       </div>
       ${profile.photo ? `<img src="${escapeHtml(profile.photo)}" class="profile-photo" />` : ""}

@@ -9,6 +9,7 @@ export interface Profile {
   email: string;
   github: string;
   blog: string;
+  linkedin?: string;
   photo?: string;
 }
 

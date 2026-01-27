@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Github, BookOpen } from 'lucide-react';
+import { Mail, Phone, Github, BookOpen, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Profile } from '@/types/resume';
 
@@ -224,6 +224,19 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
             <BookOpen className="h-4 w-4" />
             <span>{profile.blog}</span>
           </motion.a>
+          {profile.linkedin && (
+            <motion.a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
+              whileHover={{ x: 4 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Linkedin className="h-4 w-4" />
+              <span>{profile.linkedin}</span>
+            </motion.a>
+          )}
         </motion.div>
       </motion.div>
       {profile.photo && (
