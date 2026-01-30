@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users } from 'lucide-react';
+import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DashboardStats } from '@/components/admin/DashboardStats';
@@ -48,6 +48,14 @@ const menuItems = [
     icon: Users,
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
+  },
+  {
+    href: '/admin/images',
+    title: '이미지 관리',
+    description: '업로드된 이미지를 관리합니다.',
+    icon: ImageIcon,
+    color: 'text-pink-500',
+    bgColor: 'bg-pink-100 dark:bg-pink-900/30',
   },
   {
     href: '/admin/settings',

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { deleteImage } from '@/lib/supabase/storage';
 import { ImageUploadModal, useToast, useConfirm } from '@/components/ui';
-import { Plus, Trash2, Copy, Search, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Copy, Search, ArrowLeft, Check, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface ImageFile {
@@ -30,6 +30,8 @@ export default function AdminImagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [uploadFolder, setUploadFolder] = useState('posts');
+  const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
   const { toast } = useToast();
   const { confirm } = useConfirm();
   const supabase = useMemo(() => createClient(), []);
@@ -109,6 +111,56 @@ export default function AdminImagesPage() {
     }
   };
 
+  const toggleImageSelection = (path: string) => {
+    setSelectedImages((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
+
+  const selectAllImages = () => {
+    const allPaths = filteredImages.map((img) => img.path);
+    setSelectedImages(new Set(allPaths));
+  };
+
+  const clearSelection = () => {
+    setSelectedImages(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedImages.size === 0) return;
+
+    const confirmed = await confirm({
+      title: '선택한 이미지 삭제',
+      message: `${selectedImages.size}개의 이미지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      variant: 'danger',
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const deletePromises = Array.from(selectedImages).map((path) =>
+        deleteImage(path)
+      );
+      await Promise.all(deletePromises);
+      setImages((prev) =>
+        prev.filter((img) => !selectedImages.has(img.path))
+      );
+      toast(`${selectedImages.size}개의 이미지가 삭제되었습니다.`, 'success');
+      clearSelection();
+    } catch {
+      toast('일부 이미지 삭제에 실패했습니다.', 'error');
+    }
+  };
+
   const filteredImages = images.filter((image) => {
     const matchesSearch = image.name
       .toLowerCase()
@@ -135,13 +187,52 @@ export default function AdminImagesPage() {
                 이미지 관리
               </h1>
             </div>
-            <button
-              onClick={() => setUploadModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              업로드
-            </button>
+            <div className="flex items-center gap-2">
+              {isSelectionMode ? (
+                <>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedImages.size}개 선택
+                  </span>
+                  <button
+                    onClick={selectAllImages}
+                    className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    전체 선택
+                  </button>
+                  <button
+                    onClick={handleBulkDelete}
+                    disabled={selectedImages.size === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    삭제
+                  </button>
+                  <button
+                    onClick={clearSelection}
+                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsSelectionMode(true)}
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Check className="h-4 w-4" />
+                    선택
+                  </button>
+                  <button
+                    onClick={() => setUploadModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    업로드
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* 필터 */}
@@ -196,43 +287,71 @@ export default function AdminImagesPage() {
               총 {filteredImages.length}개의 이미지
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {filteredImages.map((image) => (
-                <div
-                  key={image.path}
-                  className="group relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-                >
-                  <img
-                    src={image.url}
-                    alt={image.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  {/* 호버 오버레이 */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => handleCopyUrl(image.url)}
-                      className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-                      title="URL 복사"
-                    >
-                      <Copy className="h-4 w-4 text-gray-700" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(image)}
-                      className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                      title="삭제"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+              {filteredImages.map((image) => {
+                const isSelected = selectedImages.has(image.path);
+                return (
+                  <div
+                    key={image.path}
+                    onClick={
+                      isSelectionMode
+                        ? () => toggleImageSelection(image.path)
+                        : undefined
+                    }
+                    className={`group relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 transition-colors ${
+                      isSelected
+                        ? 'border-primary-500 ring-2 ring-primary-500/30'
+                        : 'border-gray-200 dark:border-gray-700'
+                    } ${isSelectionMode ? 'cursor-pointer' : ''}`}
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    {/* 선택 모드 체크박스 */}
+                    {isSelectionMode && (
+                      <div
+                        className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                          isSelected
+                            ? 'bg-primary-500 border-primary-500'
+                            : 'bg-white/80 border-gray-300'
+                        }`}
+                      >
+                        {isSelected && (
+                          <Check className="h-4 w-4 text-white" />
+                        )}
+                      </div>
+                    )}
+                    {/* 호버 오버레이 (선택 모드가 아닐 때만) */}
+                    {!isSelectionMode && (
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleCopyUrl(image.url)}
+                          className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                          title="URL 복사"
+                        >
+                          <Copy className="h-4 w-4 text-gray-700" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(image)}
+                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="삭제"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                    {/* 파일 정보 */}
+                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+                      <p className="text-xs text-white truncate">{image.name}</p>
+                      <p className="text-xs text-gray-300">
+                        {FOLDERS.find((f) => f.value === image.folder)?.label}
+                      </p>
+                    </div>
                   </div>
-                  {/* 파일 정보 */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-xs text-white truncate">{image.name}</p>
-                    <p className="text-xs text-gray-300">
-                      {FOLDERS.find((f) => f.value === image.folder)?.label}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
