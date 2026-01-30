@@ -114,7 +114,7 @@ export default function EditPostPage() {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">글 수정</h1>
             {post.published && (
               <Link
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post.id}`}
                 target="_blank"
                 className="text-primary-500 hover:text-primary-600 text-sm"
               >
