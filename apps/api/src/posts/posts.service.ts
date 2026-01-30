@@ -28,9 +28,7 @@ export class PostsService implements OnModuleInit {
       return;
     }
 
-    this.logger.log(
-      `Found ${postsWithEmptySlugs.length} posts with empty slugs. Fixing...`,
-    );
+    this.logger.log(`Found ${postsWithEmptySlugs.length} posts with empty slugs. Fixing...`);
 
     for (const post of postsWithEmptySlugs) {
       const newSlug = await generateUniqueSlug(post.title, async (slug) => {
@@ -136,9 +134,7 @@ export class PostsService implements OnModuleInit {
         ...data,
         slug,
         authorId,
-        tags: tagIds?.length
-          ? { connect: tagIds.map((id) => ({ id })) }
-          : undefined,
+        tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
       },
       include: { tags: true },
     });
@@ -171,9 +167,7 @@ export class PostsService implements OnModuleInit {
         title,
         slug,
         createdAt: createdAt ? new Date(createdAt) : undefined,
-        tags: tagIds
-          ? { set: [], connect: tagIds.map((id) => ({ id })) }
-          : undefined,
+        tags: tagIds ? { set: [], connect: tagIds.map((id) => ({ id })) } : undefined,
       },
       include: { tags: true },
     });
