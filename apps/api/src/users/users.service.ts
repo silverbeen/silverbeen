@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '@prisma/client';
 
 interface SupabaseUser {
   id: string;
@@ -13,8 +15,20 @@ interface SupabaseUser {
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
+  private readonly supabaseAdmin: SupabaseClient | null = null;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (supabaseUrl && serviceRoleKey) {
+      this.supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      });
+    } else {
+      this.logger.warn('Supabase Admin client not configured - SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing');
+    }
+  }
 
   /**
    * Supabase Auth 사용자를 로컬 User 테이블에 동기화 (upsert)
@@ -141,11 +155,179 @@ export class UsersService {
   }
 
   /**
-   * 모든 사용자 조회
+   * 모든 사용자 조회 (로컬 DB)
    */
   async findAll() {
     return this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  /**
+   * Supabase Auth에서 모든 사용자 조회
+   */
+  async findAllFromSupabase() {
+    if (!this.supabaseAdmin) {
+      this.logger.error('Supabase Admin client not configured');
+      throw new InternalServerErrorException(
+        'Supabase Admin client not configured. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.',
+      );
+    }
+
+    try {
+      const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
+
+      if (error) {
+        this.logger.error('Failed to fetch users from Supabase', error);
+        throw new InternalServerErrorException(`Supabase error: ${error.message}`);
+      }
+
+      return data.users.map((user) => ({
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.name || null,
+        role: user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+        emailConfirmedAt: user.email_confirmed_at,
+        lastSignInAt: user.last_sign_in_at,
+        createdAt: user.created_at,
+      }));
+    } catch (err) {
+      this.logger.error('Unexpected error fetching users from Supabase', err);
+      throw new InternalServerErrorException('Failed to fetch users from Supabase');
+    }
+  }
+
+  /**
+   * Supabase Auth에서 사용자 삭제
+   */
+  async deleteFromSupabase(id: string, currentUserId: string) {
+    if (!this.supabaseAdmin) {
+      throw new InternalServerErrorException('Supabase Admin client not configured');
+    }
+
+    // 자기 자신 삭제 방지
+    if (id === currentUserId) {
+      throw new ForbiddenException('자기 자신은 삭제할 수 없습니다');
+    }
+
+    // 마지막 관리자 삭제 방지
+    const targetUser = await this.getSupabaseUserById(id);
+    if (targetUser?.role === 'ADMIN') {
+      const adminCount = await this.countAdmins();
+      if (adminCount <= 1) {
+        throw new ForbiddenException('마지막 관리자는 삭제할 수 없습니다');
+      }
+    }
+
+    try {
+      const { error } = await this.supabaseAdmin.auth.admin.deleteUser(id);
+
+      if (error) {
+        this.logger.error(`Failed to delete user ${id} from Supabase`, error);
+        throw new InternalServerErrorException(`Supabase error: ${error.message}`);
+      }
+
+      // 로컬 DB에서도 삭제 (존재하는 경우)
+      await this.prisma.user.deleteMany({ where: { id } });
+
+      this.logger.log(`User ${id} deleted successfully`);
+      return { success: true };
+    } catch (err) {
+      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException) throw err;
+      this.logger.error(`Unexpected error deleting user ${id}`, err);
+      throw new InternalServerErrorException('Failed to delete user');
+    }
+  }
+
+  /**
+   * Supabase Auth에서 사용자 역할 변경
+   */
+  async updateRoleFromSupabase(id: string, role: Role, currentUserId: string) {
+    if (!this.supabaseAdmin) {
+      throw new InternalServerErrorException('Supabase Admin client not configured');
+    }
+
+    // 자기 자신 권한 변경 방지
+    if (id === currentUserId) {
+      throw new ForbiddenException('자기 자신의 권한은 변경할 수 없습니다');
+    }
+
+    // 마지막 관리자 권한 해제 방지
+    if (role === Role.USER) {
+      const targetUser = await this.getSupabaseUserById(id);
+      if (targetUser?.role === 'ADMIN') {
+        const adminCount = await this.countAdmins();
+        if (adminCount <= 1) {
+          throw new ForbiddenException('마지막 관리자의 권한을 해제할 수 없습니다');
+        }
+      }
+    }
+
+    try {
+      const { data, error } = await this.supabaseAdmin.auth.admin.updateUserById(id, {
+        user_metadata: { role: role.toLowerCase() },
+      });
+
+      if (error) {
+        this.logger.error(`Failed to update role for user ${id}`, error);
+        throw new InternalServerErrorException(`Supabase error: ${error.message}`);
+      }
+
+      // 로컬 DB에서도 업데이트 (존재하는 경우)
+      await this.prisma.user.updateMany({
+        where: { id },
+        data: { role },
+      });
+
+      this.logger.log(`User ${id} role updated to ${role}`);
+      return {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name || null,
+        role,
+      };
+    } catch (err) {
+      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException) throw err;
+      this.logger.error(`Unexpected error updating role for user ${id}`, err);
+      throw new InternalServerErrorException('Failed to update user role');
+    }
+  }
+
+  /**
+   * Supabase에서 특정 사용자 조회
+   */
+  private async getSupabaseUserById(id: string) {
+    if (!this.supabaseAdmin) return null;
+
+    try {
+      const { data, error } = await this.supabaseAdmin.auth.admin.getUserById(id);
+      if (error || !data.user) return null;
+
+      return {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * 관리자 수 조회
+   */
+  private async countAdmins(): Promise<number> {
+    if (!this.supabaseAdmin) return 0;
+
+    try {
+      const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
+      if (error) return 0;
+
+      return data.users.filter(
+        (user) => user.user_metadata?.role?.toUpperCase() === 'ADMIN',
+      ).length;
+    } catch {
+      return 0;
+    }
   }
 }

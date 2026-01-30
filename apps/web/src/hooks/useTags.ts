@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
-import type { Tag, CreateTagDto } from '@/types/post';
+import type { Tag, CreateTagDto, UpdateTagDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
 
 export function useTags() {
@@ -38,6 +38,20 @@ export function useTags() {
     return newTag;
   };
 
+  const updateTag = async (id: string, data: UpdateTagDto) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      throw new Error('Not authenticated');
+    }
+    const updatedTag = await api.tags.update(id, data, session.access_token);
+    setTags((prev) =>
+      prev
+        .map((tag) => (tag.id === id ? { ...tag, ...updatedTag } : tag))
+        .sort((a, b) => a.name.localeCompare(b.name))
+    );
+    return updatedTag;
+  };
+
   const deleteTag = async (id: string) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
@@ -53,6 +67,7 @@ export function useTags() {
     error,
     refetch: fetchTags,
     createTag,
+    updateTag,
     deleteTag,
   };
 }
