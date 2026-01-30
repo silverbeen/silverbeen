@@ -34,6 +34,7 @@ export interface CreatePostDto {
   coverImage?: string;
   published?: boolean;
   tagIds?: string[];
+  createdAt?: string;
 }
 
 export interface UpdatePostDto {
@@ -43,6 +44,7 @@ export interface UpdatePostDto {
   coverImage?: string;
   published?: boolean;
   tagIds?: string[];
+  createdAt?: string;
 }
 
 export interface CreateTagDto {

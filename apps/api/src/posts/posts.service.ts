@@ -151,7 +151,7 @@ export class PostsService implements OnModuleInit {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
-    const { tagIds, title, ...data } = updatePostDto;
+    const { tagIds, title, createdAt, ...data } = updatePostDto;
 
     let slug = post.slug;
     if (title && title !== post.title) {
@@ -170,6 +170,7 @@ export class PostsService implements OnModuleInit {
         ...data,
         title,
         slug,
+        createdAt: createdAt ? new Date(createdAt) : undefined,
         tags: tagIds
           ? { set: [], connect: tagIds.map((id) => ({ id })) }
           : undefined,

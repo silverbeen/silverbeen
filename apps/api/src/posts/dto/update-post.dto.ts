@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
+  IsDateString,
 } from 'class-validator';
 
 export class UpdatePostDto {
@@ -30,4 +31,8 @@ export class UpdatePostDto {
   @IsArray()
   @IsString({ each: true })
   tagIds?: string[];
+
+  @IsOptional()
+  @IsDateString()
+  createdAt?: string;
 }
