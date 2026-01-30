@@ -1,4 +1,10 @@
-import { Injectable, Logger, InternalServerErrorException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PrismaService } from '../prisma/prisma.service';
@@ -30,7 +36,9 @@ export class UsersService {
         auth: { autoRefreshToken: false, persistSession: false },
       });
     } else {
-      this.logger.warn('Supabase Admin client not configured - SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing');
+      this.logger.warn(
+        'Supabase Admin client not configured - SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing',
+      );
     }
   }
 
@@ -57,10 +65,7 @@ export class UsersService {
           data: {
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name ?? existingUser.name,
-            role:
-              supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
-                ? 'ADMIN'
-                : 'USER',
+            role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
           },
         });
         updated++;
@@ -70,19 +75,14 @@ export class UsersService {
             id: supabaseUser.id,
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name,
-            role:
-              supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
-                ? 'ADMIN'
-                : 'USER',
+            role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
           },
         });
         created++;
       }
     }
 
-    this.logger.log(
-      `Synced ${supabaseUsers.length} users: ${created} created, ${updated} updated`,
-    );
+    this.logger.log(`Synced ${supabaseUsers.length} users: ${created} created, ${updated} updated`);
 
     return {
       synced: supabaseUsers.length,
@@ -101,18 +101,12 @@ export class UsersService {
         id: supabaseUser.id,
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role:
-          supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
-            ? 'ADMIN'
-            : 'USER',
+        role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
       },
       update: {
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role:
-          supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN'
-            ? 'ADMIN'
-            : 'USER',
+        role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
       },
     });
   }
@@ -138,9 +132,7 @@ export class UsersService {
 
     const existingUserIds = new Set(existingUsers.map((user) => user.id));
 
-    const invalidAuthorIds = Array.from(postAuthorIds).filter(
-      (id) => !existingUserIds.has(id),
-    );
+    const invalidAuthorIds = Array.from(postAuthorIds).filter((id) => !existingUserIds.has(id));
 
     return {
       total: posts.length,
@@ -263,7 +255,8 @@ export class UsersService {
       this.logger.log(`User ${id} deleted successfully`);
       return { success: true };
     } catch (err) {
-      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException) throw err;
+      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException)
+        throw err;
       this.logger.error(`Unexpected error deleting user ${id}`, err);
       throw new InternalServerErrorException('Failed to delete user');
     }
@@ -311,29 +304,10 @@ export class UsersService {
         role,
       };
     } catch (err) {
-      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException) throw err;
+      if (err instanceof InternalServerErrorException || err instanceof ForbiddenException)
+        throw err;
       this.logger.error(`Unexpected error updating role for user ${id}`, err);
       throw new InternalServerErrorException('Failed to update user role');
-    }
-  }
-
-  /**
-   * Supabase에서 특정 사용자 조회
-   */
-  private async getSupabaseUserById(id: string) {
-    if (!this.supabaseAdmin) return null;
-
-    try {
-      const { data, error } = await this.supabaseAdmin.auth.admin.getUserById(id);
-      if (error || !data.user) return null;
-
-      return {
-        id: data.user.id,
-        email: data.user.email,
-        role: data.user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
-      };
-    } catch {
-      return null;
     }
   }
 
