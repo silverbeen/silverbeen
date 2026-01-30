@@ -12,6 +12,9 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@giscus/react": "^3.1.0",
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^7.2.0",
@@ -21,6 +24,7 @@
     "@supabase/supabase-js": "^2.90.1",
     "@tailwindcss/typography": "^0.5.19",
     "@uiw/react-md-editor": "^4.0.11",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
@@ -38,7 +42,8 @@
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
