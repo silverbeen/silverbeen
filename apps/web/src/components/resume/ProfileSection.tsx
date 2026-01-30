@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Github, BookOpen } from 'lucide-react';
+import { Mail, Phone, Github, BookOpen, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Profile } from '@/types/resume';
 
@@ -182,48 +182,28 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
         )}
 
         <motion.div className="flex flex-col gap-2 text-sm" variants={itemVariants}>
-          {profile.phone && (
-            <motion.a
-              href={`tel:${profile.phone}`}
-              className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
-              whileHover={{ x: 4 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Phone className="h-4 w-4" />
-              <span>{profile.phone}</span>
-            </motion.a>
-          )}
-          <motion.a
-            href={`mailto:${profile.email}`}
-            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
-            whileHover={{ x: 4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Mail className="h-4 w-4" />
-            <span>{profile.email}</span>
-          </motion.a>
-          <motion.a
-            href={profile.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
-            whileHover={{ x: 4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Github className="h-4 w-4" />
-            <span>{profile.github}</span>
-          </motion.a>
-          <motion.a
-            href={profile.blog}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
-            whileHover={{ x: 4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <BookOpen className="h-4 w-4" />
-            <span>{profile.blog}</span>
-          </motion.a>
+          {[
+            { type: 'phone', value: profile.phone, Icon: Phone, href: `tel:${profile.phone}` },
+            { type: 'email', value: profile.email, Icon: Mail, href: `mailto:${profile.email}` },
+            { type: 'github', value: profile.github, Icon: Github, href: profile.github, isExternal: true },
+            { type: 'blog', value: profile.blog, Icon: BookOpen, href: profile.blog, isExternal: true },
+            { type: 'linkedin', value: profile.linkedin, Icon: Linkedin, href: profile.linkedin, isExternal: true },
+          ]
+            .filter((item) => item.value)
+            .map((item) => (
+              <motion.a
+                key={item.type}
+                href={item.href!}
+                target={item.isExternal ? '_blank' : undefined}
+                rel={item.isExternal ? 'noopener noreferrer' : undefined}
+                className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
+                whileHover={{ x: 4 }}
+                transition={{ duration: 0.2 }}
+              >
+                <item.Icon className="h-4 w-4" />
+                <span>{item.value}</span>
+              </motion.a>
+            ))}
         </motion.div>
       </motion.div>
       {profile.photo && (

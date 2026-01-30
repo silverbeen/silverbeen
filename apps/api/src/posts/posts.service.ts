@@ -28,9 +28,7 @@ export class PostsService implements OnModuleInit {
       return;
     }
 
-    this.logger.log(
-      `Found ${postsWithEmptySlugs.length} posts with empty slugs. Fixing...`,
-    );
+    this.logger.log(`Found ${postsWithEmptySlugs.length} posts with empty slugs. Fixing...`);
 
     for (const post of postsWithEmptySlugs) {
       const newSlug = await generateUniqueSlug(post.title, async (slug) => {
@@ -136,9 +134,7 @@ export class PostsService implements OnModuleInit {
         ...data,
         slug,
         authorId,
-        tags: tagIds?.length
-          ? { connect: tagIds.map((id) => ({ id })) }
-          : undefined,
+        tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
       },
       include: { tags: true },
     });
@@ -151,7 +147,7 @@ export class PostsService implements OnModuleInit {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
-    const { tagIds, title, ...data } = updatePostDto;
+    const { tagIds, title, createdAt, ...data } = updatePostDto;
 
     let slug = post.slug;
     if (title && title !== post.title) {
@@ -170,9 +166,8 @@ export class PostsService implements OnModuleInit {
         ...data,
         title,
         slug,
-        tags: tagIds
-          ? { set: [], connect: tagIds.map((id) => ({ id })) }
-          : undefined,
+        createdAt: createdAt ? new Date(createdAt) : undefined,
+        tags: tagIds ? { set: [], connect: tagIds.map((id) => ({ id })) } : undefined,
       },
       include: { tags: true },
     });

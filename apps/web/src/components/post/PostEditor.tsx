@@ -26,6 +26,12 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     initialData?.tags.map((t) => t.id) || []
   );
   const [published, setPublished] = useState(initialData?.published || false);
+  const [createdAt, setCreatedAt] = useState(() => {
+    if (initialData?.createdAt) {
+      return new Date(initialData.createdAt).toISOString().slice(0, 16);
+    }
+    return '';
+  });
 
   const handleSave = async (shouldPublish: boolean) => {
     if (!title.trim()) {
@@ -44,6 +50,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       coverImage: coverImage.trim() || undefined,
       tagIds: selectedTagIds,
       published: shouldPublish,
+      createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
     };
 
     await onSave(data);
@@ -100,6 +107,20 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
           loading={tagsLoading}
         />
       </div>
+
+      {initialData && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            작성일
+          </label>
+          <input
+            type="datetime-local"
+            value={createdAt}
+            onChange={(e) => setCreatedAt(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+      )}
 
       <div data-color-mode="auto">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
