@@ -12,11 +12,26 @@
 - **배포**: Vercel (프론트) + Railway (백엔드)
 
 ## 프로젝트 구조
-- `apps/web` - Next.js 프론트엔드
-- `apps/api` - NestJS 백엔드
-- `packages/ui` - 공유 UI 컴포넌트
-- `packages/config` - 공유 설정
-- `packages/types` - 공유 타입 정의
+
+```
+apps/
+├── web/src/                    # Next.js 프론트엔드
+│   ├── app/                    # 페이지 (App Router)
+│   │   └── admin/              # 어드민 페이지들
+│   ├── components/             # 컴포넌트
+│   │   ├── ui/                 # 공통 UI (shadcn/ui)
+│   │   └── {도메인}/           # 도메인별 컴포넌트
+│   ├── lib/                    # 유틸리티
+│   │   ├── api/                # API 호출 함수
+│   │   └── supabase/           # Supabase 클라이언트
+│   └── hooks/                  # 커스텀 훅
+├── api/src/                    # NestJS 백엔드
+│   ├── {도메인}/               # 도메인 모듈 (controller, service, dto)
+│   └── prisma/                 # Prisma 스키마
+packages/
+├── types/src/                  # 공유 타입
+└── ui/                         # 공유 UI 컴포넌트
+```
 
 ## 개발 명령어
 - `pnpm dev` - 전체 개발 서버 실행
@@ -75,31 +90,33 @@
 - API 키는 서버 사이드에서만 사용
 - 이미지는 Supabase Storage 또는 외부 CDN 사용
 
-## 패턴 문서 활용
+## 필수 규칙
 
-새 기능 개발 시 `/docs/patterns/index.md`를 읽고 해당 상황에 맞는 패턴 파일을 참조하세요.
+### 어드민 페이지
+- `/admin/*` 페이지 추가 시 → `apps/web/src/app/admin/page.tsx`의 `menuItems` 배열에 메뉴 추가 필수
 
-| 상황 | 참조 파일 |
-|------|----------|
-| 새 컴포넌트 만들기 | `docs/patterns/frontend/component.md` |
-| 새 페이지 만들기 | `docs/patterns/frontend/page.md` |
-| 커스텀 훅 만들기 | `docs/patterns/frontend/hook.md` |
-| API 호출 함수 추가 | `docs/patterns/frontend/api-client.md` |
-| 폼 컴포넌트 만들기 | `docs/patterns/frontend/form.md` |
-| 새 API 모듈 만들기 | `docs/patterns/backend/module.md` |
-| DB 테이블 추가 | `docs/patterns/database/schema.md` |
-| 타입 정의 추가 | `docs/patterns/shared/types.md` |
+### 컴포넌트
+- Server Component 우선, `useState`/`onClick`/`useEffect` 있을 때만 `'use client'`
+- UI 컴포넌트 → `apps/web/src/components/ui/` (shadcn/ui 스타일)
+- 도메인 컴포넌트 → `apps/web/src/components/{도메인}/`
 
-## 시스템 문서 활용
+### API
+- 프론트 API 호출 → `apps/web/src/lib/api/`에 함수 추가
+- 백엔드 모듈 → `apps/api/src/{도메인}/` (controller, service, dto, module)
 
-프로젝트 맥락 파악이 필요할 때 참조하세요.
+### 데이터베이스
+- 스키마 수정 → `apps/api/prisma/schema.prisma` 후 `pnpm db:push`
 
-| 상황 | 참조 파일 |
-|------|----------|
-| 시스템 구조 이해 | `docs/architecture.md` |
-| API 작업 | `docs/api.md` |
-| DB 작업 | `docs/database.md` |
-| 인증 관련 | `docs/auth.md` |
-| 테스트 작성 | `docs/patterns/testing.md` |
-| 배포 | `docs/deployment.md` |
-| 에러 해결 | `docs/troubleshooting.md` |
+### 타입
+- 공유 타입 → `packages/types/src/`
+
+### 스타일
+- Tailwind CSS만 사용, 인라인 스타일 금지
+- Primary 컬러: `primary-500` (#514EF6)
+
+## 상세 패턴 문서
+
+복잡한 예시 코드가 필요하면 해당 docs 파일을 읽을 것:
+- 새 API 모듈 → `docs/patterns/backend/module.md`
+- DB 스키마 → `docs/patterns/database/schema.md`
+- 폼 컴포넌트 → `docs/patterns/frontend/form.md`
