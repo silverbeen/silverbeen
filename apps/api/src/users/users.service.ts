@@ -168,7 +168,7 @@ export class UsersService {
   }
 
   /**
-   * Supabase Auth에서 모든 사용자 조회
+   * Supabase Auth에서 모든 사용자 조회 (페이지네이션 처리)
    */
   async findAllFromSupabase() {
     if (!this.supabaseAdmin) {
@@ -179,23 +179,53 @@ export class UsersService {
     }
 
     try {
-      const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
+      const allUsers: Array<{
+        id: string;
+        email: string | undefined;
+        name: string | null;
+        role: string;
+        emailConfirmedAt: string | null;
+        lastSignInAt: string | null;
+        createdAt: string;
+      }> = [];
 
-      if (error) {
-        this.logger.error('Failed to fetch users from Supabase', error);
-        throw new InternalServerErrorException(`Supabase error: ${error.message}`);
+      const perPage = 100;
+      let page = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await this.supabaseAdmin.auth.admin.listUsers({
+          page,
+          perPage,
+        });
+
+        if (error) {
+          this.logger.error(`Failed to fetch users from Supabase (page ${page})`, error);
+          throw new InternalServerErrorException(`Supabase error: ${error.message}`);
+        }
+
+        const mappedUsers = data.users.map((user) => ({
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.name || null,
+          role: user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+          emailConfirmedAt: user.email_confirmed_at ?? null,
+          lastSignInAt: user.last_sign_in_at ?? null,
+          createdAt: user.created_at,
+        }));
+
+        allUsers.push(...mappedUsers);
+
+        if (data.users.length < perPage) {
+          hasMore = false;
+        } else {
+          page++;
+        }
       }
 
-      return data.users.map((user) => ({
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata?.name || null,
-        role: user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
-        emailConfirmedAt: user.email_confirmed_at,
-        lastSignInAt: user.last_sign_in_at,
-        createdAt: user.created_at,
-      }));
+      return allUsers;
     } catch (err) {
+      if (err instanceof InternalServerErrorException) throw err;
       this.logger.error('Unexpected error fetching users from Supabase', err);
       throw new InternalServerErrorException('Failed to fetch users from Supabase');
     }
@@ -309,23 +339,28 @@ export class UsersService {
 
   /**
    * 마지막 관리자인지 확인 (단일 API 호출로 최적화)
+   * 에러 발생 시 fail-closed: 관리자 삭제/권한 해제를 차단
    */
   private async checkLastAdmin(id: string): Promise<boolean> {
-    if (!this.supabaseAdmin) return false;
+    if (!this.supabaseAdmin) {
+      this.logger.warn('Supabase Admin client not configured, blocking admin action for safety');
+      return true; // fail-closed: 확인할 수 없으면 차단
+    }
 
     try {
       const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
       if (error) {
         this.logger.error('Failed to list users for last admin check', error);
-        return false;
+        return true; // fail-closed: 에러 시 차단
       }
 
       const admins = data.users.filter(
         (user) => user.user_metadata?.role?.toUpperCase() === 'ADMIN',
       );
       return admins.length <= 1 && admins.some((admin) => admin.id === id);
-    } catch {
-      return false;
+    } catch (err) {
+      this.logger.error('Unexpected error in checkLastAdmin', err);
+      return true; // fail-closed: 예외 시 차단
     }
   }
 }

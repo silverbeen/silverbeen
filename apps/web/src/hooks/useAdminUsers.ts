@@ -17,7 +17,12 @@ export function useAdminUsers() {
       setLoading(true);
       const {
         data: { session },
+        error: sessionError,
       } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
 
       if (!session?.access_token) {
         throw new Error('Not authenticated');
@@ -42,7 +47,12 @@ export function useAdminUsers() {
     async (userId: string, newRole: 'ADMIN' | 'USER') => {
       const {
         data: { session },
+        error: sessionError,
       } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
 
       if (!session?.access_token) {
         throw new Error('Not authenticated');
@@ -60,7 +70,12 @@ export function useAdminUsers() {
     async (userId: string) => {
       const {
         data: { session },
+        error: sessionError,
       } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
 
       if (!session?.access_token) {
         throw new Error('Not authenticated');

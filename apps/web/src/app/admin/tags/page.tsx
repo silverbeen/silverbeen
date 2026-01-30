@@ -190,12 +190,14 @@ export default function AdminTagsPage() {
                         <input
                           type="text"
                           value={editingName}
-                          onChange={(e) => setEditingName(e.target.value)}
+                          onChange={(e) => !isSaving && setEditingName(e.target.value)}
                           onKeyDown={(e) => {
+                            if (isSaving) return;
                             if (e.key === 'Enter') handleEditSave(tag);
                             if (e.key === 'Escape') handleEditCancel();
                           }}
-                          className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          disabled={isSaving}
+                          className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
                           autoFocus
                         />
                       ) : (
