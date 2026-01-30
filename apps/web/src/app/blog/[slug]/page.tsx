@@ -22,21 +22,16 @@ import type { Metadata } from 'next';
 import type { Post } from '@/types/post';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  const blogId = parseInt(id, 10);
-
-  if (isNaN(blogId)) {
-    return { title: '잘못된 요청' };
-  }
+  const { slug } = await params;
 
   try {
-    const blog = await api.blogs.getById(blogId);
+    const blog = await api.blogs.getBySlug(slug);
     const description = blog.excerpt || blog.content.slice(0, 160).replace(/\n/g, ' ');
-    const url = `${config.siteUrl}/blog/${blog.id}`;
+    const url = `${config.siteUrl}/blog/${blog.slug}`;
 
     return {
       title: blog.title,
@@ -72,7 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 function BlogJsonLd({ blog }: { blog: Post }) {
-  const url = `${config.siteUrl}/blog/${blog.id}`;
+  const url = `${config.siteUrl}/blog/${blog.slug}`;
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -141,20 +136,13 @@ function BlogJsonLd({ blog }: { blog: Post }) {
 }
 
 export default async function BlogPage({ params }: PageProps) {
-  const { id } = await params;
-  const blogId = parseInt(id, 10);
-
-  if (isNaN(blogId)) {
-    notFound();
-  }
+  const { slug } = await params;
 
   let blog;
   let adjacentPosts;
   try {
-    [blog, adjacentPosts] = await Promise.all([
-      api.blogs.getById(blogId, { revalidate: 60 }),
-      api.blogs.getAdjacent(blogId, { revalidate: 60 }),
-    ]);
+    blog = await api.blogs.getBySlug(slug, { revalidate: 60 });
+    adjacentPosts = await api.blogs.getAdjacent(blog.id, { revalidate: 60 });
   } catch {
     notFound();
   }

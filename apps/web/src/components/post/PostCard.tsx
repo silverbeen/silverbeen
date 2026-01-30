@@ -14,7 +14,7 @@ export function PostCard({ post }: PostCardProps) {
 
   return (
     <Link
-      href={`/blog/${post.id}`}
+      href={`/blog/${post.slug}`}
       className="group hover:border-primary-200 dark:hover:border-primary-500/30 hover:shadow-primary-500/5 dark:hover:shadow-primary-500/10 relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl dark:border-gray-700/50 dark:bg-gray-800/50"
     >
       {/* Cover Image or Gradient */}
