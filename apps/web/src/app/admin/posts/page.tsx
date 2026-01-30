@@ -207,7 +207,7 @@ export default function AdminPostsPage() {
                             </Link>
                             {post.published && (
                               <Link
-                                href={`/blog/${post.id}`}
+                                href={`/blog/${post.slug}`}
                                 target="_blank"
                                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
                                 title="새 탭에서 보기"

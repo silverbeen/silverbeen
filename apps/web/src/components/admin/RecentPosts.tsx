@@ -99,7 +99,7 @@ export function RecentPosts() {
               </div>
               {post.published && (
                 <Link
-                  href={`/blog/${post.id}`}
+                  href={`/blog/${post.slug}`}
                   target="_blank"
                   className="ml-2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   title="새 탭에서 보기"

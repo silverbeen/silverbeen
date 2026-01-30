@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${config.siteUrl}/blog/${post.id}`,
+    url: `${config.siteUrl}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt),
     changeFrequency: 'weekly',
     priority: 0.7,
