@@ -24,10 +24,12 @@ export function DashboardStats() {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
 
+        if (!session?.access_token) {
+          return;
+        }
+
         const [posts, tagsData] = await Promise.all([
-          session?.access_token
-            ? api.blogs.getAdminList(session.access_token)
-            : api.blogs.getList({ page: 1, limit: 100 }).then((res) => res.posts),
+          api.blogs.getAdminList(session.access_token),
           api.tags.getList(),
         ]);
 

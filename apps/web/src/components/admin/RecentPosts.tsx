@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { api } from '@/lib/api';
+import { createClient } from '@/lib/supabase/client';
 import { formatShortDate } from '@/lib/utils';
 import type { Post } from '@/types/post';
 
@@ -14,8 +15,16 @@ export function RecentPosts() {
   useEffect(() => {
     async function fetchPosts() {
       try {
-        const data = await api.blogs.getList({ page: 1, limit: 5 });
-        setPosts(data.posts);
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          const allPosts = await api.blogs.getAdminList(session.access_token);
+          setPosts(allPosts.slice(0, 5));
+        } else {
+          const data = await api.blogs.getList({ page: 1, limit: 5 });
+          setPosts(data.posts);
+        }
       } catch (error) {
         console.error('Failed to fetch posts:', error);
       } finally {

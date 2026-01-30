@@ -1,45 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Shield, User as UserIcon, Trash2, ShieldCheck, ShieldOff } from 'lucide-react';
-import { api } from '@/lib/api';
-import { createClient } from '@/lib/supabase/client';
 import { formatDate, formatDateTime } from '@/lib/utils';
-import { useToast } from '@/components/ui';
+import { useToast, useConfirm } from '@/components/ui';
+import { useAdminUsers } from '@/hooks/useAdminUsers';
 import type { User } from '@/types/user';
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const supabase = createClient();
+  const { users, loading, error, currentUserId, updateRole, deleteUser } = useAdminUsers();
   const { toast } = useToast();
-
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.access_token) {
-          throw new Error('Not authenticated');
-        }
-        setCurrentUserId(session.user.id);
-        const data = await api.users.getList(session.access_token);
-        setUsers(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch users'));
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { confirm } = useConfirm();
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const handleRoleChange = async (user: User) => {
     const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
@@ -48,17 +21,18 @@ export default function AdminUsersPage() {
         ? `"${user.email}"에게 관리자 권한을 부여하시겠습니까?`
         : `"${user.email}"의 관리자 권한을 해제하시겠습니까?`;
 
-    if (!confirm(message)) return;
+    const confirmed = await confirm({
+      title: '권한 변경',
+      message,
+      confirmText: '변경',
+      cancelText: '취소',
+    });
+
+    if (!confirmed) return;
 
     setActionLoading(user.id);
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Not authenticated');
-
-      await api.users.updateRole(user.id, newRole, session.access_token);
-      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, role: newRole } : u)));
+      await updateRole(user.id, newRole);
       toast(`권한이 ${newRole === 'ADMIN' ? '관리자' : '일반'}로 변경되었습니다.`, 'success');
     } catch (err) {
       toast('권한 변경에 실패했습니다.', 'error');
@@ -74,17 +48,19 @@ export default function AdminUsersPage() {
       return;
     }
 
-    if (!confirm(`"${user.email}" 유저를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+    const confirmed = await confirm({
+      title: '유저 삭제',
+      message: `"${user.email}" 유저를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      variant: 'danger',
+    });
+
+    if (!confirmed) return;
 
     setActionLoading(user.id);
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Not authenticated');
-
-      await api.users.delete(user.id, session.access_token);
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      await deleteUser(user.id);
       toast('유저가 삭제되었습니다.', 'success');
     } catch (err) {
       toast('유저 삭제에 실패했습니다.', 'error');

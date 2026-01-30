@@ -1,4 +1,5 @@
 import { Injectable, Logger, InternalServerErrorException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
@@ -17,9 +18,12 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   private readonly supabaseAdmin: SupabaseClient | null = null;
 
-  constructor(private readonly prisma: PrismaService) {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    const serviceRoleKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
 
     if (supabaseUrl && serviceRoleKey) {
       this.supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
@@ -211,12 +215,8 @@ export class UsersService {
     }
 
     // 마지막 관리자 삭제 방지
-    const targetUser = await this.getSupabaseUserById(id);
-    if (targetUser?.role === 'ADMIN') {
-      const adminCount = await this.countAdmins();
-      if (adminCount <= 1) {
-        throw new ForbiddenException('마지막 관리자는 삭제할 수 없습니다');
-      }
+    if (await this.checkLastAdmin(id)) {
+      throw new ForbiddenException('마지막 관리자는 삭제할 수 없습니다');
     }
 
     try {
@@ -253,14 +253,8 @@ export class UsersService {
     }
 
     // 마지막 관리자 권한 해제 방지
-    if (role === Role.USER) {
-      const targetUser = await this.getSupabaseUserById(id);
-      if (targetUser?.role === 'ADMIN') {
-        const adminCount = await this.countAdmins();
-        if (adminCount <= 1) {
-          throw new ForbiddenException('마지막 관리자의 권한을 해제할 수 없습니다');
-        }
-      }
+    if (role === Role.USER && (await this.checkLastAdmin(id))) {
+      throw new ForbiddenException('마지막 관리자의 권한을 해제할 수 없습니다');
     }
 
     try {
@@ -314,20 +308,24 @@ export class UsersService {
   }
 
   /**
-   * 관리자 수 조회
+   * 마지막 관리자인지 확인 (단일 API 호출로 최적화)
    */
-  private async countAdmins(): Promise<number> {
-    if (!this.supabaseAdmin) return 0;
+  private async checkLastAdmin(id: string): Promise<boolean> {
+    if (!this.supabaseAdmin) return false;
 
     try {
       const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
-      if (error) return 0;
+      if (error) {
+        this.logger.error('Failed to list users for last admin check', error);
+        return false;
+      }
 
-      return data.users.filter(
+      const admins = data.users.filter(
         (user) => user.user_metadata?.role?.toUpperCase() === 'ADMIN',
-      ).length;
+      );
+      return admins.length <= 1 && admins.some((admin) => admin.id === id);
     } catch {
-      return 0;
+      return false;
     }
   }
 }

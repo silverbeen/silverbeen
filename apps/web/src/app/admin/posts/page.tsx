@@ -193,7 +193,7 @@ export default function AdminPostsPage() {
                         {post.coverImage && (
                           <img
                             src={post.coverImage}
-                            alt=""
+                            alt={post.title}
                             className="w-12 h-12 rounded-lg object-cover shrink-0"
                           />
                         )}

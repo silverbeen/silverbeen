@@ -3,17 +3,19 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useTags } from '@/hooks/useTags';
-import { useToast } from '@/components/ui';
+import { useToast, useConfirm } from '@/components/ui';
 import type { Tag } from '@/types/post';
 
 export default function AdminTagsPage() {
   const { tags, loading, error, createTag, deleteTag, updateTag } = useTags();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [newTagName, setNewTagName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +44,15 @@ export default function AdminTagsPage() {
       ? `"${tag.name}" 태그를 삭제하시겠습니까? (${postCount}개의 포스트에서 제거됩니다)`
       : `"${tag.name}" 태그를 삭제하시겠습니까?`;
 
-    if (!confirm(message)) return;
+    const confirmed = await confirm({
+      title: '태그 삭제',
+      message,
+      confirmText: '삭제',
+      cancelText: '취소',
+      variant: 'danger',
+    });
+
+    if (!confirmed) return;
 
     setDeletingId(tag.id);
     try {
@@ -72,6 +82,7 @@ export default function AdminTagsPage() {
       return;
     }
 
+    setIsSaving(true);
     try {
       await updateTag(tag.id, { name: editingName.trim() });
       toast('태그가 수정되었습니다.', 'success');
@@ -83,6 +94,8 @@ export default function AdminTagsPage() {
         toast('수정에 실패했습니다.', 'error');
       }
       console.error(err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -199,13 +212,15 @@ export default function AdminTagsPage() {
                         <>
                           <button
                             onClick={() => handleEditSave(tag)}
-                            className="text-primary-500 hover:text-primary-600 text-sm"
+                            disabled={isSaving}
+                            className="text-primary-500 hover:text-primary-600 text-sm disabled:opacity-50"
                           >
-                            저장
+                            {isSaving ? '저장 중...' : '저장'}
                           </button>
                           <button
                             onClick={handleEditCancel}
-                            className="text-gray-500 hover:text-gray-600 text-sm"
+                            disabled={isSaving}
+                            className="text-gray-500 hover:text-gray-600 text-sm disabled:opacity-50"
                           >
                             취소
                           </button>
