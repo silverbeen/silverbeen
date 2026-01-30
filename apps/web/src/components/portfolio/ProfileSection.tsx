@@ -93,42 +93,25 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
                 <span>Email</span>
               </a>
             )}
-            {profile.github && (
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-              >
-                <Github className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
-                <span>GitHub</span>
-                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
-              </a>
-            )}
-            {profile.blog && (
-              <a
-                href={profile.blog}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-              >
-                <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
-                <span>Blog</span>
-                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
-              </a>
-            )}
-            {profile.linkedin && (
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
-              >
-                <Linkedin className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
-                <span>LinkedIn</span>
-                <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
-              </a>
-            )}
+            {[
+              { name: 'GitHub', href: profile.github, Icon: Github },
+              { name: 'Blog', href: profile.blog, Icon: BookOpen },
+              { name: 'LinkedIn', href: profile.linkedin, Icon: Linkedin },
+            ]
+              .filter((link) => link.href)
+              .map(({ name, href, Icon }) => (
+                <a
+                  key={name}
+                  href={href!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group/link border-border/60 bg-background text-foreground/70 hover:border-foreground/20 hover:bg-foreground/5 hover:text-foreground flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+                >
+                  <Icon className="h-4 w-4 transition-transform duration-200 group-hover/link:scale-110" />
+                  <span>{name}</span>
+                  <ExternalLink className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover/link:translate-x-0 group-hover/link:opacity-60" />
+                </a>
+              ))}
           </motion.div>
         </div>
       </div>
