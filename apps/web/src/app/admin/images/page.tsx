@@ -174,18 +174,40 @@ export default function AdminImagesPage() {
 
     if (!confirmed) return;
 
-    try {
-      const deletePromises = Array.from(selectedImages).map((path) =>
-        deleteImage(path)
+    const pathsToDelete = Array.from(selectedImages);
+    const results = await Promise.allSettled(
+      pathsToDelete.map((path) => deleteImage(path).then(() => path))
+    );
+
+    const successfulPaths = new Set<string>();
+    let failedCount = 0;
+
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        successfulPaths.add(result.value);
+      } else {
+        failedCount++;
+      }
+    });
+
+    // 성공한 이미지만 목록에서 제거
+    if (successfulPaths.size > 0) {
+      setImages((prev) => prev.filter((img) => !successfulPaths.has(img.path)));
+    }
+
+    // 항상 선택 해제
+    clearSelection();
+
+    // 결과에 따른 토스트 메시지
+    if (failedCount === 0) {
+      toast(`${successfulPaths.size}개의 이미지가 삭제되었습니다.`, 'success');
+    } else if (successfulPaths.size === 0) {
+      toast('이미지 삭제에 실패했습니다.', 'error');
+    } else {
+      toast(
+        `${successfulPaths.size}개 삭제, ${failedCount}개 실패`,
+        'warning'
       );
-      await Promise.all(deletePromises);
-      setImages((prev) =>
-        prev.filter((img) => !selectedImages.has(img.path))
-      );
-      toast(`${selectedImages.size}개의 이미지가 삭제되었습니다.`, 'success');
-      clearSelection();
-    } catch {
-      toast('일부 이미지 삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -325,11 +347,29 @@ export default function AdminImagesPage() {
                         ? () => toggleImageSelection(image.path)
                         : undefined
                     }
+                    onKeyDown={
+                      isSelectionMode
+                        ? (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleImageSelection(image.path);
+                            }
+                          }
+                        : undefined
+                    }
+                    role={isSelectionMode ? 'button' : undefined}
+                    tabIndex={isSelectionMode ? 0 : undefined}
+                    aria-pressed={isSelectionMode ? isSelected : undefined}
+                    aria-label={
+                      isSelectionMode
+                        ? `${image.name} ${isSelected ? '선택됨' : '선택 안됨'}`
+                        : undefined
+                    }
                     className={`group relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 transition-colors ${
                       isSelected
                         ? 'border-primary-500 ring-2 ring-primary-500/30'
                         : 'border-gray-200 dark:border-gray-700'
-                    } ${isSelectionMode ? 'cursor-pointer' : ''}`}
+                    } ${isSelectionMode ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500' : ''}`}
                   >
                     <img
                       src={image.url}

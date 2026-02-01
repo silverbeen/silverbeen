@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import type { PortfolioProject } from '@/types/portfolio';
 import { SortableLinkItem } from '../SortableItems';
 import {
@@ -44,15 +44,9 @@ export function ProjectLinksSection({
   project,
   onChange,
 }: ProjectLinksSectionProps) {
-  const hasBackfilledIds = useRef(false);
-
   // ID가 없는 링크에 ID 부여하여 영속화
   useEffect(() => {
-    if (hasBackfilledIds.current) return;
-    if (!project.links?.length) {
-      hasBackfilledIds.current = true;
-      return;
-    }
+    if (!project.links?.length) return;
 
     const needsBackfill = project.links.some(
       (link) => !(link as LinkWithId).id
@@ -63,10 +57,7 @@ export function ProjectLinksSection({
         if ((link as LinkWithId).id) return link;
         return { ...link, id: generateId() };
       });
-      hasBackfilledIds.current = true;
       onChange('links', updatedLinks);
-    } else {
-      hasBackfilledIds.current = true;
     }
   }, [project.links, onChange]);
 
