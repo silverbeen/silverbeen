@@ -3,7 +3,18 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { deleteImage } from '@/lib/supabase/storage';
-import { ImageUploadModal, useToast, useConfirm } from '@/components/ui';
+import {
+  ImageUploadModal,
+  useToast,
+  useConfirm,
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui';
 import { Plus, Trash2, Copy, Search, ArrowLeft, Check, X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -243,43 +254,40 @@ export default function AdminImagesPage() {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {selectedImages.size}개 선택
                   </span>
-                  <button
-                    onClick={selectAllImages}
-                    className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  >
+                  <Button variant="outline" size="sm" onClick={selectAllImages}>
                     전체 선택
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={handleBulkDelete}
                     disabled={selectedImages.size === 0}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                     삭제
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={clearSelection}
-                    className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   >
                     <X className="h-5 w-5" />
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setIsSelectionMode(true)}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Check className="h-4 w-4" />
                     선택
-                  </button>
-                  <button
-                    onClick={() => setFolderModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-                  >
+                  </Button>
+                  <Button size="sm" onClick={() => setFolderModalOpen(true)}>
                     <Plus className="h-4 w-4" />
                     업로드
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
@@ -288,26 +296,27 @@ export default function AdminImagesPage() {
           {/* 필터 */}
           <div className="mt-4 flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="파일명으로 검색..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="pl-10"
               />
             </div>
-            <select
-              value={selectedFolder}
-              onChange={(e) => setSelectedFolder(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              {FOLDERS.map((folder) => (
-                <option key={folder.value} value={folder.value}>
-                  {folder.label}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedFolder} onValueChange={setSelectedFolder}>
+              <SelectTrigger className="w-35">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {FOLDERS.map((folder) => (
+                  <SelectItem key={folder.value} value={folder.value}>
+                    {folder.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </header>
@@ -432,33 +441,37 @@ export default function AdminImagesPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               업로드 폴더 선택
             </h3>
-            <select
-              value={uploadFolder}
-              onChange={(e) => setUploadFolder(e.target.value)}
-              className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              {FOLDERS.filter((f) => f.value !== 'all').map((folder) => (
-                <option key={folder.value} value={folder.value}>
-                  {folder.label}
-                </option>
-              ))}
-            </select>
+            <div className="mb-4">
+              <Select value={uploadFolder} onValueChange={setUploadFolder}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FOLDERS.filter((f) => f.value !== 'all').map((folder) => (
+                    <SelectItem key={folder.value} value={folder.value}>
+                      {folder.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setFolderModalOpen(false)}
-                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 취소
-              </button>
-              <button
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   setFolderModalOpen(false);
                   setUploadModalOpen(true);
                 }}
-                className="px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
               >
                 확인
-              </button>
+              </Button>
             </div>
           </div>
         </div>

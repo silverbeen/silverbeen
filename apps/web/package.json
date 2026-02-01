@@ -18,6 +18,8 @@
     "@giscus/react": "^3.1.0",
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^7.2.0",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.4",
     "@silverbeen/ui": "workspace:*",
     "@sparticuz/chromium": "^133.0.0",
     "@supabase/ssr": "^0.8.0",
