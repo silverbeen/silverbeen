@@ -46,17 +46,28 @@ interface ExperienceEditorProps {
 // 고유 ID 생성 함수
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-// 경력에 ID 부여 (없는 경우)
-const ensureExperienceId = (exp: Experience): Experience & { _id: string } => ({
-  ...exp,
-  _id: (exp as Experience & { _id?: string })._id || generateId(),
-});
+// 모듈 레벨 ID 캐시 - 컴포넌트 외부에서 관리
+const experienceIdCache = new WeakMap<Experience, string>();
+
+// 경력에 안정적인 ID 부여
+const getExperienceId = (exp: Experience): string => {
+  // 이미 _id 속성이 있으면 사용
+  const existing = (exp as Experience & { _id?: string })._id;
+  if (existing) return existing;
+
+  // 캐시에 있으면 사용
+  let id = experienceIdCache.get(exp);
+  if (!id) {
+    id = generateId();
+    experienceIdCache.set(exp, id);
+  }
+  return id;
+};
 
 export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
-  // 데이터에 ID 부여
-  const experiencesWithIds = data.map(ensureExperienceId);
-  const [expandedId, setExpandedId] = useState<string | null>(
-    experiencesWithIds[0]?._id || null
+  // 첫 번째 경력 ID를 초기 확장 상태로 설정
+  const [expandedId, setExpandedId] = useState<string | null>(() =>
+    data.length > 0 ? getExperienceId(data[0]) : null,
   );
 
   const handleAdd = () => {
@@ -67,27 +78,28 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
       startDate: '',
       techStack: [],
       projects: [],
-    };
+    } as Experience & { _id: string };
     onChange([...data, newExp]);
     setExpandedId(newId);
   };
 
   const handleRemove = (id: string) => {
-    const index = experiencesWithIds.findIndex((e) => e._id === id);
+    const index = data.findIndex((e) => getExperienceId(e) === id);
     if (index === -1) return;
     onChange(data.filter((_, i) => i !== index));
     if (expandedId === id) setExpandedId(null);
   };
 
   const handleUpdate = (id: string, updated: Experience) => {
-    const index = experiencesWithIds.findIndex((e) => e._id === id);
+    const index = data.findIndex((e) => getExperienceId(e) === id);
     if (index === -1) return;
-    onChange(data.map((item, i) => (i === index ? updated : item)));
+    // ID를 유지하여 업데이트
+    const updatedWithId = { ...updated, _id: id };
+    onChange(data.map((item, i) => (i === index ? updatedWithId : item)));
   };
 
   const handleReorder = (reordered: Experience[]) => {
     onChange(reordered);
-    // expandedId는 ID 기반이므로 순서 변경 시에도 유지됨
   };
 
   return (
@@ -95,18 +107,18 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-primary-500" />
+          <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
+            <Briefcase className="text-primary-500 h-5 w-5" />
             경력
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             경력 사항을 시간순으로 정리해주세요
           </p>
         </div>
         <button
           type="button"
           onClick={handleAdd}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30"
+          className="bg-primary-500 hover:bg-primary-600 flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md"
         >
           <Plus className="h-4 w-4" />
           경력 추가
@@ -114,12 +126,10 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
       </div>
 
       {data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
-          <Building2 className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">
-            경력을 추가해주세요
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-16 dark:border-gray-700 dark:bg-gray-800/50">
+          <Building2 className="mb-4 h-12 w-12 text-gray-300 dark:text-gray-600" />
+          <p className="font-medium text-gray-500 dark:text-gray-400">경력을 추가해주세요</p>
+          <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
             회사 정보와 프로젝트를 상세히 기록할 수 있습니다
           </p>
         </div>
@@ -131,20 +141,21 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
             <span>드래그하여 순서 변경</span>
           </div>
           <SortableList
-            items={experiencesWithIds}
-            getKey={(exp) => exp._id}
+            items={data}
+            getKey={(exp) => getExperienceId(exp)}
             onReorder={handleReorder}
-            renderItem={(exp) => (
-              <ExperienceCard
-                experience={exp}
-                expanded={expandedId === exp._id}
-                onToggle={() =>
-                  setExpandedId(expandedId === exp._id ? null : exp._id)
-                }
-                onChange={(updated) => handleUpdate(exp._id, updated)}
-                onRemove={() => handleRemove(exp._id)}
-              />
-            )}
+            renderItem={(exp) => {
+              const expId = getExperienceId(exp);
+              return (
+                <ExperienceCard
+                  experience={exp}
+                  expanded={expandedId === expId}
+                  onToggle={() => setExpandedId(expandedId === expId ? null : expId)}
+                  onChange={(updated) => handleUpdate(expId, updated)}
+                  onRemove={() => handleRemove(expId)}
+                />
+              );
+            }}
           />
         </div>
       )}
@@ -167,10 +178,7 @@ function ExperienceCard({
   onChange,
   onRemove,
 }: ExperienceCardProps) {
-  const handleChange = <K extends keyof Experience>(
-    key: K,
-    value: Experience[K]
-  ) => {
+  const handleChange = <K extends keyof Experience>(key: K, value: Experience[K]) => {
     onChange({ ...experience, [key]: value });
   };
 
@@ -193,28 +201,28 @@ function ExperienceCard({
   const handleRemoveProject = (index: number) => {
     handleChange(
       'projects',
-      experience.projects.filter((_, i) => i !== index)
+      experience.projects.filter((_, i) => i !== index),
     );
   };
 
   const projectCount = experience.projects.length;
 
   return (
-    <div className="border-2 border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs transition-shadow hover:shadow-sm dark:border-gray-700 dark:bg-gray-800">
       {/* 헤더 */}
       <div
-        className="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        className="flex cursor-pointer items-center justify-between p-5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-4 flex-1">
-          <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
-            <Building2 className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+        <div className="flex flex-1 items-center gap-4">
+          <div className="bg-primary-100 dark:bg-primary-900/30 rounded-xl p-3">
+            <Building2 className="text-primary-600 dark:text-primary-400 h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h4 className="font-semibold text-lg text-gray-900 dark:text-white">
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
               {experience.company || '새 경력'}
             </h4>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="mt-1 flex items-center gap-3">
               <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>
@@ -233,48 +241,44 @@ function ExperienceCard({
             </div>
           </div>
           {projectCount > 0 && (
-            <span className="px-3 py-1 text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full">
+            <span className="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full px-3 py-1 text-xs font-medium">
               프로젝트 {projectCount}개
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 ml-4">
+        <div className="ml-4 flex items-center gap-2">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+            className="rounded-lg p-2 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
           >
             <Trash2 className="h-4 w-4" />
           </button>
           <div
-            className={`p-2 rounded-lg transition-colors ${
+            className={`rounded-lg p-2 transition-colors ${
               expanded
                 ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                 : 'text-gray-400'
             }`}
           >
-            {expanded ? (
-              <ChevronUp className="h-5 w-5" />
-            ) : (
-              <ChevronDown className="h-5 w-5" />
-            )}
+            {expanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </div>
         </div>
       </div>
 
       {/* 콘텐츠 */}
       {expanded && (
-        <div className="p-6 space-y-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+        <div className="space-y-6 border-t border-gray-200 bg-gray-50/50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
           {/* 기본 정보 섹션 */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
-            <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary-500" />
+          <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+            <h5 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <Building2 className="text-primary-500 h-4 w-4" />
               회사 정보
             </h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField label="회사명" required>
                 <input
                   type="text"
@@ -330,16 +334,16 @@ function ExperienceCard({
           </div>
 
           {/* 프로젝트 섹션 */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-primary-500" />
+          <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+            <div className="mb-4 flex items-center justify-between">
+              <h5 className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <FolderOpen className="text-primary-500 h-4 w-4" />
                 프로젝트
               </h5>
               <button
                 type="button"
                 onClick={handleAddProject}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                className="text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 프로젝트 추가
@@ -347,11 +351,9 @@ function ExperienceCard({
             </div>
 
             {experience.projects.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/50">
-                <FolderOpen className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  프로젝트를 추가해주세요
-                </p>
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10 dark:border-gray-700 dark:bg-gray-800/50">
+                <FolderOpen className="mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">프로젝트를 추가해주세요</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -382,14 +384,9 @@ interface SortableImageItemProps {
 }
 
 function SortableImageItem({ id, url, index, onRemove, onPreview }: SortableImageItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -401,30 +398,30 @@ function SortableImageItem({ id, url, index, onRemove, onPreview }: SortableImag
     <div
       ref={setNodeRef}
       style={style}
-      className="relative group rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600"
+      className="group relative overflow-hidden rounded-xl border-2 border-gray-200 dark:border-gray-600"
     >
       {/* 드래그 핸들 */}
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-1 left-1 z-10 p-1 bg-black/50 rounded cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-1 left-1 z-10 cursor-grab rounded bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
       >
         <GripVertical className="h-3 w-3 text-white" />
       </div>
       <img
         src={url}
         alt={`Project ${index + 1}`}
-        className="w-24 h-24 object-cover cursor-pointer"
+        className="h-24 w-24 cursor-pointer object-cover"
         onClick={onPreview}
       />
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
           }}
-          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors pointer-events-auto"
+          className="pointer-events-auto rounded-lg bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -449,7 +446,7 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleChange = <K extends keyof Project>(key: K, value: Project[K]) => {
@@ -483,7 +480,7 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
   const handleRemoveTask = (index: number) => {
     handleChange(
       'tasks',
-      project.tasks.filter((_, i) => i !== index)
+      project.tasks.filter((_, i) => i !== index),
     );
   };
 
@@ -494,7 +491,7 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
   const handleRemoveImage = (index: number) => {
     handleChange(
       'images',
-      (project.images || []).filter((_, i) => i !== index)
+      (project.images || []).filter((_, i) => i !== index),
     );
   };
 
@@ -502,13 +499,13 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
   const imageCount = project.images?.length || 0;
 
   return (
-    <div className="border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 overflow-hidden">
+    <div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800">
       <div
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-3 flex-1">
-          <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+        <div className="flex flex-1 items-center gap-3">
+          <div className="rounded-lg bg-gray-100 p-2 dark:bg-gray-700">
             <FolderOpen className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           </div>
           <div>
@@ -516,10 +513,8 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
               {project.name || '새 프로젝트'}
             </span>
             {(taskCount > 0 || imageCount > 0) && (
-              <div className="flex items-center gap-2 mt-0.5">
-                {taskCount > 0 && (
-                  <span className="text-xs text-gray-400">업무 {taskCount}개</span>
-                )}
+              <div className="mt-0.5 flex items-center gap-2">
+                {taskCount > 0 && <span className="text-xs text-gray-400">업무 {taskCount}개</span>}
                 {imageCount > 0 && (
                   <span className="text-xs text-gray-400">이미지 {imageCount}개</span>
                 )}
@@ -534,15 +529,11 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
               e.stopPropagation();
               onRemove();
             }}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+            className="rounded-lg p-1.5 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
           >
             <Trash2 className="h-4 w-4" />
           </button>
-          <div
-            className={`p-1.5 rounded-lg ${
-              expanded ? 'bg-gray-100 dark:bg-gray-700' : ''
-            }`}
-          >
+          <div className={`rounded-lg p-1.5 ${expanded ? 'bg-gray-100 dark:bg-gray-700' : ''}`}>
             {expanded ? (
               <ChevronUp className="h-4 w-4 text-gray-400" />
             ) : (
@@ -553,8 +544,8 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
       </div>
 
       {expanded && (
-        <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-600">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+        <div className="space-y-4 border-t border-gray-200 p-4 pt-0 dark:border-gray-600">
+          <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
             <FormField label="프로젝트명" required>
               <input
                 type="text"
@@ -597,23 +588,23 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
           </FormField>
 
           {/* 주요 업무 */}
-          <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="space-y-3 border-t border-gray-100 pt-3 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <ListTodo className="h-4 w-4 text-primary-500" />
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <ListTodo className="text-primary-500 h-4 w-4" />
                 주요 업무
               </label>
               <button
                 type="button"
                 onClick={handleAddTask}
-                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                className="text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 업무 추가
               </button>
             </div>
             {project.tasks.length === 0 ? (
-              <p className="text-xs text-gray-400 py-4 text-center border border-dashed border-gray-200 dark:border-gray-600 rounded-lg">
+              <p className="rounded-lg border border-dashed border-gray-200 py-4 text-center text-xs text-gray-400 dark:border-gray-600">
                 업무를 추가해주세요
               </p>
             ) : (
@@ -631,21 +622,19 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
           </div>
 
           {/* 이미지 */}
-          <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="space-y-3 border-t border-gray-100 pt-3 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <ImageIcon className="h-4 w-4 text-primary-500" />
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <ImageIcon className="text-primary-500 h-4 w-4" />
                 이미지
                 {project.images && project.images.length > 1 && (
-                  <span className="text-xs font-normal text-gray-400">
-                    (드래그하여 순서 변경)
-                  </span>
+                  <span className="text-xs font-normal text-gray-400">(드래그하여 순서 변경)</span>
                 )}
               </label>
               <button
                 type="button"
                 onClick={() => setImageModalOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                className="text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20 flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 이미지 추가
@@ -676,7 +665,7 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
                 </SortableContext>
               </DndContext>
             ) : (
-              <p className="text-xs text-gray-400 py-4 text-center border border-dashed border-gray-200 dark:border-gray-600 rounded-lg">
+              <p className="rounded-lg border border-dashed border-gray-200 py-4 text-center text-xs text-gray-400 dark:border-gray-600">
                 이미지를 추가해주세요
               </p>
             )}
@@ -696,17 +685,17 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
               onClick={() => setPreviewImage(null)}
             >
-              <div className="relative max-w-4xl max-h-[90vh] p-4">
+              <div className="relative max-h-[90vh] max-w-4xl p-4">
                 <button
                   onClick={() => setPreviewImage(null)}
-                  className="absolute -top-2 -right-2 p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="absolute -top-2 -right-2 rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
                 >
                   <X className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                 </button>
                 <img
                   src={previewImage}
                   alt="Preview"
-                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                  className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-2xl"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -726,7 +715,7 @@ interface TaskEditorProps {
 
 function TaskEditor({ task, onChange, onRemove }: TaskEditorProps) {
   return (
-    <div className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 space-y-2">
+    <div className="space-y-2 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
       <div className="flex items-center gap-2">
         <input
           type="text"
@@ -738,7 +727,7 @@ function TaskEditor({ task, onChange, onRemove }: TaskEditorProps) {
         <button
           type="button"
           onClick={onRemove}
-          className="p-1 text-gray-400 hover:text-red-500 shrink-0"
+          className="shrink-0 p-1 text-gray-400 hover:text-red-500"
         >
           <Trash2 className="h-4 w-4" />
         </button>

@@ -265,9 +265,9 @@ export function ResumeFormEditor({
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         {/* 사이드바 - 섹션 네비게이션 (데스크탑만) */}
-        <div className="hidden lg:block w-56 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
+        <div className="hidden lg:block w-56 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               섹션
