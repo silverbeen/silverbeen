@@ -1,9 +1,11 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { TagSelector } from './TagSelector';
+import { MarkdownImageButton } from './MarkdownImageButton';
 import { useTags } from '@/hooks/useTags';
+import { useMarkdownImage } from '@/hooks/useMarkdownImage';
 import { useToast, ImageUpload } from '@/components/ui';
 import type { CreatePostDto, Post } from '@/types/post';
 
@@ -18,6 +20,7 @@ interface PostEditorProps {
 export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const { tags, loading: tagsLoading, createTag } = useTags();
   const { toast } = useToast();
+  const editorContainerRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
@@ -32,6 +35,22 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     }
     return '';
   });
+
+  // 마크다운 이미지 업로드 훅
+  const { uploading, handleFileUpload, bindDropEvents, bindPasteEvents } =
+    useMarkdownImage({
+      onInsert: (markdown) => setContent((prev) => prev + markdown),
+      folder: 'posts',
+    });
+
+  // 에디터에 드래그앤드롭, 붙여넣기 이벤트 바인딩
+  useEffect(() => {
+    const container = editorContainerRef.current;
+    if (container) {
+      bindDropEvents(container);
+      bindPasteEvents(container);
+    }
+  }, [bindDropEvents, bindPasteEvents]);
 
   const handleSave = async (shouldPublish: boolean) => {
     if (!title.trim()) {
@@ -122,16 +141,32 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
         </div>
       )}
 
-      <div data-color-mode="auto">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          내용
-        </label>
+      <div data-color-mode="auto" ref={editorContainerRef}>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            내용
+          </label>
+          <div className="flex items-center gap-2">
+            <MarkdownImageButton
+              onFileSelect={handleFileUpload}
+              uploading={uploading}
+            />
+            {uploading && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                업로드 중...
+              </span>
+            )}
+          </div>
+        </div>
         <MDEditor
           value={content}
           onChange={(val) => setContent(val || '')}
           height={500}
           preview="live"
         />
+        <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+          이미지를 드래그하거나 Ctrl+V로 붙여넣기 가능
+        </p>
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">

@@ -16,7 +16,7 @@ export function PostNavigation({ adjacentPosts }: PostNavigationProps) {
     <nav className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
       {prevPost ? (
         <Link
-          href={`/blog/${prevPost.id}`}
+          href={`/blog/${prevPost.slug}`}
           className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500/50"
         >
           <span className="mb-2 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -34,7 +34,7 @@ export function PostNavigation({ adjacentPosts }: PostNavigationProps) {
       )}
       {nextPost ? (
         <Link
-          href={`/blog/${nextPost.id}`}
+          href={`/blog/${nextPost.slug}`}
           className="group flex flex-col items-end rounded-xl border border-gray-200 bg-white p-4 text-right transition-all hover:border-primary-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-primary-500/50"
         >
           <span className="mb-2 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">

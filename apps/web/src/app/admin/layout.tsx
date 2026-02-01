@@ -1,4 +1,4 @@
-import { ToastProvider } from '@/components/ui';
+import { ToastProvider, ConfirmProvider } from '@/components/ui';
 
 export default function AdminLayout({
   children,
@@ -7,9 +7,11 @@ export default function AdminLayout({
 }) {
   return (
     <ToastProvider>
-      <div className="admin-layout">
-        {children}
-      </div>
+      <ConfirmProvider>
+        <div className="admin-layout">
+          {children}
+        </div>
+      </ConfirmProvider>
     </ToastProvider>
   );
 }
