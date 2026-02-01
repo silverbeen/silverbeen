@@ -113,66 +113,96 @@ export function PortfolioFormEditor({
     <div className="flex flex-col h-full min-h-[700px] bg-gray-50 dark:bg-gray-900">
       {/* 통합 상단 헤더 */}
       <div className="sticky top-0 z-20 shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
+        <div className="px-3 sm:px-4 py-2 sm:py-3">
+          {/* 모바일: 2행 레이아웃, 데스크탑: 1행 레이아웃 */}
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
             {/* 좌측: 뒤로가기 + 타이틀 */}
-            <div className="flex items-center gap-3">
-              {onBack && (
-                <button
-                  onClick={onBack}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  뒤로
-                </button>
-              )}
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                  <FileText className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+            <div className="flex items-center justify-between lg:justify-start gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                {onBack && (
+                  <button
+                    onClick={onBack}
+                    className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    <span className="hidden sm:inline">뒤로</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2">
+                  <div className="p-1 sm:p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                    <FileText className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h1 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                    {title}
+                  </h1>
                 </div>
-                <h1 className="text-base font-semibold text-gray-900 dark:text-white">
-                  {title}
-                </h1>
               </div>
+
+              {/* 모바일에서 편집 모드 전환 */}
+              {onModeChange && (
+                <div className="flex lg:hidden bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+                  <button
+                    onClick={() => onModeChange('form')}
+                    className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                      editorMode === 'form'
+                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    폼
+                  </button>
+                  <button
+                    onClick={() => onModeChange('json')}
+                    className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                      editorMode === 'json'
+                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    JSON
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* 중앙: 이전/저장/다음 네비게이션 */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
               <button
                 onClick={goToPrev}
                 disabled={currentIndex === 0}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
-                이전
+                <span className="hidden xs:inline">이전</span>
               </button>
 
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors shadow-sm"
+                className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 bg-primary-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors shadow-sm"
               >
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Check className="h-4 w-4" />
                 )}
-                {saving ? '저장 중...' : '저장하기'}
+                <span className="hidden xs:inline">{saving ? '저장 중...' : '저장하기'}</span>
+                <span className="xs:hidden">{saving ? '저장...' : '저장'}</span>
               </button>
 
               <button
                 onClick={goToNext}
                 disabled={currentIndex === sections.length - 1}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
-                다음
+                <span className="hidden xs:inline">다음</span>
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
 
-            {/* 우측: 편집 모드 전환 */}
+            {/* 우측: 편집 모드 전환 (데스크탑만) */}
             {onModeChange && (
-              <div className="flex items-center gap-2">
+              <div className="hidden lg:flex items-center gap-2">
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   편집 모드:
                 </span>
@@ -202,11 +232,41 @@ export function PortfolioFormEditor({
             )}
           </div>
         </div>
+
+        {/* 모바일 섹션 네비게이션 (가로 스크롤) */}
+        <div className="lg:hidden overflow-x-auto border-t border-gray-100 dark:border-gray-700/50">
+          <div className="flex px-2 py-2 gap-1 min-w-max">
+            {sections.map(({ key, label, icon }, index) => {
+              const isActive = activeSection === key;
+              const isPast = index < currentIndex;
+
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveSection(key)}
+                  className={`
+                    flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all
+                    ${
+                      isActive
+                        ? 'bg-primary-500 text-white shadow-sm'
+                        : isPast
+                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20'
+                          : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }
+                  `}
+                >
+                  {isPast && !isActive ? <Check className="h-3 w-3" /> : icon}
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* 사이드바 - 섹션 네비게이션 */}
-        <div className="w-56 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
+        {/* 사이드바 - 섹션 네비게이션 (데스크탑만) */}
+        <div className="hidden lg:block w-56 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               섹션
@@ -276,7 +336,7 @@ export function PortfolioFormEditor({
         </div>
 
         {/* 메인 콘텐츠 */}
-        <div className="flex-1 overflow-auto p-8">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
             {activeSection === 'profile' && (
               <ProfileEditor
