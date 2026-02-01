@@ -5,6 +5,7 @@ import { uploadImage } from '@/lib/supabase/storage';
 
 interface UseMarkdownImageOptions {
   onInsert: (markdown: string) => void;
+  onError?: (error: Error) => void;
   folder?: string;
 }
 
@@ -17,6 +18,7 @@ interface UseMarkdownImageReturn {
 
 export function useMarkdownImage({
   onInsert,
+  onError,
   folder = 'posts',
 }: UseMarkdownImageOptions): UseMarkdownImageReturn {
   const [uploading, setUploading] = useState(false);
@@ -34,6 +36,7 @@ export function useMarkdownImage({
         onInsert(`![${altText}](${result.url})\n`);
       } catch (error) {
         console.error('Image upload failed:', error);
+        onError?.(error instanceof Error ? error : new Error(String(error)));
       } finally {
         setUploading(false);
       }

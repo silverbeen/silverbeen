@@ -43,27 +43,51 @@ interface ExperienceEditorProps {
   onChange: (data: Experience[]) => void;
 }
 
+// 고유 ID 생성 함수
+const generateId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+// 경력에 ID 부여 (없는 경우)
+const ensureExperienceId = (exp: Experience): Experience & { _id: string } => ({
+  ...exp,
+  _id: (exp as Experience & { _id?: string })._id || generateId(),
+});
+
 export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  // 데이터에 ID 부여
+  const experiencesWithIds = data.map(ensureExperienceId);
+  const [expandedId, setExpandedId] = useState<string | null>(
+    experiencesWithIds[0]?._id || null
+  );
 
   const handleAdd = () => {
-    const newExp: Experience = {
+    const newId = generateId();
+    const newExp = {
+      _id: newId,
       company: '',
       startDate: '',
       techStack: [],
       projects: [],
     };
     onChange([...data, newExp]);
-    setExpandedIndex(data.length);
+    setExpandedId(newId);
   };
 
-  const handleRemove = (index: number) => {
+  const handleRemove = (id: string) => {
+    const index = experiencesWithIds.findIndex((e) => e._id === id);
+    if (index === -1) return;
     onChange(data.filter((_, i) => i !== index));
-    if (expandedIndex === index) setExpandedIndex(null);
+    if (expandedId === id) setExpandedId(null);
   };
 
-  const handleUpdate = (index: number, updated: Experience) => {
+  const handleUpdate = (id: string, updated: Experience) => {
+    const index = experiencesWithIds.findIndex((e) => e._id === id);
+    if (index === -1) return;
     onChange(data.map((item, i) => (i === index ? updated : item)));
+  };
+
+  const handleReorder = (reordered: Experience[]) => {
+    onChange(reordered);
+    // expandedId는 ID 기반이므로 순서 변경 시에도 유지됨
   };
 
   return (
@@ -107,18 +131,18 @@ export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
             <span>드래그하여 순서 변경</span>
           </div>
           <SortableList
-            items={data}
-            getKey={(_, index) => `exp-${index}`}
-            onReorder={onChange}
-            renderItem={(exp, index) => (
+            items={experiencesWithIds}
+            getKey={(exp) => exp._id}
+            onReorder={handleReorder}
+            renderItem={(exp) => (
               <ExperienceCard
                 experience={exp}
-                expanded={expandedIndex === index}
+                expanded={expandedId === exp._id}
                 onToggle={() =>
-                  setExpandedIndex(expandedIndex === index ? null : index)
+                  setExpandedId(expandedId === exp._id ? null : exp._id)
                 }
-                onChange={(updated) => handleUpdate(index, updated)}
-                onRemove={() => handleRemove(index)}
+                onChange={(updated) => handleUpdate(exp._id, updated)}
+                onRemove={() => handleRemove(exp._id)}
               />
             )}
           />

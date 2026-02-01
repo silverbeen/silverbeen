@@ -113,6 +113,9 @@ packages/
 ### 스타일
 - Tailwind CSS만 사용, 인라인 스타일 금지
 - Primary 컬러: `primary-500` (#514EF6)
+- **예외**:
+  - @dnd-kit 드래그앤드롭 라이브러리는 동적 transform/transition을 위해 인라인 스타일 허용
+  - 진행률 바 등 동적 width/height가 필요한 경우 인라인 스타일 허용
 
 ## 상세 패턴 문서
 
