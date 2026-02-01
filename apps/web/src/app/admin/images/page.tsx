@@ -20,7 +20,8 @@ const FOLDERS = [
   { value: 'posts', label: '포스트' },
   { value: 'covers', label: '커버' },
   { value: 'profiles', label: '프로필' },
-  { value: 'projects', label: '프로젝트' },
+  { value: 'resume', label: '이력서' },
+  { value: 'portfolio', label: '포트폴리오' },
 ];
 
 export default function AdminImagesPage() {

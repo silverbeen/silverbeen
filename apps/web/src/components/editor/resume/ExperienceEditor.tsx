@@ -662,8 +662,8 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
             isOpen={imageModalOpen}
             onClose={() => setImageModalOpen(false)}
             onSelect={handleAddImage}
-            folder="projects"
-            title="프로젝트 이미지 업로드"
+            folder="resume"
+            title="경력 이미지 업로드"
           />
 
           {/* 이미지 미리보기 모달 */}

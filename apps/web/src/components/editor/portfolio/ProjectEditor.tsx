@@ -670,8 +670,8 @@ function ProjectCard({
             isOpen={imageModalOpen}
             onClose={() => setImageModalOpen(false)}
             onSelect={handleAddImage}
-            folder="projects"
-            title="프로젝트 이미지 업로드"
+            folder="portfolio"
+            title="포트폴리오 이미지 업로드"
           />
         </div>
       )}
