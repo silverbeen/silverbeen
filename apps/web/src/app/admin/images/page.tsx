@@ -46,28 +46,47 @@ export default function AdminImagesPage() {
         (f) => f.value
       );
 
-      // 병렬로 모든 폴더의 이미지 가져오기
+      // 병렬로 모든 폴더의 이미지 가져오기 (페이지네이션 적용)
+      const PAGE_SIZE = 100;
       const imagePromises = foldersToFetch.map(async (folder) => {
-        const { data, error } = await supabase.storage
-          .from('images')
-          .list(folder, { sortBy: { column: 'created_at', order: 'desc' } });
+        const folderImages: ImageFile[] = [];
+        let offset = 0;
+        let hasMore = true;
 
-        if (error) {
-          console.error(`Error fetching images from ${folder}:`, error);
-          return [];
+        // 페이지네이션 루프로 모든 이미지 가져오기
+        while (hasMore) {
+          const { data, error } = await supabase.storage
+            .from('images')
+            .list(folder, {
+              sortBy: { column: 'created_at', order: 'desc' },
+              limit: PAGE_SIZE,
+              offset,
+            });
+
+          if (error) {
+            console.error(`Error fetching images from ${folder}:`, error);
+            break;
+          }
+
+          const validFiles = data.filter((file) => !file.name.startsWith('.'));
+          folderImages.push(
+            ...validFiles.map((file) => ({
+              name: file.name,
+              path: `${folder}/${file.name}`,
+              folder,
+              url: supabase.storage
+                .from('images')
+                .getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
+              createdAt: file.created_at || '',
+            }))
+          );
+
+          // 다음 페이지가 있는지 확인
+          hasMore = data.length === PAGE_SIZE;
+          offset += PAGE_SIZE;
         }
 
-        return data
-          .filter((file) => !file.name.startsWith('.'))
-          .map((file) => ({
-            name: file.name,
-            path: `${folder}/${file.name}`,
-            folder,
-            url: supabase.storage
-              .from('images')
-              .getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
-            createdAt: file.created_at || '',
-          }));
+        return folderImages;
       });
 
       const results = await Promise.all(imagePromises);

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import type { PortfolioProject } from '@/types/portfolio';
 import { SortableLinkItem } from '../SortableItems';
 import {
@@ -19,6 +20,18 @@ import {
 } from '@dnd-kit/sortable';
 import { Plus, Link as LinkIcon } from 'lucide-react';
 
+// 링크에 ID를 포함한 타입
+type LinkWithId = { id: string; label: string; url: string };
+
+// 고유 ID 생성 함수
+const generateId = () =>
+  `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+// 링크 ID 가져오기
+const getLinkId = (link: { label: string; url: string }): string => {
+  return (link as LinkWithId).id || '';
+};
+
 interface ProjectLinksSectionProps {
   project: PortfolioProject;
   onChange: <K extends keyof PortfolioProject>(
@@ -31,6 +44,32 @@ export function ProjectLinksSection({
   project,
   onChange,
 }: ProjectLinksSectionProps) {
+  const hasBackfilledIds = useRef(false);
+
+  // ID가 없는 링크에 ID 부여하여 영속화
+  useEffect(() => {
+    if (hasBackfilledIds.current) return;
+    if (!project.links?.length) {
+      hasBackfilledIds.current = true;
+      return;
+    }
+
+    const needsBackfill = project.links.some(
+      (link) => !(link as LinkWithId).id
+    );
+
+    if (needsBackfill) {
+      const updatedLinks = project.links.map((link) => {
+        if ((link as LinkWithId).id) return link;
+        return { ...link, id: generateId() };
+      });
+      hasBackfilledIds.current = true;
+      onChange('links', updatedLinks);
+    } else {
+      hasBackfilledIds.current = true;
+    }
+  }, [project.links, onChange]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -43,22 +82,24 @@ export function ProjectLinksSection({
   );
 
   const handleAddLink = () => {
-    onChange('links', [...(project.links || []), { label: '', url: '' }]);
+    const newLink = { id: generateId(), label: '', url: '' };
+    onChange('links', [...(project.links || []), newLink]);
   };
 
   const handleUpdateLink = (
-    index: number,
+    id: string,
     updated: { label: string; url: string }
   ) => {
-    const newLinks = [...(project.links || [])];
-    newLinks[index] = updated;
+    const newLinks = (project.links || []).map((link) =>
+      getLinkId(link) === id ? { ...updated, id } : link
+    );
     onChange('links', newLinks);
   };
 
-  const handleRemoveLink = (index: number) => {
+  const handleRemoveLink = (id: string) => {
     onChange(
       'links',
-      (project.links || []).filter((_, i) => i !== index)
+      (project.links || []).filter((link) => getLinkId(link) !== id)
     );
   };
 
@@ -66,9 +107,13 @@ export function ProjectLinksSection({
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const links = project.links || [];
-      const oldIndex = links.findIndex((_, i) => `link-${i}` === active.id);
-      const newIndex = links.findIndex((_, i) => `link-${i}` === over.id);
-      onChange('links', arrayMove(links, oldIndex, newIndex));
+      const oldIndex = links.findIndex(
+        (link) => getLinkId(link) === active.id
+      );
+      const newIndex = links.findIndex((link) => getLinkId(link) === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onChange('links', arrayMove(links, oldIndex, newIndex));
+      }
     }
   };
 
@@ -106,19 +151,22 @@ export function ProjectLinksSection({
           onDragEnd={handleLinkDragEnd}
         >
           <SortableContext
-            items={(project.links || []).map((_, i) => `link-${i}`)}
+            items={(project.links || []).map((link) => getLinkId(link))}
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-3">
-              {(project.links || []).map((link, index) => (
-                <SortableLinkItem
-                  key={`link-${index}`}
-                  id={`link-${index}`}
-                  link={link}
-                  onUpdate={(updated) => handleUpdateLink(index, updated)}
-                  onRemove={() => handleRemoveLink(index)}
-                />
-              ))}
+              {(project.links || []).map((link) => {
+                const linkId = getLinkId(link);
+                return (
+                  <SortableLinkItem
+                    key={linkId}
+                    id={linkId}
+                    link={link}
+                    onUpdate={(updated) => handleUpdateLink(linkId, updated)}
+                    onRemove={() => handleRemoveLink(linkId)}
+                  />
+                );
+              })}
             </div>
           </SortableContext>
         </DndContext>

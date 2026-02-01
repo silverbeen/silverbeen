@@ -67,9 +67,10 @@ export function ResumeFormEditor({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
-  // initialData가 변경되면 formData 업데이트
+  // initialData가 변경되면 formData 업데이트 및 에러 초기화
   useEffect(() => {
     setFormData(initialData);
+    setErrors({});
   }, [initialData]);
 
   const handleSave = async () => {
@@ -86,7 +87,11 @@ export function ResumeFormEditor({
     }
 
     setErrors({});
-    await onSave(result.data as ResumeData);
+    try {
+      await onSave(result.data);
+    } catch {
+      toast('저장 중 오류가 발생했습니다.', 'error');
+    }
   };
 
   const updateSection = useCallback(

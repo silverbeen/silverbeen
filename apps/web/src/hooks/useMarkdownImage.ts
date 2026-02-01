@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { uploadImage } from '@/lib/supabase/storage';
 
 interface UseMarkdownImageOptions {
@@ -22,8 +22,9 @@ export function useMarkdownImage({
   folder = 'posts',
 }: UseMarkdownImageOptions): UseMarkdownImageReturn {
   const [uploading, setUploading] = useState(false);
-  const dropRef = useRef<HTMLElement | null>(null);
-  const pasteRef = useRef<HTMLElement | null>(null);
+  // element를 상태로 관리하여 ref 변경 시 리스너 재바인딩
+  const [dropElement, setDropElement] = useState<HTMLElement | null>(null);
+  const [pasteElement, setPasteElement] = useState<HTMLElement | null>(null);
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -41,20 +42,16 @@ export function useMarkdownImage({
         setUploading(false);
       }
     },
-    [onInsert, folder]
+    [onInsert, onError, folder]
   );
 
   // 드래그앤드롭 이벤트 바인딩
-  const bindDropEvents = useCallback(
-    (element: HTMLElement | null) => {
-      dropRef.current = element;
-    },
-    []
-  );
+  const bindDropEvents = useCallback((element: HTMLElement | null) => {
+    setDropElement(element);
+  }, []);
 
   useEffect(() => {
-    const element = dropRef.current;
-    if (!element) return;
+    if (!dropElement) return;
 
     const handleDrop = (e: DragEvent) => {
       e.preventDefault();
@@ -70,26 +67,22 @@ export function useMarkdownImage({
       e.stopPropagation();
     };
 
-    element.addEventListener('drop', handleDrop);
-    element.addEventListener('dragover', handleDragOver);
+    dropElement.addEventListener('drop', handleDrop);
+    dropElement.addEventListener('dragover', handleDragOver);
 
     return () => {
-      element.removeEventListener('drop', handleDrop);
-      element.removeEventListener('dragover', handleDragOver);
+      dropElement.removeEventListener('drop', handleDrop);
+      dropElement.removeEventListener('dragover', handleDragOver);
     };
-  }, [handleFileUpload]);
+  }, [dropElement, handleFileUpload]);
 
   // 클립보드 붙여넣기 이벤트 바인딩
-  const bindPasteEvents = useCallback(
-    (element: HTMLElement | null) => {
-      pasteRef.current = element;
-    },
-    []
-  );
+  const bindPasteEvents = useCallback((element: HTMLElement | null) => {
+    setPasteElement(element);
+  }, []);
 
   useEffect(() => {
-    const element = pasteRef.current;
-    if (!element) return;
+    if (!pasteElement) return;
 
     const handlePaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
@@ -107,9 +100,9 @@ export function useMarkdownImage({
       }
     };
 
-    element.addEventListener('paste', handlePaste);
-    return () => element.removeEventListener('paste', handlePaste);
-  }, [handleFileUpload]);
+    pasteElement.addEventListener('paste', handlePaste);
+    return () => pasteElement.removeEventListener('paste', handlePaste);
+  }, [pasteElement, handleFileUpload]);
 
   return {
     uploading,

@@ -103,7 +103,10 @@ export default function AdminResumePage() {
           fetchData={fetchResume}
           saveData={saveResume}
           renderPreview={renderPreview}
-          onModeChange={() => setMode('form')}
+          onModeChange={(latestData) => {
+            setData(latestData);
+            setMode('form');
+          }}
         />
       ) : (
         <ResumeFormEditor

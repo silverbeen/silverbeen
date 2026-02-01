@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { PortfolioProject } from '@/types/portfolio';
 import { SortableList } from '../SortableList';
 import { ProjectCard } from './ProjectCard';
@@ -11,29 +11,40 @@ interface ProjectEditorProps {
   onChange: (data: PortfolioProject[]) => void;
 }
 
+type ProjectWithId = PortfolioProject & { _id: string };
+
 // 고유 ID 생성 함수
 const generateId = () =>
   `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-// 모듈 레벨 ID 캐시 - 컴포넌트 외부에서 관리
-const projectIdCache = new WeakMap<PortfolioProject, string>();
-
 // 프로젝트에 안정적인 ID 부여
 const getProjectId = (project: PortfolioProject): string => {
-  // 이미 _id 속성이 있으면 사용
-  const existing = (project as PortfolioProject & { _id?: string })._id;
-  if (existing) return existing;
-
-  // 캐시에 있으면 사용
-  let id = projectIdCache.get(project);
-  if (!id) {
-    id = generateId();
-    projectIdCache.set(project, id);
-  }
-  return id;
+  return (project as ProjectWithId)._id || '';
 };
 
 export function ProjectEditor({ data, onChange }: ProjectEditorProps) {
+  const hasBackfilledIds = useRef(false);
+
+  // ID가 없는 항목에 ID 부여하여 영속화
+  useEffect(() => {
+    if (hasBackfilledIds.current) return;
+
+    const needsBackfill = data.some(
+      (p) => !(p as ProjectWithId)._id
+    );
+
+    if (needsBackfill) {
+      const updatedData = data.map((p) => {
+        if ((p as ProjectWithId)._id) return p;
+        return { ...p, _id: generateId() } as ProjectWithId;
+      });
+      hasBackfilledIds.current = true;
+      onChange(updatedData);
+    } else {
+      hasBackfilledIds.current = true;
+    }
+  }, [data, onChange]);
+
   // 첫 번째 프로젝트 ID를 초기 확장 상태로 설정
   const [expandedId, setExpandedId] = useState<string | null>(() =>
     data.length > 0 ? getProjectId(data[0]) : null

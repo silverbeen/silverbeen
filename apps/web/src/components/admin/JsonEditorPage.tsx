@@ -54,8 +54,8 @@ interface JsonEditorPageProps<T> {
   saveData: (data: T, token: string) => Promise<T>;
   /** 미리보기 렌더링 함수 */
   renderPreview: (data: T) => ReactNode;
-  /** 폼 모드로 전환 콜백 (있을 경우 토글 버튼 표시) */
-  onModeChange?: () => void;
+  /** 폼 모드로 전환 콜백 (있을 경우 토글 버튼 표시) - 현재 편집 데이터 전달 */
+  onModeChange?: (latestData: T) => void;
 }
 
 export function JsonEditorPage<T>({
@@ -183,9 +183,9 @@ export function JsonEditorPage<T>({
           </div>
           <div className="flex items-center gap-3">
             {/* 폼 모드 전환 버튼 */}
-            {onModeChange && (
+            {onModeChange && data && (
               <button
-                onClick={onModeChange}
+                onClick={() => onModeChange(data)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 폼 편집

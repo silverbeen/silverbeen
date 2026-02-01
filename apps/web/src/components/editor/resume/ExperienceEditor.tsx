@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Experience, Project, ProjectTask } from '@/types/resume';
 import { FormField, inputClassName, AutoTextarea } from '../FormField';
 import { StringArrayField } from '../ArrayField';
@@ -43,28 +43,62 @@ interface ExperienceEditorProps {
   onChange: (data: Experience[]) => void;
 }
 
+type ExperienceWithId = Experience & { _id: string };
+type ProjectWithId = Project & { _id: string };
+
 // 고유 ID 생성 함수
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-// 모듈 레벨 ID 캐시 - 컴포넌트 외부에서 관리
-const experienceIdCache = new WeakMap<Experience, string>();
-
 // 경력에 안정적인 ID 부여
 const getExperienceId = (exp: Experience): string => {
-  // 이미 _id 속성이 있으면 사용
-  const existing = (exp as Experience & { _id?: string })._id;
-  if (existing) return existing;
+  return (exp as ExperienceWithId)._id || '';
+};
 
-  // 캐시에 있으면 사용
-  let id = experienceIdCache.get(exp);
-  if (!id) {
-    id = generateId();
-    experienceIdCache.set(exp, id);
-  }
-  return id;
+// 프로젝트에 안정적인 ID 부여
+const getProjectId = (project: Project): string => {
+  return (project as ProjectWithId)._id || '';
 };
 
 export function ExperienceEditor({ data, onChange }: ExperienceEditorProps) {
+  const hasBackfilledIds = useRef(false);
+
+  // ID가 없는 항목에 ID 부여하여 영속화
+  useEffect(() => {
+    if (hasBackfilledIds.current) return;
+
+    let needsUpdate = false;
+    const updatedData = data.map((exp) => {
+      let updated = exp;
+
+      // Experience에 ID 부여
+      if (!(exp as ExperienceWithId)._id) {
+        updated = { ...updated, _id: generateId() } as ExperienceWithId;
+        needsUpdate = true;
+      }
+
+      // 내부 프로젝트에도 ID 부여
+      if (exp.projects?.length) {
+        const updatedProjects = exp.projects.map((p) => {
+          if ((p as ProjectWithId)._id) return p;
+          needsUpdate = true;
+          return { ...p, _id: generateId() } as ProjectWithId;
+        });
+        if (needsUpdate) {
+          updated = { ...updated, projects: updatedProjects };
+        }
+      }
+
+      return updated;
+    });
+
+    if (needsUpdate) {
+      hasBackfilledIds.current = true;
+      onChange(updatedData);
+    } else {
+      hasBackfilledIds.current = true;
+    }
+  }, [data, onChange]);
+
   // 첫 번째 경력 ID를 초기 확장 상태로 설정
   const [expandedId, setExpandedId] = useState<string | null>(() =>
     data.length > 0 ? getExperienceId(data[0]) : null,
@@ -183,12 +217,13 @@ function ExperienceCard({
   };
 
   const handleAddProject = () => {
-    const newProject: Project = {
+    const newProject = {
+      _id: generateId(),
       name: '',
       description: '',
       role: '',
       tasks: [],
-    };
+    } as ProjectWithId;
     handleChange('projects', [...experience.projects, newProject]);
   };
 
@@ -359,7 +394,7 @@ function ExperienceCard({
               <div className="space-y-3">
                 {experience.projects.map((project, index) => (
                   <ProjectCard
-                    key={index}
+                    key={getProjectId(project) || index}
                     project={project}
                     onChange={(p) => handleUpdateProject(index, p)}
                     onRemove={() => handleRemoveProject(index)}
