@@ -26,6 +26,7 @@ const FOLDERS = [
 export default function AdminImagesPage() {
   const [images, setImages] = useState<ImageFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('all');
@@ -39,17 +40,23 @@ export default function AdminImagesPage() {
   const fetchImages = useCallback(async () => {
     setLoading(true);
     try {
-      const folders = ['posts', 'covers', 'profiles', 'projects'];
-      const allImages: ImageFile[] = [];
+      // FOLDERS 상수에서 'all'을 제외하고 동적으로 생성
+      const foldersToFetch = FOLDERS.filter((f) => f.value !== 'all').map(
+        (f) => f.value
+      );
 
-      for (const folder of folders) {
+      // 병렬로 모든 폴더의 이미지 가져오기
+      const imagePromises = foldersToFetch.map(async (folder) => {
         const { data, error } = await supabase.storage
           .from('images')
           .list(folder, { sortBy: { column: 'created_at', order: 'desc' } });
 
-        if (error) continue;
+        if (error) {
+          console.error(`Error fetching images from ${folder}:`, error);
+          return [];
+        }
 
-        const folderImages = data
+        return data
           .filter((file) => !file.name.startsWith('.'))
           .map((file) => ({
             name: file.name,
@@ -60,9 +67,10 @@ export default function AdminImagesPage() {
               .getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
             createdAt: file.created_at || '',
           }));
+      });
 
-        allImages.push(...folderImages);
-      }
+      const results = await Promise.all(imagePromises);
+      const allImages = results.flat();
 
       // 최신순 정렬
       allImages.sort(
@@ -224,7 +232,7 @@ export default function AdminImagesPage() {
                     선택
                   </button>
                   <button
-                    onClick={() => setUploadModalOpen(true)}
+                    onClick={() => setFolderModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
@@ -357,8 +365,8 @@ export default function AdminImagesPage() {
         )}
       </main>
 
-      {/* 업로드 모달 */}
-      {uploadModalOpen && (
+      {/* 폴더 선택 모달 */}
+      {folderModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-lg mx-4 bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -375,10 +383,28 @@ export default function AdminImagesPage() {
                 </option>
               ))}
             </select>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setFolderModalOpen(false)}
+                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  setFolderModalOpen(false);
+                  setUploadModalOpen(true);
+                }}
+                className="px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              >
+                확인
+              </button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* 이미지 업로드 모달 */}
       <ImageUploadModal
         isOpen={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}

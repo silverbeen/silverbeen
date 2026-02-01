@@ -31,6 +31,12 @@ export async function uploadImage(
 ): Promise<UploadResult> {
   const { optimize = true, optimizeOptions } = options;
 
+  // 파일 크기 검증 (5MB 제한) - 최적화 전 원본 기준으로 먼저 검사
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    throw new Error('파일 크기는 5MB를 초과할 수 없습니다.');
+  }
+
   // 이미지 최적화 (기본값: true)
   let uploadFile = file;
   if (optimize && file.type.startsWith('image/')) {
@@ -51,12 +57,6 @@ export async function uploadImage(
   const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
   if (!allowedExtensions.includes(fileExt)) {
     throw new Error('지원하지 않는 이미지 형식입니다. (jpg, jpeg, png, gif, webp만 허용)');
-  }
-
-  // 파일 크기 검증 (5MB 제한) - 최적화 전 원본 기준
-  const maxSize = 5 * 1024 * 1024;
-  if (uploadFile.size > maxSize) {
-    throw new Error('파일 크기는 5MB를 초과할 수 없습니다.');
   }
 
   // 고유한 파일명 생성

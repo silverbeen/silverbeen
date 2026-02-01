@@ -4,6 +4,7 @@ import {
   type ReactNode,
   useRef,
   useEffect,
+  useCallback,
   type TextareaHTMLAttributes,
 } from 'react';
 
@@ -85,7 +86,7 @@ export function AutoTextarea({
 }: AutoTextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const adjustHeight = () => {
+  const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -102,11 +103,11 @@ export function AutoTextarea({
       maxHeight
     );
     textarea.style.height = `${newHeight}px`;
-  };
+  }, [minRows, maxRows]);
 
   useEffect(() => {
     adjustHeight();
-  }, [value]);
+  }, [value, adjustHeight]);
 
   return (
     <textarea

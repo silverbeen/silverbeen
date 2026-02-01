@@ -103,6 +103,7 @@ export default function AdminPortfolioPage() {
           fetchData={fetchPortfolio}
           saveData={savePortfolio}
           renderPreview={renderPreview}
+          onModeChange={() => setMode('form')}
         />
       ) : (
         <PortfolioFormEditor

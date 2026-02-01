@@ -18,7 +18,7 @@ apps/web/src/app/blog/[slug]/page.tsx       # /blog/my-post
 ## 관련 문서
 
 | 상황 | 참조 파일 |
-|------|----------|
+| ------ | ---------- |
 | Server/Client 컴포넌트 페이지 | [page-component.md](./page-component.md) |
 | 스켈레톤 UI | [page-skeleton.md](./page-skeleton.md) |
 | 에러/로딩 처리 | [page-error.md](./page-error.md) |

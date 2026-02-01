@@ -13,7 +13,7 @@
 
 ## 프로젝트 구조
 
-```
+```text
 apps/
 ├── web/src/                    # Next.js 프론트엔드
 │   ├── app/                    # 페이지 (App Router)
