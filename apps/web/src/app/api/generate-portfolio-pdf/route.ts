@@ -381,13 +381,13 @@ function generatePortfolioHtml(data: PortfolioData): string {
     .impact-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; font-weight: 500; color: #111827; margin-bottom: 4px; }
     .impact-dot { width: 5px; height: 5px; background: #514EF6; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
 
-    /* Growth */
+    /* Growth - 실 서비스 색상과 통일 (amber-50/orange-50 그라데이션) */
     .growth { margin-top: 12px; }
-    .growth-title { font-size: 12px; font-weight: 700; color: #d97706; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .growth-title { font-size: 12px; font-weight: 700; color: #b45309; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .growth-title::before { content: ''; width: 14px; height: 14px; background: #f59e0b; border-radius: 50%; flex-shrink: 0; }
-    .growth-item { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+    .growth-item { background: linear-gradient(to bottom right, rgba(255, 251, 235, 0.5), rgba(255, 247, 237, 0.3)); border: 1px solid rgba(252, 211, 77, 0.5); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
     .growth-item-title { font-size: 12px; font-weight: 600; color: #b45309; margin-bottom: 4px; }
-    .growth-item-content { font-size: 11px; color: #6b7280; line-height: 1.6; }
+    .growth-item-content { font-size: 11px; color: rgba(17, 24, 39, 0.8); line-height: 1.6; }
 
     /* Screenshots */
     .screenshots { margin-top: 12px; }

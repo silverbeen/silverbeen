@@ -26,8 +26,11 @@
 6. `frontend/component.md` - UI 컴포넌트
 
 ### 새 페이지 추가
-1. `frontend/page.md` - 페이지 생성
-2. `frontend/component.md` - 필요한 컴포넌트
+1. `frontend/page.md` - 페이지 생성 (인덱스)
+2. `frontend/page-component.md` - Server/Client 컴포넌트
+3. `frontend/page-skeleton.md` - 스켈레톤 UI
+4. `frontend/page-error.md` - 에러/로딩 처리
+5. `frontend/page-admin.md` - 어드민 페이지 (대시보드 메뉴 추가 필수)
 
 ### CRUD 폼 추가
 1. `frontend/form.md` - 폼 컴포넌트
