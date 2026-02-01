@@ -6,9 +6,10 @@ import { getReadingTime, getPreview } from '@/utils/post';
 
 interface PostCardProps {
   post: Post;
+  priority?: boolean;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, priority = false }: PostCardProps) {
   const preview = post.excerpt || getPreview(post.content);
   const readingTime = getReadingTime(post.content);
 
@@ -24,6 +25,7 @@ export function PostCard({ post }: PostCardProps) {
             src={post.coverImage}
             alt={post.title}
             fill
+            priority={priority}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
