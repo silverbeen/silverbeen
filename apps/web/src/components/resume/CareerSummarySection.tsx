@@ -62,7 +62,7 @@ export function CareerSummarySection({ careerSummary }: CareerSummarySectionProp
 
           return (
             <motion.div
-              key={`${career.company}-${career.startDate}`}
+              key={`${career.company}-${career.startDate}-${career.endDate || 'current'}`}
               className="group flex items-start gap-4"
               variants={itemVariants}
               whileHover={{ x: 4 }}

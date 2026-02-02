@@ -28,9 +28,9 @@ export function calculateDuration(
 
   // 시작월도 포함하여 1개월 추가
   months += 1;
-  if (months > 12) {
-    years += 1;
-    months -= 12;
+  if (months >= 12) {
+    years += Math.floor(months / 12);
+    months %= 12;
   }
 
   // 같은 달이면 최소 1개월로 처리
@@ -57,9 +57,9 @@ export function formatPeriod(startDate: string, endDate?: string): string {
 /**
  * 인턴 여부를 확인하는 헬퍼 함수
  */
-export function isInternPosition(position: string): boolean {
-  const lowerPosition = position.toLowerCase();
-  return lowerPosition.includes("intern") || position.includes("인턴");
+export function isInternPosition(position?: string): boolean {
+  const lowerPosition = position?.toLowerCase() ?? "";
+  return lowerPosition.includes("intern") || lowerPosition.includes("인턴");
 }
 
 /**
@@ -68,7 +68,7 @@ export function isInternPosition(position: string): boolean {
  * @returns "X년 Y개월" 형식의 문자열, 경력이 없으면 빈 문자열
  */
 export function calculateTotalExperience(
-  careers: { position: string; startDate: string; endDate?: string }[]
+  careers: { position?: string; startDate: string; endDate?: string }[]
 ): string {
   if (!careers || careers.length === 0) return "";
 

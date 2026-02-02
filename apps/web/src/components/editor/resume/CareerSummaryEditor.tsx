@@ -70,7 +70,7 @@ export function CareerSummaryEditor({ data, onChange }: CareerSummaryEditorProps
           </div>
           <SortableList
             items={data}
-            getKey={(career, index) => `${career.company}-${career.startDate}-${index}`}
+            getKey={(_, index) => `career-${index}`}
             onReorder={onChange}
             renderItem={(career, index) => (
               <CareerCard
