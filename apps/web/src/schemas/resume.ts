@@ -100,11 +100,21 @@ export const coreCompetencySchema = z.object({
   description: z.string().min(1, '설명을 입력해주세요'),
 });
 
+// CareerSummary 스키마
+export const careerSummarySchema = z.object({
+  company: z.string().min(1, '회사명을 입력해주세요'),
+  position: z.string().min(1, '직책을 입력해주세요'),
+  startDate: z.string().min(1, '시작일을 입력해주세요'),
+  endDate: z.string().optional(),
+  description: z.string().optional(),
+});
+
 // 전체 이력서 스키마
 export const resumeSchema = z.object({
   profile: profileSchema,
   skills: skillsSchema,
   coreCompetencies: z.array(coreCompetencySchema).optional(),
+  careerSummary: z.array(careerSummarySchema).optional(),
   experience: z.array(experienceSchema),
   education: z.array(educationSchema),
   certifications: z.array(certificationSchema),

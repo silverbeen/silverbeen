@@ -3,6 +3,7 @@
 import {
   ProfileSection,
   SkillsSection,
+  CareerSummarySection,
   ExperienceSection,
   EducationSection,
   CertificationSection,
@@ -31,6 +32,13 @@ export function ResumeSections({ data, ImageComponent }: ResumeSectionsProps) {
       <SkillsSection skills={data.skills} />
 
       <hr className="border-sky-100 dark:border-sky-900/30" />
+
+      {data.careerSummary && data.careerSummary.length > 0 && (
+        <>
+          <CareerSummarySection careerSummary={data.careerSummary} />
+          <hr className="border-sky-100 dark:border-sky-900/30" />
+        </>
+      )}
 
       <ExperienceSection experience={data.experience} ImageComponent={ImageComponent} />
 

@@ -5,6 +5,7 @@ import type { ResumeData } from '@/types/resume';
 import { resumeSchema } from '@/schemas/resume';
 import { ProfileEditor } from './ProfileEditor';
 import { SkillsEditor } from './SkillsEditor';
+import { CareerSummaryEditor } from './CareerSummaryEditor';
 import { ExperienceEditor } from './ExperienceEditor';
 import { EducationEditor } from './EducationEditor';
 import { CertificationEditor } from './CertificationEditor';
@@ -39,6 +40,7 @@ interface ResumeFormEditorProps {
 type SectionKey =
   | 'profile'
   | 'skills'
+  | 'careerSummary'
   | 'experience'
   | 'education'
   | 'certifications'
@@ -47,7 +49,8 @@ type SectionKey =
 const sections: { key: SectionKey; label: string; icon: React.ReactNode }[] = [
   { key: 'profile', label: '기본 정보', icon: <User className="h-4 w-4" /> },
   { key: 'skills', label: '기술 스택', icon: <Code2 className="h-4 w-4" /> },
-  { key: 'experience', label: '경력', icon: <Briefcase className="h-4 w-4" /> },
+  { key: 'careerSummary', label: '경력', icon: <Briefcase className="h-4 w-4" /> },
+  { key: 'experience', label: '프로젝트', icon: <Briefcase className="h-4 w-4" /> },
   { key: 'education', label: '학력', icon: <GraduationCap className="h-4 w-4" /> },
   { key: 'certifications', label: '자격증', icon: <Award className="h-4 w-4" /> },
   { key: 'awards', label: '수상', icon: <Medal className="h-4 w-4" /> },
@@ -351,6 +354,12 @@ export function ResumeFormEditor({
               <SkillsEditor
                 data={formData.skills}
                 onChange={(value) => updateSection('skills', value)}
+              />
+            )}
+            {activeSection === 'careerSummary' && (
+              <CareerSummaryEditor
+                data={formData.careerSummary || []}
+                onChange={(value) => updateSection('careerSummary', value)}
               />
             )}
             {activeSection === 'experience' && (
