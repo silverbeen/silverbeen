@@ -88,7 +88,7 @@ export function CareerSummarySection({ careerSummary }: CareerSummarySectionProp
                   </motion.span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {career.position} · {period}
+                  {career.position ? `${career.position} · ` : ""}{period}
                 </p>
                 {career.description && (
                   <p className="text-sm text-muted-foreground mt-1">
