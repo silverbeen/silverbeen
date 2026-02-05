@@ -33,9 +33,10 @@ export function TableOfContents({ experience }: TableOfContentsProps) {
     const sections: TocSection[] = [
       { id: "profile", title: "프로필", level: 1 },
       { id: "skills", title: "기술 스택", level: 1 },
+      { id: "career-summary", title: "경력", level: 1 },
       {
         id: "experience",
-        title: "경력",
+        title: "프로젝트",
         level: 1,
         children: experience.flatMap((exp) => {
           const companySlug = exp.company.replace(/[^a-zA-Z0-9가-힣]/g, "-").toLowerCase();

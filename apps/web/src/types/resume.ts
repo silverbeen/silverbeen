@@ -85,10 +85,19 @@ export interface CoreCompetency {
   description: string;
 }
 
+export interface CareerSummary {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+}
+
 export interface ResumeData {
   profile: Profile;
   skills: Skills;
   coreCompetencies?: CoreCompetency[];
+  careerSummary?: CareerSummary[];
   experience: Experience[];
   education: Education[];
   certifications: Certification[];
