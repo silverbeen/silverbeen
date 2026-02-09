@@ -41,9 +41,32 @@
       "description": "SSE 스트리밍 최적화 및 양방향 무한 스크롤 엔진 구현을 통한 끊김 없는 실시간 대화 경험 제공"
     }
   ],
+  "careerSummary": [
+    {
+      "company": "(주) 버블탭",
+      "position": "Frontend Developer",
+      "startDate": "2022.12",
+      "description": "AI 캐릭터 채팅 B2C 서비스 개발 · Turborepo 화이트 레이블 아키텍처 설계 · DX 자동화"
+    },
+    {
+      "company": "(주) 아데나소프트웨어",
+      "position": "Frontend Developer",
+      "startDate": "2022.06",
+      "endDate": "2022.11",
+      "description": "채팅형 웹소설 B2C 서비스 · 에디터 · 백오피스 시스템 개발"
+    },
+    {
+      "company": "(주) 짐티",
+      "position": "Frontend Developer (체험형 인턴)",
+      "startDate": "2021.12",
+      "endDate": "2022.01",
+      "description": "Naver Map API 기반 지점 안내 페이지 개발 · AWS 배포"
+    }
+  ],
   "experience": [
     {
       "company": "(주) 버블탭 (구 아데나소프트웨어)",
+      "position": "Frontend Developer",
       "startDate": "2022.07",
       "description": "2022년 아데나소프트웨어 입사 → 2024년 버블탭으로 분사",
       "techStack": [
@@ -365,6 +388,7 @@
     },
     {
       "company": "(주) 짐티",
+      "position": "Frontend Developer Intern",
       "startDate": "2022.01",
       "endDate": "2022.02",
       "description": "겨울방학 체험형 인턴십",

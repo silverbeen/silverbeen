@@ -5,6 +5,11 @@ import { config } from "@/config";
 import type { ResumeData, Experience } from "@/types/resume";
 import resumeDataFallback from "@/data/resume.json";
 import { createClient } from "@/lib/supabase/server";
+import {
+  calculateDuration,
+  calculateTotalExperience,
+  formatPeriod,
+} from "@/utils/date";
 
 async function getResumeData(): Promise<ResumeData> {
   try {
@@ -17,33 +22,6 @@ async function getResumeData(): Promise<ResumeData> {
     console.error("Failed to fetch resume data:", error);
     return resumeDataFallback as ResumeData;
   }
-}
-
-function calculateDuration(startDate: string, endDate?: string): string {
-  const parseYearMonth = (dateStr: string) => {
-    const [year, month] = dateStr.split(".").map(Number);
-    return new Date(year, month - 1);
-  };
-
-  const start = parseYearMonth(startDate);
-  const end = endDate ? parseYearMonth(endDate) : new Date();
-
-  let years = end.getFullYear() - start.getFullYear();
-  let months = end.getMonth() - start.getMonth();
-
-  if (months < 0) {
-    years -= 1;
-    months += 12;
-  }
-
-  if (years === 0 && months === 0) return "1개월";
-  if (years > 0 && months > 0) return `${years}년 ${months}개월`;
-  if (years > 0) return `${years}년`;
-  return `${months}개월`;
-}
-
-function formatPeriod(startDate: string, endDate?: string): string {
-  return endDate ? `${startDate} - ${endDate}` : `${startDate} - 재직중`;
 }
 
 // XSS 방지를 위한 HTML 이스케이프 헬퍼
@@ -59,7 +37,7 @@ function escapeHtml(text: string): string {
 }
 
 function generateResumeHtml(data: ResumeData): string {
-  const { profile, skills, experience, education, certifications, awards } =
+  const { profile, skills, careerSummary, experience, education, certifications, awards } =
     data;
 
   const skillLabels: Record<string, string> = {
@@ -171,7 +149,6 @@ function generateResumeHtml(data: ResumeData): string {
   const renderExperience = () => {
     return experience
       .map((exp) => {
-        const duration = calculateDuration(exp.startDate, exp.endDate);
         const period = formatPeriod(exp.startDate, exp.endDate);
 
         const techStackHtml = exp.techStack
@@ -191,7 +168,6 @@ function generateResumeHtml(data: ResumeData): string {
           <div class="experience-card">
             <div class="company-header">
               <span class="company-name">${escapeHtml(exp.company)}</span>
-              <span class="company-duration">${escapeHtml(duration)}</span>
             </div>
             <div class="company-period">${escapeHtml(period)}${exp.description ? ` · ${escapeHtml(exp.description)}` : ""}</div>
             <div class="exp-tech-stack">
@@ -261,6 +237,40 @@ function generateResumeHtml(data: ResumeData): string {
       .join("");
   };
 
+  const totalExperience = careerSummary ? calculateTotalExperience(careerSummary) : "";
+
+  const renderCareerSummary = () => {
+    if (!careerSummary || careerSummary.length === 0) return "";
+
+    // 회사명에서 첫 글자 추출 (괄호나 특수문자 제외)
+    const getCompanyInitial = (company: string): string => {
+      const cleanName = company.replace(/^\(주\)\s*/, "").trim();
+      return cleanName.charAt(0).toUpperCase();
+    };
+
+    return careerSummary
+      .map((career) => {
+        const duration = calculateDuration(career.startDate, career.endDate);
+        const period = formatPeriod(career.startDate, career.endDate);
+        const initial = getCompanyInitial(career.company);
+
+        return `
+          <div class="career-item">
+            <div class="career-icon">${escapeHtml(initial)}</div>
+            <div class="career-content">
+              <div class="career-header">
+                <span class="career-company">${escapeHtml(career.company)}</span>
+                <span class="career-duration">${escapeHtml(duration)}</span>
+              </div>
+              <div class="career-detail">${escapeHtml(career.position)} · ${escapeHtml(period)}</div>
+              ${career.description ? `<div class="career-description">${escapeHtml(career.description)}</div>` : ""}
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  };
+
   // 로컬 폰트 URL 생성
   const fontBaseUrl = config.siteUrl;
 
@@ -304,6 +314,15 @@ function generateResumeHtml(data: ResumeData): string {
     .skill-label { width: 130px; font-size: 13px; font-weight: 600; color: #111827; flex-shrink: 0; }
     .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
     .skill-tag { background: #f3f4f6; border-radius: 4px; padding: 3px 10px; font-size: 12px; color: #374151; }
+    .career-item { display: flex; gap: 12px; margin-bottom: 12px; }
+    .career-icon { width: 36px; height: 36px; background: #514EF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 14px; font-weight: 700; }
+    .career-content { flex: 1; }
+    .career-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .career-company { font-size: 15px; font-weight: 700; color: #111827; }
+    .career-duration { background: #514EF6; color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+    .career-detail { font-size: 13px; color: #6b7280; }
+    .career-description { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .career-total { font-size: 14px; font-weight: 500; color: #6b7280; margin-left: 8px; }
     .experience-card { margin-bottom: 20px; }
     .company-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .company-name { font-size: 17px; font-weight: 700; color: #111827; }
@@ -315,7 +334,7 @@ function generateResumeHtml(data: ResumeData): string {
     .exp-tech-label { width: 80px; color: #6b7280; flex-shrink: 0; }
     .exp-tech-items { color: #111827; }
     .projects-title { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 10px; }
-    .project-card { border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 12px; background: #ffffff; }
+    .project-card { border: 1px solid rgba(81, 78, 246, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px; background: #ffffff; }
     .project-header { border-bottom: 1px solid rgba(81, 78, 246, 0.1); padding-bottom: 12px; margin-bottom: 12px; }
     .project-name { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 4px; }
     .project-period { font-size: 12px; font-weight: 500; color: rgba(81, 78, 246, 0.8); margin-bottom: 8px; }
@@ -337,12 +356,11 @@ function generateResumeHtml(data: ResumeData): string {
     .impact-title { font-size: 13px; font-weight: 700; color: #514EF6; margin-bottom: 8px; }
     .impact-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 5px; }
     .impact-dot { width: 6px; height: 6px; background: #514EF6; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-    .screenshots { margin-top: 12px; }
-    .screenshots-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .screenshots-title::before { content: ''; width: 18px; height: 18px; background: #0ea5e9; border-radius: 4px; }
-    .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .screenshots-grid-single { grid-template-columns: 1fr; }
-    .screenshot-img { width: 100%; border-radius: 6px; border: 1px solid #e5e7eb; }
+    .screenshots { margin-top: 8px; }
+    .screenshots-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .screenshots-title::before { content: ''; width: 14px; height: 14px; background: #0ea5e9; border-radius: 3px; }
+    .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .screenshot-img { width: 100%; max-height: 260px; object-fit: cover; object-position: top; border-radius: 4px; border: 1px solid #e5e7eb; }
     .education-item { display: flex; gap: 12px; margin-bottom: 12px; }
     .education-icon { width: 36px; height: 36px; background: #514EF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 14px; font-weight: 700; }
     .education-school { font-size: 14px; font-weight: 600; color: #111827; }
@@ -385,9 +403,20 @@ function generateResumeHtml(data: ResumeData): string {
       <div class="section-title"><div class="section-title-bar"></div><div class="section-title-text">보유 기술</div></div>
       ${renderSkills()}
     </div>
+    ${careerSummary && careerSummary.length > 0 ? `
     <hr />
     <div class="section">
-      <div class="section-title"><div class="section-title-bar"></div><div class="section-title-text">경력</div></div>
+      <div class="section-title">
+        <div class="section-title-bar"></div>
+        <div class="section-title-text">경력</div>
+        ${totalExperience ? `<span class="career-total">총 ${totalExperience}</span>` : ""}
+      </div>
+      ${renderCareerSummary()}
+    </div>
+    ` : ""}
+    <hr />
+    <div class="section">
+      <div class="section-title"><div class="section-title-bar"></div><div class="section-title-text">프로젝트</div></div>
       ${renderExperience()}
     </div>
     <hr />

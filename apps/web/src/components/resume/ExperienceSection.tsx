@@ -77,7 +77,7 @@ export function ExperienceSection({
 }: ExperienceSectionProps) {
   return (
     <section id="experience">
-      <SectionTitle>경력</SectionTitle>
+      <SectionTitle>프로젝트</SectionTitle>
       <motion.div
         className="flex flex-col gap-12"
         variants={containerVariants}
@@ -411,7 +411,7 @@ function ProjectCard({
             {project.images.map((image, idx) => (
               <motion.button
                 key={idx}
-                className="group/image relative aspect-video overflow-hidden rounded-lg border border-border bg-muted cursor-pointer"
+                className="group/image relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted cursor-pointer"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}

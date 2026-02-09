@@ -1,6 +1,7 @@
 export { SectionTitle } from "./SectionTitle";
 export { ProfileSection } from "./ProfileSection";
 export { SkillsSection } from "./SkillsSection";
+export { CareerSummarySection } from "./CareerSummarySection";
 export { EducationSection } from "./EducationSection";
 export { ExperienceSection } from "./ExperienceSection";
 export { CertificationSection } from "./CertificationSection";
