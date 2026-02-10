@@ -26,13 +26,9 @@ export function PostActions({ postId, postTitle }: PostActionsProps) {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const isAdminFlag =
-          user.user_metadata?.is_admin === true ||
-          user.user_metadata?.is_admin === 'true' ||
-          user.user_metadata?.is_admin === '1';
         const isAdminRole =
-          (user.user_metadata?.role || '').toLowerCase() === 'admin';
-        setIsAuthenticated(isAdminFlag || isAdminRole);
+          (user.app_metadata?.role || '').toLowerCase() === 'admin';
+        setIsAuthenticated(isAdminRole);
       }
     };
 

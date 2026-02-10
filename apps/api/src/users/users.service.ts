@@ -13,9 +13,11 @@ import { Role } from '@prisma/client';
 interface SupabaseUser {
   id: string;
   email: string;
+  app_metadata?: {
+    role?: string;
+  };
   user_metadata?: {
     name?: string;
-    role?: string;
   };
 }
 
@@ -65,7 +67,7 @@ export class UsersService {
           data: {
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name ?? existingUser.name,
-            role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+            role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
           },
         });
         updated++;
@@ -75,7 +77,7 @@ export class UsersService {
             id: supabaseUser.id,
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name,
-            role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+            role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
           },
         });
         created++;
@@ -101,12 +103,12 @@ export class UsersService {
         id: supabaseUser.id,
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+        role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
       },
       update: {
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role: supabaseUser.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+        role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
       },
     });
   }
@@ -200,7 +202,7 @@ export class UsersService {
           id: user.id,
           email: user.email,
           name: user.user_metadata?.name || null,
-          role: user.user_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+          role: user.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
           emailConfirmedAt: user.email_confirmed_at ?? null,
           lastSignInAt: user.last_sign_in_at ?? null,
           createdAt: user.created_at,
@@ -282,7 +284,7 @@ export class UsersService {
 
     try {
       const { data, error } = await this.supabaseAdmin.auth.admin.updateUserById(id, {
-        user_metadata: { role: role.toLowerCase() },
+        app_metadata: { role: role.toLowerCase() },
       });
 
       if (error) {
@@ -329,7 +331,7 @@ export class UsersService {
       }
 
       const admins = data.users.filter(
-        (user) => user.user_metadata?.role?.toUpperCase() === 'ADMIN',
+        (user) => user.app_metadata?.role?.toUpperCase() === 'ADMIN',
       );
       return admins.length <= 1 && admins.some((admin) => admin.id === id);
     } catch (err) {
