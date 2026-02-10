@@ -11,12 +11,13 @@ interface PostsGridProps {
   page: number;
   sortBy: SortByType;
   order: OrderType;
+  search?: string;
   initialData?: PostListResponse | null;
   onDataLoaded?: (data: PostListResponse | null) => void;
 }
 
-export function PostsGrid({ tag, page, sortBy, order, initialData, onDataLoaded }: PostsGridProps) {
-  const { data, loading, error } = usePosts({ tag, page, sortBy, order }, initialData);
+export function PostsGrid({ tag, page, sortBy, order, search, initialData, onDataLoaded }: PostsGridProps) {
+  const { data, loading, error } = usePosts({ tag, page, sortBy, order, search }, initialData);
 
   useEffect(() => {
     if (onDataLoaded) {
@@ -70,7 +71,11 @@ export function PostsGrid({ tag, page, sortBy, order, initialData, onDataLoaded 
     return (
       <div className="py-12 text-center">
         <p className="text-gray-500 dark:text-gray-400">
-          {tag ? `"${tag}" 태그의 글이 없습니다.` : '아직 작성된 글이 없습니다.'}
+          {search
+            ? `"${search}" 검색 결과가 없습니다.`
+            : tag
+              ? `"${tag}" 태그의 글이 없습니다.`
+              : '아직 작성된 글이 없습니다.'}
         </p>
       </div>
     );

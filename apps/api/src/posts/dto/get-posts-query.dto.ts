@@ -33,4 +33,8 @@ export class GetPostsQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   order?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

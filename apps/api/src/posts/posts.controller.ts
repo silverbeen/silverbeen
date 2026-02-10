@@ -18,6 +18,7 @@ export class PostsController {
       tag: query.tag,
       sortBy: query.sortBy,
       order: query.order,
+      search: query.search,
     });
   }
 
