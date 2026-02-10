@@ -16,6 +16,7 @@ import { PostNavigation } from '@/components/post/PostNavigation';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { WritePostButton } from '@/components/post/WritePostButton';
 import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
+import { SeriesNavigation } from '@/components/post/SeriesNavigation';
 import { formatDateKorean } from '@/utils/date';
 import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
@@ -140,9 +141,13 @@ export default async function BlogPage({ params }: PageProps) {
 
   let blog;
   let adjacentPosts;
+  let seriesData = null;
   try {
     blog = await api.blogs.getBySlug(slug, { revalidate: 60 });
     adjacentPosts = await api.blogs.getAdjacent(blog.id, { revalidate: 60 });
+    if (blog.series?.slug) {
+      seriesData = await api.series.getBySlug(blog.series.slug, { revalidate: 60 });
+    }
   } catch {
     notFound();
   }
@@ -215,6 +220,10 @@ export default async function BlogPage({ params }: PageProps) {
             <div className="relative mb-8 aspect-video overflow-hidden rounded-xl">
               <img src={blog.coverImage} alt={blog.title} className="h-full w-full object-cover" />
             </div>
+          )}
+
+          {seriesData && (
+            <SeriesNavigation series={seriesData} currentPostId={blog.id} />
           )}
 
           <div className="prose prose-lg dark:prose-invert mb-12 max-w-none">

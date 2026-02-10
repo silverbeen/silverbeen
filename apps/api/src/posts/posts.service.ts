@@ -74,7 +74,7 @@ export class PostsService implements OnModuleInit {
         skip,
         take: limit,
         orderBy: { [sortBy]: order },
-        include: { tags: true },
+        include: { tags: true, series: true },
       }),
       this.prisma.post.count({ where }),
     ]);
@@ -91,14 +91,14 @@ export class PostsService implements OnModuleInit {
     return this.prisma.post.findMany({
       where: { authorId },
       orderBy: { createdAt: 'desc' },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 
   async findBySlug(slug: string) {
     const post = await this.prisma.post.findUnique({
       where: { slug },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
 
     if (!post) {
@@ -111,7 +111,7 @@ export class PostsService implements OnModuleInit {
   async findById(id: number) {
     const post = await this.prisma.post.findUnique({
       where: { id },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
 
     if (!post) {
@@ -122,7 +122,7 @@ export class PostsService implements OnModuleInit {
   }
 
   async create(authorId: string, createPostDto: CreatePostDto) {
-    const { tagIds, ...data } = createPostDto;
+    const { tagIds, seriesId, ...data } = createPostDto;
 
     const slug = await generateUniqueSlug(data.title, async (slug) => {
       const existing = await this.prisma.post.findUnique({ where: { slug } });
@@ -135,8 +135,9 @@ export class PostsService implements OnModuleInit {
         slug,
         authorId,
         tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
+        series: seriesId ? { connect: { id: seriesId } } : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 
@@ -147,7 +148,7 @@ export class PostsService implements OnModuleInit {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
-    const { tagIds, title, createdAt, ...data } = updatePostDto;
+    const { tagIds, title, createdAt, seriesId, ...data } = updatePostDto;
 
     let slug = post.slug;
     if (title && title !== post.title) {
@@ -168,8 +169,13 @@ export class PostsService implements OnModuleInit {
         slug,
         createdAt: createdAt ? new Date(createdAt) : undefined,
         tags: tagIds ? { set: [], connect: tagIds.map((id) => ({ id })) } : undefined,
+        series: seriesId === null
+          ? { disconnect: true }
+          : seriesId
+            ? { connect: { id: seriesId } }
+            : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 

@@ -35,4 +35,8 @@ export class UpdatePostDto {
   @IsOptional()
   @IsDateString()
   createdAt?: string;
+
+  @IsOptional()
+  @IsString()
+  seriesId?: string | null;
 }
