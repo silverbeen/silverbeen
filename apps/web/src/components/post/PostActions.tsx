@@ -12,7 +12,7 @@ interface PostActionsProps {
 
 export function PostActions({ postId, postTitle }: PostActionsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -26,13 +26,9 @@ export function PostActions({ postId, postTitle }: PostActionsProps) {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const isAdminFlag =
-          user.user_metadata?.is_admin === true ||
-          user.user_metadata?.is_admin === 'true' ||
-          user.user_metadata?.is_admin === '1';
         const isAdminRole =
-          (user.user_metadata?.role || '').toLowerCase() === 'admin';
-        setIsAuthenticated(isAdminFlag || isAdminRole);
+          (user.app_metadata?.role || '').toLowerCase() === 'admin';
+        setIsAdmin(isAdminRole);
       }
     };
 
@@ -78,7 +74,7 @@ export function PostActions({ postId, postTitle }: PostActionsProps) {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!isAdmin) {
     return null;
   }
 

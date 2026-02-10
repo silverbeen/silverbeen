@@ -9,9 +9,12 @@ interface JwtPayload {
   role: string;
   aud: string;
   exp: number;
-  user_metadata?: {
+  app_metadata?: {
     role?: string;
-    is_admin?: boolean;
+    [key: string]: unknown;
+  };
+  user_metadata?: {
+    name?: string;
     [key: string]: unknown;
   };
 }
@@ -47,6 +50,7 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
       id: payload.sub,
       email: payload.email,
       role: payload.role,
+      app_metadata: payload.app_metadata,
       user_metadata: payload.user_metadata,
     };
   }
