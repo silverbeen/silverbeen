@@ -26,6 +26,10 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   private readonly supabaseAdmin: SupabaseClient | null = null;
 
+  private resolveRole(appMetadata?: { role?: string }): Role {
+    return appMetadata?.role?.toUpperCase() === 'ADMIN' ? Role.ADMIN : Role.USER;
+  }
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
@@ -67,7 +71,7 @@ export class UsersService {
           data: {
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name ?? existingUser.name,
-            role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+            role: this.resolveRole(supabaseUser.app_metadata),
           },
         });
         updated++;
@@ -77,7 +81,7 @@ export class UsersService {
             id: supabaseUser.id,
             email: supabaseUser.email,
             name: supabaseUser.user_metadata?.name,
-            role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+            role: this.resolveRole(supabaseUser.app_metadata),
           },
         });
         created++;
@@ -103,12 +107,12 @@ export class UsersService {
         id: supabaseUser.id,
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+        role: this.resolveRole(supabaseUser.app_metadata),
       },
       update: {
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.name,
-        role: supabaseUser.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+        role: this.resolveRole(supabaseUser.app_metadata),
       },
     });
   }
@@ -202,7 +206,7 @@ export class UsersService {
           id: user.id,
           email: user.email,
           name: user.user_metadata?.name || null,
-          role: user.app_metadata?.role?.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER',
+          role: this.resolveRole(user.app_metadata as { role?: string }),
           emailConfirmedAt: user.email_confirmed_at ?? null,
           lastSignInAt: user.last_sign_in_at ?? null,
           createdAt: user.created_at,
@@ -324,16 +328,29 @@ export class UsersService {
     }
 
     try {
-      const { data, error } = await this.supabaseAdmin.auth.admin.listUsers();
-      if (error) {
-        this.logger.error('Failed to list users for last admin check', error);
-        return true; // fail-closed: 에러 시 차단
+      const allAdminIds: string[] = [];
+      const perPage = 100;
+      let page = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await this.supabaseAdmin.auth.admin.listUsers({ page, perPage });
+        if (error) {
+          this.logger.error('Failed to list users for last admin check', error);
+          return true; // fail-closed: 에러 시 차단
+        }
+
+        for (const user of data.users) {
+          if (this.resolveRole(user.app_metadata as { role?: string }) === Role.ADMIN) {
+            allAdminIds.push(user.id);
+          }
+        }
+
+        hasMore = data.users.length >= perPage;
+        page++;
       }
 
-      const admins = data.users.filter(
-        (user) => user.app_metadata?.role?.toUpperCase() === 'ADMIN',
-      );
-      return admins.length <= 1 && admins.some((admin) => admin.id === id);
+      return allAdminIds.length <= 1 && allAdminIds.includes(id);
     } catch (err) {
       this.logger.error('Unexpected error in checkLastAdmin', err);
       return true; // fail-closed: 예외 시 차단
