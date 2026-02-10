@@ -1,8 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-function isAdmin(user: { app_metadata: { role?: string } } | null): boolean {
-  return user?.app_metadata?.role?.toLowerCase() === 'admin';
+function isAdmin(user: { app_metadata: Record<string, unknown> } | null): boolean {
+  return (user?.app_metadata?.role as string)?.toLowerCase() === 'admin';
 }
 
 export async function updateSession(request: NextRequest) {
