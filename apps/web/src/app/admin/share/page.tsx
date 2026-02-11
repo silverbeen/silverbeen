@@ -18,11 +18,11 @@ export default function AdminSharePage() {
   const { toast } = useToast();
   const supabase = useMemo(() => createClient(), []);
 
-  const getToken = async () => {
+  const getToken = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) throw new Error('Not authenticated');
     return session.access_token;
-  };
+  }, [supabase]);
 
   const fetchLinks = useCallback(async () => {
     try {
@@ -34,7 +34,7 @@ export default function AdminSharePage() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, getToken]);
 
   useEffect(() => {
     fetchLinks();

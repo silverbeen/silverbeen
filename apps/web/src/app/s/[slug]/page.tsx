@@ -11,7 +11,7 @@ export default async function SharePage({ params }: PageProps) {
   try {
     const link = await api.share.getBySlug(slug);
 
-    api.share.incrementView(slug).catch(() => {});
+    api.share.incrementView(slug).catch(console.error);
 
     if (link.type === 'RESUME') {
       redirect('/resume');

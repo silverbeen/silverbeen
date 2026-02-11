@@ -7,6 +7,12 @@ import { randomBytes } from 'crypto';
 export class ShareService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async findLinkByIdOrThrow(id: string) {
+    const link = await this.prisma.shareLink.findUnique({ where: { id } });
+    if (!link) throw new NotFoundException('Share link not found');
+    return link;
+  }
+
   async findAll() {
     return this.prisma.shareLink.findMany({
       orderBy: { createdAt: 'desc' },
@@ -39,8 +45,7 @@ export class ShareService {
   }
 
   async toggleActive(id: string) {
-    const link = await this.prisma.shareLink.findUnique({ where: { id } });
-    if (!link) throw new NotFoundException('Share link not found');
+    const link = await this.findLinkByIdOrThrow(id);
 
     return this.prisma.shareLink.update({
       where: { id },
@@ -49,8 +54,7 @@ export class ShareService {
   }
 
   async delete(id: string) {
-    const link = await this.prisma.shareLink.findUnique({ where: { id } });
-    if (!link) throw new NotFoundException('Share link not found');
+    await this.findLinkByIdOrThrow(id);
 
     return this.prisma.shareLink.delete({ where: { id } });
   }
