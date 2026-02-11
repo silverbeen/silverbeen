@@ -9,6 +9,7 @@ import { AuthModule } from './auth';
 import { PostsModule } from './posts';
 import { TagsModule } from './tags';
 import { UsersModule } from './users';
+import { ShareModule } from './share';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from './users';
     PostsModule,
     TagsModule,
     UsersModule,
+    ShareModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon } from 'lucide-react';
+import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, Share2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DashboardStats } from '@/components/admin/DashboardStats';
@@ -56,6 +56,14 @@ const menuItems = [
     icon: ImageIcon,
     color: 'text-pink-500',
     bgColor: 'bg-pink-100 dark:bg-pink-900/30',
+  },
+  {
+    href: '/admin/share',
+    title: '공유 링크',
+    description: '이력서/포트폴리오 공유 링크를 생성하고 관리합니다.',
+    icon: Share2,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
   },
   {
     href: '/admin/settings',
