@@ -21,8 +21,10 @@ export class StatsService {
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    const stats = await this.prisma.dailyStats.findMany({
+    const stats = await this.prisma.dailyStats.groupBy({
+      by: ['date'],
       where: { date: { gte: startDate } },
+      _sum: { views: true },
       orderBy: { date: 'asc' },
     });
 
@@ -35,7 +37,7 @@ export class StatsService {
 
     for (const stat of stats) {
       const key = new Date(stat.date).toISOString().split('T')[0];
-      dailyMap.set(key, (dailyMap.get(key) || 0) + stat.views);
+      dailyMap.set(key, stat._sum.views || 0);
     }
 
     return Array.from(dailyMap.entries()).map(([date, views]) => ({ date, views }));
@@ -59,7 +61,7 @@ export class StatsService {
   async getTagStats() {
     const tags = await this.prisma.tag.findMany({
       include: {
-        _count: { select: { posts: true } },
+        _count: { select: { posts: { where: { published: true } } } },
         posts: {
           where: { published: true },
           select: { viewCount: true },

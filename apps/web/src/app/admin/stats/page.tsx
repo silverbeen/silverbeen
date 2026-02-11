@@ -163,9 +163,9 @@ export default function AdminStatsPage() {
           <div className="rounded-xl bg-white p-6 shadow dark:bg-gray-800">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">태그별 통계</h2>
             <div className="space-y-3">
-              {tagStats.map((tag) => {
+              {(() => {
                 const maxTagViews = Math.max(...tagStats.map((t) => t.totalViews), 1);
-                return (
+                return tagStats.map((tag) => (
                   <div key={tag.name}>
                     <div className="mb-1 flex items-center justify-between">
                       <span className="text-sm text-gray-700 dark:text-gray-300">{tag.name}</span>
@@ -180,8 +180,8 @@ export default function AdminStatsPage() {
                       />
                     </div>
                   </div>
-                );
-              })}
+                ));
+              })()}
               {tagStats.length === 0 && (
                 <p className="text-sm text-gray-400">데이터가 없습니다.</p>
               )}

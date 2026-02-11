@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -15,14 +15,14 @@ export class StatsController {
 
   @Get('daily')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async getDailyStats(@Query('days') days?: string) {
-    return this.statsService.getDailyStats(days ? parseInt(days, 10) : 30);
+  async getDailyStats(@Query('days', new DefaultValuePipe(30), ParseIntPipe) days: number) {
+    return this.statsService.getDailyStats(days);
   }
 
   @Get('top-posts')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async getTopPosts(@Query('limit') limit?: string) {
-    return this.statsService.getTopPosts(limit ? parseInt(limit, 10) : 10);
+  async getTopPosts(@Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number) {
+    return this.statsService.getTopPosts(limit);
   }
 
   @Get('tags')
