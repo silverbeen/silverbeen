@@ -66,8 +66,9 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     }
   }, [initialData, setInitialState, loadDraft]);
 
-  // 상태 변경 시 auto-save에 반영
+  // 상태 변경 시 auto-save에 반영 (초기화 완료 후에만)
   useEffect(() => {
+    if (!initializedRef.current) return;
     updateState({ title, content, excerpt, coverImage, tagIds: selectedTagIds });
   }, [title, content, excerpt, coverImage, selectedTagIds, updateState]);
 
@@ -253,7 +254,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
 
         <div className="flex gap-3">
           <button
-            onClick={() => { saveDraftNow(); toast('임시 저장되었습니다.', 'info'); }}
+            onClick={() => { const saved = saveDraftNow(); toast(saved ? '임시 저장되었습니다.' : '변경 사항이 없습니다.', saved ? 'info' : 'warning'); }}
             className="px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             로컬 저장

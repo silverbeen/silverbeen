@@ -36,18 +36,20 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
     isDirtyRef.current = false;
   }, []);
 
-  const save = useCallback(() => {
-    if (!isDirtyRef.current) return;
+  const save = useCallback((): boolean => {
+    if (!isDirtyRef.current) return false;
     // save 시점에 실제 변경 여부 확인
     if (JSON.stringify(stateRef.current) === initialStateRef.current) {
       isDirtyRef.current = false;
-      return;
+      return false;
     }
     const { title, content } = stateRef.current;
-    if (!title.trim() && !content.trim()) return;
+    if (!title.trim() && !content.trim()) return false;
 
     saveDraft(stateRef.current, postId);
+    isDirtyRef.current = false;
     setLastSaved(new Date().toISOString());
+    return true;
   }, [postId]);
 
   const saveRef = useRef(save);
@@ -77,6 +79,7 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
     const handler = (e: BeforeUnloadEvent) => {
       if (isDirtyRef.current) {
         e.preventDefault();
+        e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handler);
