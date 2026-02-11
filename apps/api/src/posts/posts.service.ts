@@ -70,9 +70,14 @@ export class PostsService implements OnModuleInit {
     }
 
     if (options?.search) {
-      where.OR = [
-        { title: { contains: options.search, mode: 'insensitive' } },
-        { content: { contains: options.search, mode: 'insensitive' } },
+      where.AND = [
+        ...((where.AND as Array<Record<string, unknown>>) || []),
+        {
+          OR: [
+            { title: { contains: options.search, mode: 'insensitive' } },
+            { content: { contains: options.search, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
