@@ -93,6 +93,23 @@ model Tag {
   @@map("tags")
 }
 
+// ShareLink model - for shareable resume/portfolio links
+model ShareLink {
+  id          String    @id @default(uuid())
+  slug        String    @unique
+  type        ShareType
+  label       String?
+  active      Boolean   @default(true)
+  viewCount   Int       @default(0) @map("view_count")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([type])
+  @@map("share_links")
+}
+
 // DailyStats model - for visitor statistics
 model DailyStats {
   id        String   @id @default(uuid())
@@ -106,6 +123,11 @@ model DailyStats {
   @@index([date])
   @@index([postId])
   @@map("daily_stats")
+}
+
+enum ShareType {
+  RESUME
+  PORTFOLIO
 }
 
 // Role enum
