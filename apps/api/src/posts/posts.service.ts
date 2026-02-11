@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  BadRequestException,
   ForbiddenException,
   OnModuleInit,
   Logger,
@@ -51,7 +52,7 @@ export class PostsService implements OnModuleInit {
     page?: number;
     limit?: number;
     tag?: string;
-    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
     order?: 'asc' | 'desc';
   }) {
     const page = options?.page || 1;
@@ -226,5 +227,59 @@ export class PostsService implements OnModuleInit {
     ]);
 
     return { prevPost, nextPost };
+  }
+
+  async toggleLike(slug: string, fingerprint: string) {
+    if (!fingerprint) {
+      throw new BadRequestException('Fingerprint is required');
+    }
+
+    const post = await this.prisma.post.findUnique({ where: { slug } });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const existingLike = await this.prisma.postLike.findUnique({
+      where: { postId_fingerprint: { postId: post.id, fingerprint } },
+    });
+
+    if (existingLike) {
+      await this.prisma.$transaction([
+        this.prisma.postLike.delete({ where: { id: existingLike.id } }),
+        this.prisma.post.update({
+          where: { id: post.id },
+          data: { likeCount: { decrement: 1 } },
+        }),
+      ]);
+      return { liked: false, likeCount: post.likeCount - 1 };
+    } else {
+      await this.prisma.$transaction([
+        this.prisma.postLike.create({
+          data: { postId: post.id, fingerprint },
+        }),
+        this.prisma.post.update({
+          where: { id: post.id },
+          data: { likeCount: { increment: 1 } },
+        }),
+      ]);
+      return { liked: true, likeCount: post.likeCount + 1 };
+    }
+  }
+
+  async getLikeStatus(slug: string, fingerprint: string) {
+    const post = await this.prisma.post.findUnique({ where: { slug } });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    if (!fingerprint) {
+      return { liked: false, likeCount: post.likeCount };
+    }
+
+    const existingLike = await this.prisma.postLike.findUnique({
+      where: { postId_fingerprint: { postId: post.id, fingerprint } },
+    });
+
+    return { liked: !!existingLike, likeCount: post.likeCount };
   }
 }

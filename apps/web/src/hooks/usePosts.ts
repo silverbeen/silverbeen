@@ -9,7 +9,7 @@ export function usePosts(
   params?: {
     tag?: string;
     page?: number;
-    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
     order?: 'asc' | 'desc';
   },
   initialData?: PostListResponse | null

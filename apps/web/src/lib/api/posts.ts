@@ -5,6 +5,7 @@ import type {
   CreatePostDto,
   UpdatePostDto,
   AdjacentPostsResponse,
+  LikeStatusResponse,
 } from '@/types/post';
 
 export const postsApi = {
@@ -13,7 +14,7 @@ export const postsApi = {
       page?: number;
       limit?: number;
       tag?: string;
-      sortBy?: 'createdAt' | 'viewCount' | 'title';
+      sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
       order?: 'asc' | 'desc';
     },
     options?: { revalidate?: number }
@@ -67,4 +68,13 @@ export const postsApi = {
 
   getAdjacent: (id: number, options?: { revalidate?: number }) =>
     fetcher<AdjacentPostsResponse>(`/posts/${id}/adjacent`, { revalidate: options?.revalidate }),
+
+  toggleLike: (slug: string, fingerprint: string) =>
+    fetcher<LikeStatusResponse>(`/posts/${slug}/like`, {
+      method: 'POST',
+      body: JSON.stringify({ fingerprint }),
+    }),
+
+  getLikeStatus: (slug: string, fingerprint: string) =>
+    fetcher<LikeStatusResponse>(`/posts/${slug}/like-status?fingerprint=${encodeURIComponent(fingerprint)}`),
 };

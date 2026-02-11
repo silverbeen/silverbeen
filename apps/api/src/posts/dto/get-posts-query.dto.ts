@@ -27,8 +27,8 @@ export class GetPostsQueryDto {
   tag?: string;
 
   @IsOptional()
-  @IsIn(['createdAt', 'viewCount', 'title'])
-  sortBy?: 'createdAt' | 'viewCount' | 'title';
+  @IsIn(['createdAt', 'viewCount', 'likeCount', 'title'])
+  sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
 
   @IsOptional()
   @IsIn(['asc', 'desc'])

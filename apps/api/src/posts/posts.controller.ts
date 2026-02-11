@@ -63,6 +63,22 @@ export class PostsController {
     return this.postsService.incrementViewCount(slug);
   }
 
+  @Post(':slug/like')
+  async toggleLike(
+    @Param('slug') slug: string,
+    @Body('fingerprint') fingerprint: string,
+  ) {
+    return this.postsService.toggleLike(slug, fingerprint);
+  }
+
+  @Get(':slug/like-status')
+  async getLikeStatus(
+    @Param('slug') slug: string,
+    @Query('fingerprint') fingerprint: string,
+  ) {
+    return this.postsService.getLikeStatus(slug, fingerprint);
+  }
+
   @Get(':id/adjacent')
   async getAdjacentPosts(@Param('id') id: string) {
     return this.postsService.getAdjacentPosts(parseInt(id, 10));

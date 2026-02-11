@@ -15,9 +15,15 @@ export interface Post {
   coverImage?: string | null;
   published: boolean;
   viewCount: number;
+  likeCount: number;
   tags: Tag[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LikeStatusResponse {
+  liked: boolean;
+  likeCount: number;
 }
 
 export interface PostListResponse {
