@@ -5,6 +5,7 @@ import type {
   CreatePostDto,
   UpdatePostDto,
   AdjacentPostsResponse,
+  LikeStatusResponse,
 } from '@/types/post';
 
 export const postsApi = {
@@ -13,8 +14,9 @@ export const postsApi = {
       page?: number;
       limit?: number;
       tag?: string;
-      sortBy?: 'createdAt' | 'viewCount' | 'title';
+      sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
       order?: 'asc' | 'desc';
+      search?: string;
     },
     options?: { revalidate?: number }
   ) => {
@@ -24,6 +26,7 @@ export const postsApi = {
     if (params?.tag) searchParams.set('tag', params.tag);
     if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
     if (params?.order) searchParams.set('order', params.order);
+    if (params?.search) searchParams.set('search', params.search);
 
     const query = searchParams.toString();
     return fetcher<PostListResponse>(`/posts${query ? `?${query}` : ''}`, {
@@ -67,4 +70,13 @@ export const postsApi = {
 
   getAdjacent: (id: number, options?: { revalidate?: number }) =>
     fetcher<AdjacentPostsResponse>(`/posts/${id}/adjacent`, { revalidate: options?.revalidate }),
+
+  toggleLike: (slug: string, fingerprint: string) =>
+    fetcher<LikeStatusResponse>(`/posts/${slug}/like`, {
+      method: 'POST',
+      body: JSON.stringify({ fingerprint }),
+    }),
+
+  getLikeStatus: (slug: string, fingerprint: string) =>
+    fetcher<LikeStatusResponse>(`/posts/${slug}/like-status?fingerprint=${encodeURIComponent(fingerprint)}`),
 };

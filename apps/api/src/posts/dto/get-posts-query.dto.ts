@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min, IsString, IsIn } from 'class-validator';
+import { IsOptional, IsInt, Min, IsString, IsIn, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class GetPostsQueryDto {
@@ -27,10 +27,15 @@ export class GetPostsQueryDto {
   tag?: string;
 
   @IsOptional()
-  @IsIn(['createdAt', 'viewCount', 'title'])
-  sortBy?: 'createdAt' | 'viewCount' | 'title';
+  @IsIn(['createdAt', 'viewCount', 'likeCount', 'title'])
+  sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
   order?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  search?: string;
 }

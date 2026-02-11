@@ -1,6 +1,6 @@
 'use client';
 
-export type SortByType = 'createdAt' | 'viewCount' | 'title';
+export type SortByType = 'createdAt' | 'viewCount' | 'likeCount' | 'title';
 export type OrderType = 'asc' | 'desc';
 
 interface SortSelectorProps {
@@ -13,6 +13,7 @@ const SORT_OPTIONS = [
   { value: 'createdAt-desc', label: '최신순' },
   { value: 'createdAt-asc', label: '오래된순' },
   { value: 'viewCount-desc', label: '조회순' },
+  { value: 'likeCount-desc', label: '좋아요순' },
   { value: 'title-asc', label: '제목순' },
 ] as const;
 

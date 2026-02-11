@@ -1,11 +1,14 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { TagSelector } from './TagSelector';
+import { SeriesSelector } from './SeriesSelector';
 import { MarkdownImageButton } from './MarkdownImageButton';
+import { DraftBanner } from './DraftBanner';
 import { useTags } from '@/hooks/useTags';
 import { useMarkdownImage } from '@/hooks/useMarkdownImage';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import { useToast, ImageUpload } from '@/components/ui';
 import type { CreatePostDto, Post } from '@/types/post';
 
@@ -28,6 +31,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
     initialData?.tags.map((t) => t.id) || []
   );
+  const [seriesId, setSeriesId] = useState<string | null>(initialData?.seriesId || null);
   const [published, setPublished] = useState(initialData?.published || false);
   const [createdAt, setCreatedAt] = useState(() => {
     if (initialData?.createdAt) {
@@ -35,6 +39,58 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     }
     return '';
   });
+  const [draftAvailable, setDraftAvailable] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+
+  // 임시 저장 훅
+  const { updateState, setInitialState, save: saveDraftNow, load: loadDraft, discard: discardDraft, lastSaved } =
+    useAutoSave({ postId: initialData?.id });
+
+  // 초기 상태 설정 및 드래프트 확인
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const initial = {
+      title: initialData?.title || '',
+      content: initialData?.content || '',
+      excerpt: initialData?.excerpt || '',
+      coverImage: initialData?.coverImage || '',
+      tagIds: initialData?.tags.map((t) => t.id) || [],
+    };
+    setInitialState(initial);
+
+    const draft = loadDraft();
+    if (draft && draft.savedAt) {
+      setDraftAvailable(true);
+      setDraftSavedAt(draft.savedAt);
+    }
+  }, [initialData, setInitialState, loadDraft]);
+
+  // 상태 변경 시 auto-save에 반영 (초기화 완료 후에만)
+  useEffect(() => {
+    if (!initializedRef.current) return;
+    updateState({ title, content, excerpt, coverImage, tagIds: selectedTagIds });
+  }, [title, content, excerpt, coverImage, selectedTagIds, updateState]);
+
+  const handleRestoreDraft = useCallback(() => {
+    const draft = loadDraft();
+    if (!draft) return;
+    setTitle(draft.title);
+    setContent(draft.content);
+    setExcerpt(draft.excerpt);
+    setCoverImage(draft.coverImage);
+    if (draft.tagIds?.length) setSelectedTagIds(draft.tagIds);
+    setDraftAvailable(false);
+    toast('임시 저장된 글을 복원했습니다.', 'success');
+  }, [loadDraft, toast]);
+
+  const handleDiscardDraft = useCallback(() => {
+    discardDraft();
+    setDraftAvailable(false);
+    toast('임시 저장을 삭제했습니다.', 'info');
+  }, [discardDraft, toast]);
 
   // 마크다운 이미지 업로드 훅
   const { uploading, handleFileUpload, bindDropEvents, bindPasteEvents } =
@@ -70,13 +126,23 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: selectedTagIds,
       published: shouldPublish,
       createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
+      seriesId: initialData ? (seriesId ?? null) : (seriesId || undefined),
     };
 
     await onSave(data);
+    discardDraft();
   };
 
   return (
     <div className="space-y-6">
+      {draftAvailable && draftSavedAt && (
+        <DraftBanner
+          savedAt={draftSavedAt}
+          onRestore={handleRestoreDraft}
+          onDiscard={handleDiscardDraft}
+        />
+      )}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           제목
@@ -127,6 +193,13 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
         />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          시리즈 (선택)
+        </label>
+        <SeriesSelector selectedSeriesId={seriesId} onSeriesChange={setSeriesId} />
+      </div>
+
       {initialData && (
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -170,19 +243,32 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            className="rounded border-gray-300 dark:border-gray-600"
-          />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            바로 발행하기
-          </span>
-        </label>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={published}
+              onChange={(e) => setPublished(e.target.checked)}
+              className="rounded border-gray-300 dark:border-gray-600"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              바로 발행하기
+            </span>
+          </label>
+          {lastSaved && (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              자동 저장됨 {new Date(lastSaved).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+        </div>
 
         <div className="flex gap-3">
+          <button
+            onClick={() => { const saved = saveDraftNow(); toast(saved ? '임시 저장되었습니다.' : '변경 사항이 없습니다.', saved ? 'info' : 'warning'); }}
+            className="px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            로컬 저장
+          </button>
           <button
             onClick={() => handleSave(false)}
             disabled={saving}

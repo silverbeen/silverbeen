@@ -18,6 +18,7 @@ export class PostsController {
       tag: query.tag,
       sortBy: query.sortBy,
       order: query.order,
+      search: query.search,
     });
   }
 
@@ -61,6 +62,22 @@ export class PostsController {
   @Post(':slug/view')
   async incrementView(@Param('slug') slug: string) {
     return this.postsService.incrementViewCount(slug);
+  }
+
+  @Post(':slug/like')
+  async toggleLike(
+    @Param('slug') slug: string,
+    @Body('fingerprint') fingerprint: string,
+  ) {
+    return this.postsService.toggleLike(slug, fingerprint);
+  }
+
+  @Get(':slug/like-status')
+  async getLikeStatus(
+    @Param('slug') slug: string,
+    @Query('fingerprint') fingerprint: string,
+  ) {
+    return this.postsService.getLikeStatus(slug, fingerprint);
   }
 
   @Get(':id/adjacent')

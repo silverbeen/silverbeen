@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { PortfolioProject } from '@/types/portfolio';
 import { ImageUploadModal } from '@/components/ui';
 import { SortableImageItem } from '../SortableItems';
+import { generateImageIds } from '../../utils';
 import {
   DndContext,
   closestCenter,
@@ -17,7 +18,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Plus, Image as ImageIcon } from 'lucide-react';
 
@@ -46,6 +47,11 @@ export function ProjectImagesSection({
     })
   );
 
+  const imageIds = useMemo(
+    () => generateImageIds(project.images),
+    [project.images]
+  );
+
   const handleAddImage = (url: string) => {
     onChange('images', [...(project.images || []), url]);
   };
@@ -61,9 +67,11 @@ export function ProjectImagesSection({
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const images = project.images || [];
-      const oldIndex = images.findIndex((_, i) => `image-${i}` === active.id);
-      const newIndex = images.findIndex((_, i) => `image-${i}` === over.id);
-      onChange('images', arrayMove(images, oldIndex, newIndex));
+      const oldIndex = imageIds.indexOf(active.id as string);
+      const newIndex = imageIds.indexOf(over.id as string);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onChange('images', arrayMove(images, oldIndex, newIndex));
+      }
     }
   };
 
@@ -97,14 +105,14 @@ export function ProjectImagesSection({
           onDragEnd={handleImageDragEnd}
         >
           <SortableContext
-            items={(project.images || []).map((_, i) => `image-${i}`)}
-            strategy={verticalListSortingStrategy}
+            items={imageIds}
+            strategy={rectSortingStrategy}
           >
             <div className="flex flex-wrap gap-3">
               {project.images.map((url, index) => (
                 <SortableImageItem
-                  key={`image-${index}`}
-                  id={`image-${index}`}
+                  key={imageIds[index]}
+                  id={imageIds[index]}
                   url={url}
                   index={index}
                   onRemove={() => handleRemoveImage(index)}

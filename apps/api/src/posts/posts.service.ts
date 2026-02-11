@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  BadRequestException,
   ForbiddenException,
   OnModuleInit,
   Logger,
@@ -8,12 +9,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { generateUniqueSlug } from '../common/utils/slug.util';
+import { StatsService } from '../stats/stats.service';
 
 @Injectable()
 export class PostsService implements OnModuleInit {
   private readonly logger = new Logger(PostsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly statsService: StatsService,
+  ) {}
 
   async onModuleInit() {
     await this.fixEmptySlugs();
@@ -51,11 +56,12 @@ export class PostsService implements OnModuleInit {
     page?: number;
     limit?: number;
     tag?: string;
-    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
     order?: 'asc' | 'desc';
+    search?: string;
   }) {
     const page = options?.page || 1;
-    const limit = options?.limit || 10;
+    const limit = options?.limit || 12;
     const skip = (page - 1) * limit;
     const sortBy = options?.sortBy || 'createdAt';
     const order = options?.order || 'desc';
@@ -68,13 +74,25 @@ export class PostsService implements OnModuleInit {
       };
     }
 
+    if (options?.search) {
+      where.AND = [
+        ...((where.AND as Array<Record<string, unknown>>) || []),
+        {
+          OR: [
+            { title: { contains: options.search, mode: 'insensitive' } },
+            { content: { contains: options.search, mode: 'insensitive' } },
+          ],
+        },
+      ];
+    }
+
     const [posts, total] = await Promise.all([
       this.prisma.post.findMany({
         where,
         skip,
         take: limit,
         orderBy: { [sortBy]: order },
-        include: { tags: true },
+        include: { tags: true, series: true },
       }),
       this.prisma.post.count({ where }),
     ]);
@@ -91,14 +109,32 @@ export class PostsService implements OnModuleInit {
     return this.prisma.post.findMany({
       where: { authorId },
       orderBy: { createdAt: 'desc' },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 
   async findBySlug(slug: string) {
     const post = await this.prisma.post.findUnique({
       where: { slug },
-      include: { tags: true },
+      include: {
+        tags: true,
+        series: {
+          include: {
+            posts: {
+              where: { published: true },
+              orderBy: { seriesOrder: 'asc' },
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                excerpt: true,
+                seriesOrder: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!post) {
@@ -111,7 +147,7 @@ export class PostsService implements OnModuleInit {
   async findById(id: number) {
     const post = await this.prisma.post.findUnique({
       where: { id },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
 
     if (!post) {
@@ -122,7 +158,7 @@ export class PostsService implements OnModuleInit {
   }
 
   async create(authorId: string, createPostDto: CreatePostDto) {
-    const { tagIds, ...data } = createPostDto;
+    const { tagIds, seriesId, ...data } = createPostDto;
 
     const slug = await generateUniqueSlug(data.title, async (slug) => {
       const existing = await this.prisma.post.findUnique({ where: { slug } });
@@ -135,8 +171,9 @@ export class PostsService implements OnModuleInit {
         slug,
         authorId,
         tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
+        series: seriesId ? { connect: { id: seriesId } } : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 
@@ -147,7 +184,7 @@ export class PostsService implements OnModuleInit {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
-    const { tagIds, title, createdAt, ...data } = updatePostDto;
+    const { tagIds, title, createdAt, seriesId, ...data } = updatePostDto;
 
     let slug = post.slug;
     if (title && title !== post.title) {
@@ -168,8 +205,13 @@ export class PostsService implements OnModuleInit {
         slug,
         createdAt: createdAt ? new Date(createdAt) : undefined,
         tags: tagIds ? { set: [], connect: tagIds.map((id) => ({ id })) } : undefined,
+        series: seriesId === null
+          ? { disconnect: true }
+          : seriesId
+            ? { connect: { id: seriesId } }
+            : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, series: true },
     });
   }
 
@@ -189,6 +231,10 @@ export class PostsService implements OnModuleInit {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+
+    this.statsService.recordView(slug, post.id).catch((err) => {
+      this.logger.error(`Failed to record view stat: ${err.message}`);
+    });
 
     return this.prisma.post.update({
       where: { slug },
@@ -226,5 +272,59 @@ export class PostsService implements OnModuleInit {
     ]);
 
     return { prevPost, nextPost };
+  }
+
+  async toggleLike(slug: string, fingerprint: string) {
+    if (!fingerprint) {
+      throw new BadRequestException('Fingerprint is required');
+    }
+
+    const post = await this.prisma.post.findUnique({ where: { slug } });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const existingLike = await this.prisma.postLike.findUnique({
+      where: { postId_fingerprint: { postId: post.id, fingerprint } },
+    });
+
+    if (existingLike) {
+      const [, updatedPost] = await this.prisma.$transaction([
+        this.prisma.postLike.delete({ where: { id: existingLike.id } }),
+        this.prisma.post.update({
+          where: { id: post.id },
+          data: { likeCount: { decrement: 1 } },
+        }),
+      ]);
+      return { liked: false, likeCount: updatedPost.likeCount };
+    } else {
+      const [, updatedPost] = await this.prisma.$transaction([
+        this.prisma.postLike.create({
+          data: { postId: post.id, fingerprint },
+        }),
+        this.prisma.post.update({
+          where: { id: post.id },
+          data: { likeCount: { increment: 1 } },
+        }),
+      ]);
+      return { liked: true, likeCount: updatedPost.likeCount };
+    }
+  }
+
+  async getLikeStatus(slug: string, fingerprint: string) {
+    const post = await this.prisma.post.findUnique({ where: { slug } });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    if (!fingerprint) {
+      return { liked: false, likeCount: post.likeCount };
+    }
+
+    const existingLike = await this.prisma.postLike.findUnique({
+      where: { postId_fingerprint: { postId: post.id, fingerprint } },
+    });
+
+    return { liked: !!existingLike, likeCount: post.likeCount };
   }
 }

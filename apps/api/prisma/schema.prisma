@@ -44,26 +44,59 @@ model Portfolio {
   @@map("portfolios")
 }
 
+// Series model - for blog series (연재글)
+model Series {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  coverImage  String?  @map("cover_image")
+  posts       Post[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("series")
+}
+
 // Post model - for blog
 model Post {
-  id         Int      @id @default(autoincrement())
-  authorId   String   @map("author_id")
-  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  title      String
-  slug       String   @unique
-  content    String   // Markdown content
-  excerpt    String?
-  coverImage String?  @map("cover_image")
-  published  Boolean  @default(false)
-  viewCount  Int      @default(0) @map("view_count")
-  tags       Tag[]
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  authorId    String   @map("author_id")
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String   @unique
+  content     String   // Markdown content
+  excerpt     String?
+  coverImage  String?  @map("cover_image")
+  published   Boolean  @default(false)
+  viewCount   Int      @default(0) @map("view_count")
+  likeCount   Int      @default(0) @map("like_count")
+  seriesId    String?  @map("series_id")
+  series      Series?  @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  seriesOrder Int?     @map("series_order")
+  tags        Tag[]
+  likes       PostLike[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@index([authorId])
   @@index([slug])
   @@index([published])
+  @@index([seriesId])
   @@map("posts")
+}
+
+// PostLike model - anonymous likes with fingerprint
+model PostLike {
+  id          String   @id @default(uuid())
+  postId      Int      @map("post_id")
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  fingerprint String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, fingerprint])
+  @@index([postId])
+  @@map("post_likes")
 }
 
 // Tag model - for blog categorization
@@ -73,6 +106,43 @@ model Tag {
   posts Post[]
 
   @@map("tags")
+}
+
+// ShareLink model - for shareable resume/portfolio links
+model ShareLink {
+  id          String    @id @default(uuid())
+  slug        String    @unique
+  type        ShareType
+  label       String?
+  active      Boolean   @default(true)
+  viewCount   Int       @default(0) @map("view_count")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([type])
+  @@map("share_links")
+}
+
+// DailyStats model - for visitor statistics
+model DailyStats {
+  id        String   @id @default(uuid())
+  date      DateTime @db.Date
+  postId    Int?     @map("post_id")
+  page      String   // 'blog', 'resume', 'portfolio', or post slug
+  views     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date, page])
+  @@index([date])
+  @@index([postId])
+  @@map("daily_stats")
+}
+
+enum ShareType {
+  RESUME
+  PORTFOLIO
 }
 
 // Role enum

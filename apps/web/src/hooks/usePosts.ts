@@ -9,8 +9,9 @@ export function usePosts(
   params?: {
     tag?: string;
     page?: number;
-    sortBy?: 'createdAt' | 'viewCount' | 'title';
+    sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
     order?: 'asc' | 'desc';
+    search?: string;
   },
   initialData?: PostListResponse | null
 ) {
@@ -28,6 +29,7 @@ export function usePosts(
           tag: params?.tag,
           sortBy: params?.sortBy,
           order: params?.order,
+          search: params?.search,
         },
         { revalidate: 60 }
       );
@@ -38,7 +40,7 @@ export function usePosts(
     } finally {
       setLoading(false);
     }
-  }, [params?.page, params?.tag, params?.sortBy, params?.order]);
+  }, [params?.page, params?.tag, params?.sortBy, params?.order, params?.search]);
 
   useEffect(() => {
     if (isInitialRef.current) {

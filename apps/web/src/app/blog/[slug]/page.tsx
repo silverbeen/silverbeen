@@ -16,6 +16,8 @@ import { PostNavigation } from '@/components/post/PostNavigation';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { WritePostButton } from '@/components/post/WritePostButton';
 import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
+import { LikeButton } from '@/components/post/LikeButton';
+import { SeriesNavigation } from '@/components/post/SeriesNavigation';
 import { formatDateKorean } from '@/utils/date';
 import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
@@ -217,6 +219,10 @@ export default async function BlogPage({ params }: PageProps) {
             </div>
           )}
 
+          {blog.series && (
+            <SeriesNavigation series={blog.series} currentPostId={blog.id} />
+          )}
+
           <div className="prose prose-lg dark:prose-invert mb-12 max-w-none">
             <CodeBlockCopy />
             <MDXRemote
@@ -232,6 +238,10 @@ export default async function BlogPage({ params }: PageProps) {
                 },
               }}
             />
+          </div>
+
+          <div className="mb-8 flex justify-center">
+            <LikeButton slug={blog.slug} initialLikeCount={blog.likeCount} />
           </div>
 
           <hr className="mb-8 border-gray-200 dark:border-gray-700" />
