@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, BookOpen } from 'lucide-react';
+import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, BarChart3, BookOpen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DashboardStats } from '@/components/admin/DashboardStats';
@@ -64,6 +64,14 @@ const menuItems = [
     icon: ImageIcon,
     color: 'text-pink-500',
     bgColor: 'bg-pink-100 dark:bg-pink-900/30',
+  },
+  {
+    href: '/admin/stats',
+    title: '방문자 통계',
+    description: '일별 조회수, 인기 글, 태그별 통계를 확인합니다.',
+    icon: BarChart3,
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-100 dark:bg-teal-900/30',
   },
   {
     href: '/admin/settings',

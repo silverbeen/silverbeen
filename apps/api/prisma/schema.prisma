@@ -93,6 +93,21 @@ model Tag {
   @@map("tags")
 }
 
+// DailyStats model - for visitor statistics
+model DailyStats {
+  id        String   @id @default(uuid())
+  date      DateTime @db.Date
+  postId    Int?     @map("post_id")
+  page      String   // 'blog', 'resume', 'portfolio', or post slug
+  views     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date, page])
+  @@index([date])
+  @@index([postId])
+  @@map("daily_stats")
+}
+
 // Role enum
 enum Role {
   USER

@@ -6,6 +6,7 @@ import { portfolioApi } from './portfolio';
 import { postsApi as blogsApi } from './posts';
 import { tagsApi } from './tags';
 import { usersApi } from './users';
+import { statsApi } from './stats';
 import { seriesApi } from './series';
 
 export const api = {
@@ -14,5 +15,6 @@ export const api = {
   blogs: blogsApi,
   tags: tagsApi,
   users: usersApi,
+  stats: statsApi,
   series: seriesApi,
 };

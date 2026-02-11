@@ -8,12 +8,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { generateUniqueSlug } from '../common/utils/slug.util';
+import { StatsService } from '../stats/stats.service';
 
 @Injectable()
 export class PostsService implements OnModuleInit {
   private readonly logger = new Logger(PostsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly statsService: StatsService,
+  ) {}
 
   async onModuleInit() {
     await this.fixEmptySlugs();
@@ -213,6 +217,10 @@ export class PostsService implements OnModuleInit {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+
+    this.statsService.recordView(slug, post.id).catch((err) => {
+      this.logger.error(`Failed to record view stat: ${err.message}`);
+    });
 
     return this.prisma.post.update({
       where: { slug },

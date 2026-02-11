@@ -9,6 +9,7 @@ import { AuthModule } from './auth';
 import { PostsModule } from './posts';
 import { TagsModule } from './tags';
 import { UsersModule } from './users';
+import { StatsModule } from './stats';
 import { SeriesModule } from './series';
 
 @Module({
@@ -21,6 +22,7 @@ import { SeriesModule } from './series';
     PostsModule,
     TagsModule,
     UsersModule,
+    StatsModule,
     SeriesModule,
   ],
   controllers: [AppController],
