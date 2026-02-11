@@ -9,6 +9,7 @@ import { DraftBanner } from './DraftBanner';
 import { useTags } from '@/hooks/useTags';
 import { useMarkdownImage } from '@/hooks/useMarkdownImage';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { loadDraft as loadDraftUtil } from '@/utils/draft';
 import { useToast, ImageUpload } from '@/components/ui';
 import type { CreatePostDto, Post } from '@/types/post';
 
@@ -29,7 +30,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    initialData?.tags.map((t) => t.id) || []
+    initialData?.tags.map((t) => t.id) || [],
   );
   const [seriesId, setSeriesId] = useState<string | null>(initialData?.seriesId || null);
   const [published, setPublished] = useState(initialData?.published || false);
@@ -39,12 +40,24 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     }
     return '';
   });
-  const [draftAvailable, setDraftAvailable] = useState(false);
-  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [draftAvailable, setDraftAvailable] = useState(() => {
+    const draft = loadDraftUtil(initialData?.id);
+    return !!(draft?.savedAt);
+  });
+  const [draftSavedAt] = useState<string | null>(() => {
+    const draft = loadDraftUtil(initialData?.id);
+    return draft?.savedAt ?? null;
+  });
 
   // 임시 저장 훅
-  const { updateState, setInitialState, save: saveDraftNow, load: loadDraft, discard: discardDraft, lastSaved } =
-    useAutoSave({ postId: initialData?.id });
+  const {
+    updateState,
+    setInitialState,
+    save: saveDraftNow,
+    load: loadDraft,
+    discard: discardDraft,
+    lastSaved,
+  } = useAutoSave({ postId: initialData?.id });
 
   // 초기 상태 설정 및 드래프트 확인
   const initializedRef = useRef(false);
@@ -60,13 +73,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: initialData?.tags.map((t) => t.id) || [],
     };
     setInitialState(initial);
-
-    const draft = loadDraft();
-    if (draft && draft.savedAt) {
-      setDraftAvailable(true);
-      setDraftSavedAt(draft.savedAt);
-    }
-  }, [initialData, setInitialState, loadDraft]);
+  }, [initialData, setInitialState]);
 
   // 상태 변경 시 auto-save에 반영 (초기화 완료 후에만)
   useEffect(() => {
@@ -93,11 +100,10 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   }, [discardDraft, toast]);
 
   // 마크다운 이미지 업로드 훅
-  const { uploading, handleFileUpload, bindDropEvents, bindPasteEvents } =
-    useMarkdownImage({
-      onInsert: (markdown) => setContent((prev) => prev + markdown),
-      folder: 'posts',
-    });
+  const { uploading, handleFileUpload, bindDropEvents, bindPasteEvents } = useMarkdownImage({
+    onInsert: (markdown) => setContent((prev) => prev + markdown),
+    folder: 'posts',
+  });
 
   // 에디터에 드래그앤드롭, 붙여넣기 이벤트 바인딩
   useEffect(() => {
@@ -126,7 +132,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: selectedTagIds,
       published: shouldPublish,
       createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
-      seriesId: initialData ? (seriesId ?? null) : (seriesId || undefined),
+      seriesId: initialData ? (seriesId ?? undefined) : seriesId || undefined,
     };
 
     await onSave(data);
@@ -144,7 +150,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           제목
         </label>
         <input
@@ -152,12 +158,12 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="글 제목을 입력하세요"
-          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           발췌문 (선택)
         </label>
         <input
@@ -165,23 +171,19 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
           value={excerpt}
           onChange={(e) => setExcerpt(e.target.value)}
           placeholder="글 목록에 표시될 짧은 설명"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           커버 이미지 (선택)
         </label>
-        <ImageUpload
-          value={coverImage}
-          onChange={setCoverImage}
-          folder="covers"
-        />
+        <ImageUpload value={coverImage} onChange={setCoverImage} folder="covers" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           태그
         </label>
         <TagSelector
@@ -194,7 +196,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           시리즈 (선택)
         </label>
         <SeriesSelector selectedSeriesId={seriesId} onSeriesChange={setSeriesId} />
@@ -202,32 +204,25 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
 
       {initialData && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             작성일
           </label>
           <input
             type="datetime-local"
             value={createdAt}
             onChange={(e) => setCreatedAt(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
           />
         </div>
       )}
 
       <div data-color-mode="auto" ref={editorContainerRef}>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            내용
-          </label>
+        <div className="mb-2 flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">내용</label>
           <div className="flex items-center gap-2">
-            <MarkdownImageButton
-              onFileSelect={handleFileUpload}
-              uploading={uploading}
-            />
+            <MarkdownImageButton onFileSelect={handleFileUpload} uploading={uploading} />
             {uploading && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                업로드 중...
-              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">업로드 중...</span>
             )}
           </div>
         </div>
@@ -242,7 +237,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
         </p>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2">
             <input
@@ -251,35 +246,43 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
               onChange={(e) => setPublished(e.target.checked)}
               className="rounded border-gray-300 dark:border-gray-600"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              바로 발행하기
-            </span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">바로 발행하기</span>
           </label>
           {lastSaved && (
             <span className="text-xs text-gray-400 dark:text-gray-500">
-              자동 저장됨 {new Date(lastSaved).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+              자동 저장됨{' '}
+              {new Date(lastSaved).toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </span>
           )}
         </div>
 
         <div className="flex gap-3">
           <button
-            onClick={() => { const saved = saveDraftNow(); toast(saved ? '임시 저장되었습니다.' : '변경 사항이 없습니다.', saved ? 'info' : 'warning'); }}
-            className="px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => {
+              const saved = saveDraftNow();
+              toast(
+                saved ? '임시 저장되었습니다.' : '변경 사항이 없습니다.',
+                saved ? 'info' : 'warning',
+              );
+            }}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
           >
             로컬 저장
           </button>
           <button
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             {saving ? '저장 중...' : '임시저장'}
           </button>
           <button
             onClick={() => handleSave(true)}
             disabled={saving}
-            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors"
+            className="bg-primary-500 hover:bg-primary-600 rounded-lg px-4 py-2 text-white transition-colors disabled:opacity-50"
           >
             {saving ? '저장 중...' : '발행하기'}
           </button>

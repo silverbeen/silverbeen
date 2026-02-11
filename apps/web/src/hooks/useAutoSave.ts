@@ -53,7 +53,9 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
   }, [postId]);
 
   const saveRef = useRef(save);
-  saveRef.current = save;
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   const load = useCallback((): DraftData | null => {
     return loadDraft(postId);
