@@ -5,6 +5,7 @@ import type { Experience, Project, ProjectTask } from '@/types/resume';
 import { FormField, inputClassName, AutoTextarea } from '../FormField';
 import { StringArrayField } from '../ArrayField';
 import { SortableList } from '../SortableList';
+import { generateImageIds } from '../utils';
 import { ImageUploadModal } from '@/components/ui';
 import {
   DndContext,
@@ -492,14 +493,10 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
     onChange({ ...project, [key]: value });
   };
 
-  const imageIds = useMemo(() => {
-    const seen = new Map<string, number>();
-    return (project.images || []).map((url) => {
-      const count = seen.get(url) || 0;
-      seen.set(url, count + 1);
-      return count === 0 ? `img-${url}` : `img-${url}-dup${count}`;
-    });
-  }, [project.images]);
+  const imageIds = useMemo(
+    () => generateImageIds(project.images),
+    [project.images]
+  );
 
   // Image DnD handler
   const handleImageDragEnd = (event: DragEndEvent) => {

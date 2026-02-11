@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import type { PortfolioProject } from '@/types/portfolio';
 import { ImageUploadModal } from '@/components/ui';
 import { SortableImageItem } from '../SortableItems';
+import { generateImageIds } from '../../utils';
 import {
   DndContext,
   closestCenter,
@@ -46,14 +47,10 @@ export function ProjectImagesSection({
     })
   );
 
-  const imageIds = useMemo(() => {
-    const seen = new Map<string, number>();
-    return (project.images || []).map((url) => {
-      const count = seen.get(url) || 0;
-      seen.set(url, count + 1);
-      return count === 0 ? `img-${url}` : `img-${url}-dup${count}`;
-    });
-  }, [project.images]);
+  const imageIds = useMemo(
+    () => generateImageIds(project.images),
+    [project.images]
+  );
 
   const handleAddImage = (url: string) => {
     onChange('images', [...(project.images || []), url]);
