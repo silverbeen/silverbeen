@@ -1,13 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(ls:*)",
-      "Bash(cd:*)",
-      "Bash(git:*)",
-      "Bash(cat:*)",
-      "Read",
-      "Write(**/silverbeen*/**)",
-      "Edit(**/silverbeen*/**)"
-    ]
+    "allow": ["Bash(*)", "Skill(*)", "WebFetch(*)"],
+    "additionalDirectories": ["/Users/gang-eunbin/Desktop/dev"]
   }
 }

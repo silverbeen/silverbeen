@@ -31,6 +31,7 @@ interface BlogPageProps {
     page?: string;
     sortBy?: string;
     order?: string;
+    search?: string;
   }>;
 }
 
@@ -87,8 +88,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     ? (params.order as OrderType)
     : 'desc';
 
+  const search = params.search || '';
+
   const initialData = await api.blogs
-    .getList({ tag: tag || undefined, page, sortBy, order }, { revalidate: 60 })
+    .getList({ tag: tag || undefined, page, sortBy, order, search: search || undefined }, { revalidate: 60 })
     .catch(() => null);
 
   return (
@@ -110,6 +113,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             initialPage={page}
             initialSortBy={sortBy}
             initialOrder={order}
+            initialSearch={search}
           />
         </Suspense>
       </div>

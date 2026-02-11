@@ -58,9 +58,10 @@ export class PostsService implements OnModuleInit {
     tag?: string;
     sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
     order?: 'asc' | 'desc';
+    search?: string;
   }) {
     const page = options?.page || 1;
-    const limit = options?.limit || 10;
+    const limit = options?.limit || 12;
     const skip = (page - 1) * limit;
     const sortBy = options?.sortBy || 'createdAt';
     const order = options?.order || 'desc';
@@ -71,6 +72,18 @@ export class PostsService implements OnModuleInit {
       where.tags = {
         some: { name: options.tag },
       };
+    }
+
+    if (options?.search) {
+      where.AND = [
+        ...((where.AND as Array<Record<string, unknown>>) || []),
+        {
+          OR: [
+            { title: { contains: options.search, mode: 'insensitive' } },
+            { content: { contains: options.search, mode: 'insensitive' } },
+          ],
+        },
+      ];
     }
 
     const [posts, total] = await Promise.all([

@@ -16,6 +16,7 @@ export const postsApi = {
       tag?: string;
       sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'title';
       order?: 'asc' | 'desc';
+      search?: string;
     },
     options?: { revalidate?: number }
   ) => {
@@ -25,6 +26,7 @@ export const postsApi = {
     if (params?.tag) searchParams.set('tag', params.tag);
     if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
     if (params?.order) searchParams.set('order', params.order);
+    if (params?.search) searchParams.set('search', params.search);
 
     const query = searchParams.toString();
     return fetcher<PostListResponse>(`/posts${query ? `?${query}` : ''}`, {
