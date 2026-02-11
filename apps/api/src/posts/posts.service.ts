@@ -244,16 +244,16 @@ export class PostsService implements OnModuleInit {
     });
 
     if (existingLike) {
-      await this.prisma.$transaction([
+      const [, updatedPost] = await this.prisma.$transaction([
         this.prisma.postLike.delete({ where: { id: existingLike.id } }),
         this.prisma.post.update({
           where: { id: post.id },
           data: { likeCount: { decrement: 1 } },
         }),
       ]);
-      return { liked: false, likeCount: post.likeCount - 1 };
+      return { liked: false, likeCount: updatedPost.likeCount };
     } else {
-      await this.prisma.$transaction([
+      const [, updatedPost] = await this.prisma.$transaction([
         this.prisma.postLike.create({
           data: { postId: post.id, fingerprint },
         }),
@@ -262,7 +262,7 @@ export class PostsService implements OnModuleInit {
           data: { likeCount: { increment: 1 } },
         }),
       ]);
-      return { liked: true, likeCount: post.likeCount + 1 };
+      return { liked: true, likeCount: updatedPost.likeCount };
     }
   }
 
