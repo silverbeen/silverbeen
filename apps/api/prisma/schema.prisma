@@ -70,10 +70,12 @@ model Post {
   coverImage  String?  @map("cover_image")
   published   Boolean  @default(false)
   viewCount   Int      @default(0) @map("view_count")
+  likeCount   Int      @default(0) @map("like_count")
   seriesId    String?  @map("series_id")
   series      Series?  @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   seriesOrder Int?     @map("series_order")
   tags        Tag[]
+  likes       PostLike[]
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -82,6 +84,19 @@ model Post {
   @@index([published])
   @@index([seriesId])
   @@map("posts")
+}
+
+// PostLike model - anonymous likes with fingerprint
+model PostLike {
+  id          String   @id @default(uuid())
+  postId      Int      @map("post_id")
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  fingerprint String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([postId, fingerprint])
+  @@index([postId])
+  @@map("post_likes")
 }
 
 // Tag model - for blog categorization

@@ -37,12 +37,18 @@ export interface Post {
   coverImage?: string | null;
   published: boolean;
   viewCount: number;
+  likeCount: number;
   seriesId?: string | null;
   series?: Series | null;
   seriesOrder?: number | null;
   tags: Tag[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LikeStatusResponse {
+  liked: boolean;
+  likeCount: number;
 }
 
 export interface PostListResponse {
