@@ -98,7 +98,25 @@ export class PostsService implements OnModuleInit {
   async findBySlug(slug: string) {
     const post = await this.prisma.post.findUnique({
       where: { slug },
-      include: { tags: true, series: true },
+      include: {
+        tags: true,
+        series: {
+          include: {
+            posts: {
+              where: { published: true },
+              orderBy: { seriesOrder: 'asc' },
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                excerpt: true,
+                seriesOrder: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!post) {

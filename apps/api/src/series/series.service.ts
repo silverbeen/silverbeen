@@ -1,15 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSeriesDto, UpdateSeriesDto } from './dto';
-
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^\w\s가-힣-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-}
+import { generateUniqueSlug } from '../common/utils/slug.util';
 
 @Injectable()
 export class SeriesService {
@@ -24,7 +16,11 @@ export class SeriesService {
           orderBy: { seriesOrder: 'asc' },
           select: { id: true, title: true, slug: true, seriesOrder: true },
         },
-        _count: { select: { posts: true } },
+        _count: {
+          select: {
+            posts: { where: { published: true } },
+          },
+        },
       },
     });
   }
@@ -74,13 +70,10 @@ export class SeriesService {
   }
 
   async create(dto: CreateSeriesDto) {
-    const baseSlug = generateSlug(dto.title);
-    let slug = baseSlug;
-    let counter = 1;
-
-    while (await this.prisma.series.findUnique({ where: { slug } })) {
-      slug = `${baseSlug}-${counter++}`;
-    }
+    const slug = await generateUniqueSlug(dto.title, async (s) => {
+      const existing = await this.prisma.series.findUnique({ where: { slug: s } });
+      return !!existing;
+    });
 
     return this.prisma.series.create({
       data: { ...dto, slug },
@@ -94,15 +87,10 @@ export class SeriesService {
     const data: Record<string, unknown> = { ...dto };
 
     if (dto.title) {
-      const baseSlug = generateSlug(dto.title);
-      let slug = baseSlug;
-      let counter = 1;
-
-      while (true) {
-        const existing = await this.prisma.series.findUnique({ where: { slug } });
-        if (!existing || existing.id === id) break;
-        slug = `${baseSlug}-${counter++}`;
-      }
+      const slug = await generateUniqueSlug(dto.title, async (s) => {
+        const existing = await this.prisma.series.findUnique({ where: { slug: s } });
+        return !!existing && existing.id !== id;
+      });
 
       data.slug = slug;
     }
@@ -117,25 +105,39 @@ export class SeriesService {
   async delete(id: string) {
     await this.findById(id);
 
-    await this.prisma.post.updateMany({
-      where: { seriesId: id },
-      data: { seriesId: null, seriesOrder: null },
-    });
+    return this.prisma.$transaction(async (prisma) => {
+      await prisma.post.updateMany({
+        where: { seriesId: id },
+        data: { seriesId: null, seriesOrder: null },
+      });
 
-    return this.prisma.series.delete({ where: { id } });
+      return prisma.series.delete({ where: { id } });
+    });
   }
 
   async updatePostOrder(id: string, postIds: number[]) {
     await this.findById(id);
 
-    const updates = postIds.map((postId, index) =>
-      this.prisma.post.update({
-        where: { id: postId },
-        data: { seriesId: id, seriesOrder: index + 1 },
-      })
-    );
+    if (!postIds || postIds.length === 0) {
+      return this.findById(id);
+    }
 
-    await this.prisma.$transaction(updates);
+    const transactionOps = [
+      // 시리즈에서 제거된 포스트의 연결을 해제합니다.
+      this.prisma.post.updateMany({
+        where: { seriesId: id, NOT: { id: { in: postIds } } },
+        data: { seriesId: null, seriesOrder: null },
+      }),
+      // 시리즈에 포함된 포스트들의 순서를 업데이트합니다.
+      ...postIds.map((postId, index) =>
+        this.prisma.post.update({
+          where: { id: postId },
+          data: { seriesId: id, seriesOrder: index + 1 },
+        })
+      ),
+    ];
+
+    await this.prisma.$transaction(transactionOps);
 
     return this.findById(id);
   }

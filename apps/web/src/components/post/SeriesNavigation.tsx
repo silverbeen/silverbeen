@@ -14,6 +14,7 @@ export function SeriesNavigation({ series, currentPostId }: SeriesNavigationProp
   const [expanded, setExpanded] = useState(false);
   const posts = series.posts || [];
   const currentIndex = posts.findIndex((p) => p.id === currentPostId);
+  const displayIndex = currentIndex >= 0 ? currentIndex + 1 : '-';
 
   return (
     <div className="mb-8 overflow-hidden rounded-xl border border-primary-200 bg-primary-50/50 dark:border-primary-800 dark:bg-primary-900/20">
@@ -30,7 +31,7 @@ export function SeriesNavigation({ series, currentPostId }: SeriesNavigationProp
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {currentIndex + 1}/{posts.length}
+            {displayIndex}/{posts.length}
           </span>
           {expanded ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />

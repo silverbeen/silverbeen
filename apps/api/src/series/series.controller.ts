@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SeriesService } from './series.service';
-import { CreateSeriesDto, UpdateSeriesDto } from './dto';
+import { CreateSeriesDto, UpdateSeriesDto, UpdatePostOrderDto } from './dto';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 
@@ -50,7 +50,7 @@ export class SeriesController {
 
   @Put(':id/order')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async updatePostOrder(@Param('id') id: string, @Body('postIds') postIds: number[]) {
-    return this.seriesService.updatePostOrder(id, postIds);
+  async updatePostOrder(@Param('id') id: string, @Body() dto: UpdatePostOrderDto) {
+    return this.seriesService.updatePostOrder(id, dto.postIds);
   }
 }

@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsArray,
   IsDateString,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdatePostDto {
@@ -37,6 +38,7 @@ export class UpdatePostDto {
   createdAt?: string;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsString()
   seriesId?: string | null;
 }

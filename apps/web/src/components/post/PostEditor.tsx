@@ -72,7 +72,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: selectedTagIds,
       published: shouldPublish,
       createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
-      seriesId: seriesId || undefined,
+      seriesId: initialData ? (seriesId ?? null) : (seriesId || undefined),
     };
 
     await onSave(data);

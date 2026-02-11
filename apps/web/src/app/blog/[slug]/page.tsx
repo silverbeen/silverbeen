@@ -141,13 +141,9 @@ export default async function BlogPage({ params }: PageProps) {
 
   let blog;
   let adjacentPosts;
-  let seriesData = null;
   try {
     blog = await api.blogs.getBySlug(slug, { revalidate: 60 });
     adjacentPosts = await api.blogs.getAdjacent(blog.id, { revalidate: 60 });
-    if (blog.series?.slug) {
-      seriesData = await api.series.getBySlug(blog.series.slug, { revalidate: 60 });
-    }
   } catch {
     notFound();
   }
@@ -222,8 +218,8 @@ export default async function BlogPage({ params }: PageProps) {
             </div>
           )}
 
-          {seriesData && (
-            <SeriesNavigation series={seriesData} currentPostId={blog.id} />
+          {blog.series && (
+            <SeriesNavigation series={blog.series} currentPostId={blog.id} />
           )}
 
           <div className="prose prose-lg dark:prose-invert mb-12 max-w-none">
