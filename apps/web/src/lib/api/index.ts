@@ -7,6 +7,8 @@ import { postsApi as blogsApi } from './posts';
 import { tagsApi } from './tags';
 import { usersApi } from './users';
 import { shareApi } from './share';
+import { statsApi } from './stats';
+import { seriesApi } from './series';
 
 export const api = {
   resume: resumeApi,
@@ -15,4 +17,6 @@ export const api = {
   tags: tagsApi,
   users: usersApi,
   share: shareApi,
+  stats: statsApi,
+  series: seriesApi,
 };

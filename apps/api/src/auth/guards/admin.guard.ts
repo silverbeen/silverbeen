@@ -16,8 +16,7 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // 표준: user_metadata.role === 'admin' 확인 (대소문자 무시)
-    const isAdmin = user.user_metadata?.role?.toLowerCase() === 'admin';
+    const isAdmin = user.app_metadata?.role?.toLowerCase() === 'admin';
 
     if (!isAdmin) {
       throw new ForbiddenException('Admin access required');

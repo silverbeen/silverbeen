@@ -10,6 +10,8 @@ import { PostsModule } from './posts';
 import { TagsModule } from './tags';
 import { UsersModule } from './users';
 import { ShareModule } from './share';
+import { StatsModule } from './stats';
+import { SeriesModule } from './series';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ShareModule } from './share';
     TagsModule,
     UsersModule,
     ShareModule,
+    StatsModule,
+    SeriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

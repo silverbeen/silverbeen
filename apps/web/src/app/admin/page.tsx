@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, Share2 } from 'lucide-react';
+import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, Share2, BarChart3, BookOpen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DashboardStats } from '@/components/admin/DashboardStats';
@@ -42,6 +42,14 @@ const menuItems = [
     bgColor: 'bg-orange-100 dark:bg-orange-900/30',
   },
   {
+    href: '/admin/series',
+    title: '시리즈 관리',
+    description: '블로그 시리즈(연재글)를 생성하고 관리합니다.',
+    icon: BookOpen,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
+  },
+  {
     href: '/admin/users',
     title: '유저 관리',
     description: '가입된 사용자를 확인합니다.',
@@ -64,6 +72,14 @@ const menuItems = [
     icon: Share2,
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
+  },
+  {
+    href: '/admin/stats',
+    title: '방문자 통계',
+    description: '일별 조회수, 인기 글, 태그별 통계를 확인합니다.',
+    icon: BarChart3,
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-100 dark:bg-teal-900/30',
   },
   {
     href: '/admin/settings',
