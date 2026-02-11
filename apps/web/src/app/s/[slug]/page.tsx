@@ -8,17 +8,20 @@ interface PageProps {
 export default async function SharePage({ params }: PageProps) {
   const { slug } = await params;
 
+  let link;
   try {
-    const link = await api.share.getBySlug(slug);
+    link = await api.share.getBySlug(slug);
 
     api.share.incrementView(slug).catch(console.error);
-
-    if (link.type === 'RESUME') {
-      redirect('/resume');
-    } else {
-      redirect('/portfolio');
-    }
   } catch {
     notFound();
+  }
+
+  if (!link) notFound();
+
+  if (link.type === 'RESUME') {
+    redirect('/resume');
+  } else {
+    redirect('/portfolio');
   }
 }

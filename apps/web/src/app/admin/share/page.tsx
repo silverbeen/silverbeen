@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Plus, Trash2, Copy, ExternalLink, ToggleLeft, ToggleRight } from 'lucide-react';
 import { api } from '@/lib/api';
 import { createClient } from '@/lib/supabase/client';
-import { useToast } from '@/components/ui';
+import { useToast, useConfirm } from '@/components/ui';
 import { config } from '@/config';
 import type { ShareLink } from '@/lib/api/share';
 
@@ -16,6 +16,7 @@ export default function AdminSharePage() {
   const [type, setType] = useState<'RESUME' | 'PORTFOLIO'>('RESUME');
   const [label, setLabel] = useState('');
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const supabase = useMemo(() => createClient(), []);
 
   const getToken = useCallback(async () => {
@@ -64,7 +65,12 @@ export default function AdminSharePage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('이 공유 링크를 삭제하시겠습니까?')) return;
+    const confirmed = await confirm({
+      title: '공유 링크 삭제',
+      message: '이 공유 링크를 삭제하시겠습니까?',
+      confirmText: '삭제',
+    });
+    if (!confirmed) return;
     try {
       const token = await getToken();
       await api.share.delete(id, token);
@@ -76,8 +82,9 @@ export default function AdminSharePage() {
   };
 
   const copyLink = (slug: string) => {
-    navigator.clipboard.writeText(`${config.siteUrl}/s/${slug}`);
-    toast('링크가 복사되었습니다.', 'success');
+    navigator.clipboard.writeText(`${config.siteUrl}/s/${slug}`)
+      .then(() => toast('링크가 복사되었습니다.', 'success'))
+      .catch(() => toast('링크 복사에 실패했습니다.', 'error'));
   };
 
   return (

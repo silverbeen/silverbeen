@@ -60,6 +60,9 @@ export class ShareService {
   }
 
   async incrementView(slug: string) {
+    const link = await this.prisma.shareLink.findUnique({ where: { slug } });
+    if (!link) throw new NotFoundException('Share link not found');
+
     return this.prisma.shareLink.update({
       where: { slug },
       data: { viewCount: { increment: 1 } },
