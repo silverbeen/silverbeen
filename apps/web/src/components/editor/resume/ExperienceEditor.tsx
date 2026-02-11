@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Experience, Project, ProjectTask } from '@/types/resume';
 import { FormField, inputClassName, AutoTextarea } from '../FormField';
 import { StringArrayField } from '../ArrayField';
 import { SortableList } from '../SortableList';
+import { generateImageIds } from '../utils';
 import { ImageUploadModal } from '@/components/ui';
 import {
   DndContext,
@@ -20,7 +21,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -478,7 +479,11 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
 
   // DnD sensors for images
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -488,13 +493,18 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
     onChange({ ...project, [key]: value });
   };
 
+  const imageIds = useMemo(
+    () => generateImageIds(project.images),
+    [project.images]
+  );
+
   // Image DnD handler
   const handleImageDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const images = project.images || [];
-      const oldIndex = images.findIndex((_, i) => `image-${i}` === active.id);
-      const newIndex = images.findIndex((_, i) => `image-${i}` === over.id);
+      const oldIndex = imageIds.indexOf(active.id as string);
+      const newIndex = imageIds.indexOf(over.id as string);
       if (oldIndex !== -1 && newIndex !== -1) {
         handleChange('images', arrayMove(images, oldIndex, newIndex));
       }
@@ -682,14 +692,14 @@ function ProjectCard({ project, onChange, onRemove }: ProjectCardProps) {
                 onDragEnd={handleImageDragEnd}
               >
                 <SortableContext
-                  items={(project.images || []).map((_, i) => `image-${i}`)}
-                  strategy={verticalListSortingStrategy}
+                  items={imageIds}
+                  strategy={rectSortingStrategy}
                 >
                   <div className="flex flex-wrap gap-3">
                     {project.images.map((url, index) => (
                       <SortableImageItem
-                        key={`image-${index}`}
-                        id={`image-${index}`}
+                        key={imageIds[index]}
+                        id={imageIds[index]}
                         url={url}
                         index={index}
                         onRemove={() => handleRemoveImage(index)}

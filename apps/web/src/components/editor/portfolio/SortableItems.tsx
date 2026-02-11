@@ -195,10 +195,10 @@ export function SortableImageItem({
         alt={`Project ${index + 1}`}
         className="w-24 h-24 object-cover"
       />
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+      <div className="pointer-events-none absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
         <button
           type="button"
-          className="p-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors cursor-grab active:cursor-grabbing"
+          className="pointer-events-auto p-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors cursor-grab active:cursor-grabbing"
           {...attributes}
           {...listeners}
         >
@@ -206,8 +206,11 @@ export function SortableImageItem({
         </button>
         <button
           type="button"
-          onClick={onRemove}
-          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="pointer-events-auto p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
         >
           <Trash2 className="h-4 w-4" />
         </button>
