@@ -43,6 +43,9 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
     setLastSaved(new Date().toISOString());
   }, [postId]);
 
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
   const load = useCallback((): DraftData | null => {
     return loadDraft(postId);
   }, [postId]);
@@ -56,11 +59,11 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
   // Auto-save interval
   useEffect(() => {
     const timer = setInterval(() => {
-      save();
+      saveRef.current();
     }, interval);
 
     return () => clearInterval(timer);
-  }, [save, interval]);
+  }, [interval]);
 
   // beforeunload warning
   useEffect(() => {
