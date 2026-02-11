@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useRef } from 'react';
 import { TagSelector } from './TagSelector';
+import { SeriesSelector } from './SeriesSelector';
 import { MarkdownImageButton } from './MarkdownImageButton';
 import { useTags } from '@/hooks/useTags';
 import { useMarkdownImage } from '@/hooks/useMarkdownImage';
@@ -28,6 +29,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
     initialData?.tags.map((t) => t.id) || []
   );
+  const [seriesId, setSeriesId] = useState<string | null>(initialData?.seriesId || null);
   const [published, setPublished] = useState(initialData?.published || false);
   const [createdAt, setCreatedAt] = useState(() => {
     if (initialData?.createdAt) {
@@ -70,6 +72,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: selectedTagIds,
       published: shouldPublish,
       createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
+      seriesId: initialData ? (seriesId ?? null) : (seriesId || undefined),
     };
 
     await onSave(data);
@@ -125,6 +128,13 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
           onCreateTag={(name) => createTag({ name })}
           loading={tagsLoading}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          시리즈 (선택)
+        </label>
+        <SeriesSelector selectedSeriesId={seriesId} onSeriesChange={setSeriesId} />
       </div>
 
       {initialData && (

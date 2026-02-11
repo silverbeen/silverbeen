@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon } from 'lucide-react';
+import { FileText, Briefcase, Tags, Settings, PenSquare, ExternalLink, Users, ImageIcon, BookOpen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DashboardStats } from '@/components/admin/DashboardStats';
@@ -40,6 +40,14 @@ const menuItems = [
     icon: Tags,
     color: 'text-orange-500',
     bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+  },
+  {
+    href: '/admin/series',
+    title: '시리즈 관리',
+    description: '블로그 시리즈(연재글)를 생성하고 관리합니다.',
+    icon: BookOpen,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
   },
   {
     href: '/admin/users',
