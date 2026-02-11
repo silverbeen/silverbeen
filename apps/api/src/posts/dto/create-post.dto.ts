@@ -31,4 +31,8 @@ export class CreatePostDto {
   @IsArray()
   @IsString({ each: true })
   tagIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  seriesId?: string;
 }
