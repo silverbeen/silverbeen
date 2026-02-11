@@ -16,6 +16,7 @@ import { PostNavigation } from '@/components/post/PostNavigation';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
 import { WritePostButton } from '@/components/post/WritePostButton';
 import { CodeBlockCopy } from '@/components/post/CodeBlockCopy';
+import { SeriesNavigation } from '@/components/post/SeriesNavigation';
 import { formatDateKorean } from '@/utils/date';
 import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
@@ -215,6 +216,10 @@ export default async function BlogPage({ params }: PageProps) {
             <div className="relative mb-8 aspect-video overflow-hidden rounded-xl">
               <img src={blog.coverImage} alt={blog.title} className="h-full w-full object-cover" />
             </div>
+          )}
+
+          {blog.series && (
+            <SeriesNavigation series={blog.series} currentPostId={blog.id} />
           )}
 
           <div className="prose prose-lg dark:prose-invert mb-12 max-w-none">
