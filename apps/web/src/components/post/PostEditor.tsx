@@ -45,7 +45,11 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
     useAutoSave({ postId: initialData?.id });
 
   // 초기 상태 설정 및 드래프트 확인
+  const initializedRef = useRef(false);
   useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
     const initial = {
       title: initialData?.title || '',
       content: initialData?.content || '',
@@ -60,8 +64,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       setDraftAvailable(true);
       setDraftSavedAt(draft.savedAt);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialData, setInitialState, loadDraft]);
 
   // 상태 변경 시 auto-save에 반영
   useEffect(() => {

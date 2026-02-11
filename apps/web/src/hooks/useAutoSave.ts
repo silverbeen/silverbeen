@@ -25,7 +25,9 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
 
   const updateState = useCallback((state: AutoSaveState) => {
     stateRef.current = state;
-    isDirtyRef.current = JSON.stringify(state) !== initialStateRef.current;
+    // 매 키 입력마다 JSON.stringify 비교하지 않고 dirty 플래그만 설정
+    // 실제 비교는 save 시점에 수행
+    isDirtyRef.current = true;
   }, []);
 
   const setInitialState = useCallback((state: AutoSaveState) => {
@@ -36,6 +38,11 @@ export function useAutoSave({ postId, interval = 30000 }: UseAutoSaveOptions = {
 
   const save = useCallback(() => {
     if (!isDirtyRef.current) return;
+    // save 시점에 실제 변경 여부 확인
+    if (JSON.stringify(stateRef.current) === initialStateRef.current) {
+      isDirtyRef.current = false;
+      return;
+    }
     const { title, content } = stateRef.current;
     if (!title.trim() && !content.trim()) return;
 
