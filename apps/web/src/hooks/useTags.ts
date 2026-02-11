@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '@/lib/api';
 import type { Tag, CreateTagDto, UpdateTagDto } from '@/types/post';
 import { createClient } from '@/lib/supabase/client';
@@ -9,7 +9,7 @@ export function useTags() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchTags = useCallback(async () => {
     try {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { TagFilter } from './TagFilter';
 import { SearchInput } from './SearchInput';
@@ -34,50 +34,72 @@ export function PostPageContent({
   const [order, setOrder] = useState<OrderType>(initialOrder);
   const [search, setSearch] = useState(initialSearch);
 
+  const stateRef = useRef({ tag, page, sortBy, order, search });
+  stateRef.current = { tag, page, sortBy, order, search };
+
   const handleDataLoaded = useCallback((data: PostListResponse | null) => {
     setPostsData(data);
   }, []);
 
-  const updateParams = (
-    newTag: string | null,
-    newPage: number,
-    newSortBy: SortByType,
-    newOrder: OrderType,
-    newSearch?: string,
-  ) => {
-    setTag(newTag);
-    setPage(newPage);
-    setSortBy(newSortBy);
-    setOrder(newOrder);
-    if (newSearch !== undefined) setSearch(newSearch);
+  const updateParams = useCallback(
+    (
+      newTag: string | null,
+      newPage: number,
+      newSortBy: SortByType,
+      newOrder: OrderType,
+      newSearch?: string,
+    ) => {
+      setTag(newTag);
+      setPage(newPage);
+      setSortBy(newSortBy);
+      setOrder(newOrder);
+      if (newSearch !== undefined) setSearch(newSearch);
 
-    const params = new URLSearchParams();
-    if (newTag) params.set('tag', newTag);
-    if (newPage > 1) params.set('page', newPage.toString());
-    if (newSortBy !== 'createdAt') params.set('sortBy', newSortBy);
-    if (newOrder !== 'desc') params.set('order', newOrder);
-    const searchValue = newSearch !== undefined ? newSearch : search;
-    if (searchValue) params.set('search', searchValue);
+      const params = new URLSearchParams();
+      if (newTag) params.set('tag', newTag);
+      if (newPage > 1) params.set('page', newPage.toString());
+      if (newSortBy !== 'createdAt') params.set('sortBy', newSortBy);
+      if (newOrder !== 'desc') params.set('order', newOrder);
+      const searchValue = newSearch !== undefined ? newSearch : stateRef.current.search;
+      if (searchValue) params.set('search', searchValue);
 
-    const queryString = params.toString();
-    router.push(queryString ? `/blog?${queryString}` : '/blog', { scroll: false });
-  };
+      const queryString = params.toString();
+      router.replace(queryString ? `/blog?${queryString}` : '/blog', { scroll: false });
+    },
+    [router],
+  );
 
-  const handleTagChange = (newTag: string | null) => {
-    updateParams(newTag, 1, sortBy, order);
-  };
+  const handleTagChange = useCallback(
+    (newTag: string | null) => {
+      const { sortBy, order } = stateRef.current;
+      updateParams(newTag, 1, sortBy, order);
+    },
+    [updateParams],
+  );
 
-  const handlePageChange = (newPage: number) => {
-    updateParams(tag, newPage, sortBy, order);
-  };
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      const { tag, sortBy, order } = stateRef.current;
+      updateParams(tag, newPage, sortBy, order);
+    },
+    [updateParams],
+  );
 
-  const handleSortChange = (newSortBy: SortByType, newOrder: OrderType) => {
-    updateParams(tag, 1, newSortBy, newOrder);
-  };
+  const handleSortChange = useCallback(
+    (newSortBy: SortByType, newOrder: OrderType) => {
+      const { tag } = stateRef.current;
+      updateParams(tag, 1, newSortBy, newOrder);
+    },
+    [updateParams],
+  );
 
-  const handleSearchChange = (newSearch: string) => {
-    updateParams(tag, 1, sortBy, order, newSearch);
-  };
+  const handleSearchChange = useCallback(
+    (newSearch: string) => {
+      const { tag, sortBy, order } = stateRef.current;
+      updateParams(tag, 1, sortBy, order, newSearch);
+    },
+    [updateParams],
+  );
 
   return (
     <>

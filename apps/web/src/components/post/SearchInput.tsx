@@ -17,6 +17,12 @@ export function SearchInput({ value, onChange, placeholder = '검색어를 입�
     setInputValue(value);
   }, [value]);
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   const handleChange = (newValue: string) => {
     setInputValue(newValue);
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -26,6 +32,7 @@ export function SearchInput({ value, onChange, placeholder = '검색어를 입�
   };
 
   const handleClear = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     setInputValue('');
     onChange('');
   };

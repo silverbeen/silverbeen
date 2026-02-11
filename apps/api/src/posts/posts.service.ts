@@ -56,7 +56,7 @@ export class PostsService implements OnModuleInit {
     search?: string;
   }) {
     const page = options?.page || 1;
-    const limit = options?.limit || 10;
+    const limit = options?.limit || 12;
     const skip = (page - 1) * limit;
     const sortBy = options?.sortBy || 'createdAt';
     const order = options?.order || 'desc';
