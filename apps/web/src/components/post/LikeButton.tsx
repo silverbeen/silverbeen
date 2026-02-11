@@ -24,7 +24,9 @@ export function LikeButton({ slug, initialLikeCount }: LikeButtonProps) {
         setLiked(res.liked);
         setLikeCount(res.likeCount);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error('Failed to fetch like status:', err);
+      });
   }, [slug]);
 
   const handleToggleLike = async () => {
@@ -33,13 +35,20 @@ export function LikeButton({ slug, initialLikeCount }: LikeButtonProps) {
     const fingerprint = getFingerprint();
     if (!fingerprint) return;
 
+    const prevLiked = liked;
+    const prevCount = likeCount;
+
+    setLiked(!liked);
+    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
     setLoading(true);
+
     try {
       const res = await api.blogs.toggleLike(slug, fingerprint);
       setLiked(res.liked);
       setLikeCount(res.likeCount);
     } catch {
-      // ignore
+      setLiked(prevLiked);
+      setLikeCount(prevCount);
     } finally {
       setLoading(false);
     }
