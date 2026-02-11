@@ -6,6 +6,7 @@ import {
   OnModuleInit,
   Logger,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { generateUniqueSlug } from '../common/utils/slug.util';
@@ -165,14 +166,20 @@ export class PostsService implements OnModuleInit {
       return !!existing;
     });
 
+    const createData: Prisma.PostUncheckedCreateInput = {
+      title: data.title,
+      content: data.content,
+      excerpt: data.excerpt,
+      coverImage: data.coverImage,
+      published: data.published,
+      slug,
+      authorId,
+      seriesId: seriesId || null,
+      tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
+    };
+
     return this.prisma.post.create({
-      data: {
-        ...data,
-        slug,
-        authorId,
-        tags: tagIds?.length ? { connect: tagIds.map((id) => ({ id })) } : undefined,
-        series: seriesId ? { connect: { id: seriesId } } : undefined,
-      },
+      data: createData,
       include: { tags: true, series: true },
     });
   }
