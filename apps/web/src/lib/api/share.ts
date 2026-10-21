@@ -1,43 +1,32 @@
+import type { ShareLink, CreateShareLinkDto } from '@silverbeen/types';
 import { fetcher } from './client';
 
-export interface ShareLink {
-  id: string;
-  slug: string;
-  type: 'RESUME' | 'PORTFOLIO';
-  label?: string | null;
-  active: boolean;
-  viewCount: number;
-  expiresAt?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export const shareApi = {
-  getList: (token: string) =>
+  getList: () =>
     fetcher<ShareLink[]>('/share', {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
   getBySlug: (slug: string) =>
     fetcher<ShareLink>(`/share/${slug}`),
 
-  create: (data: { type: 'RESUME' | 'PORTFOLIO'; label?: string; expiresAt?: string }, token: string) =>
+  create: (data: CreateShareLinkDto) =>
     fetcher<ShareLink>('/share', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  toggleActive: (id: string, token: string) =>
+  toggleActive: (id: string) =>
     fetcher<ShareLink>(`/share/${id}/toggle`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  delete: (id: string, token: string) =>
+  delete: (id: string) =>
     fetcher<void>(`/share/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
   incrementView: (slug: string) =>

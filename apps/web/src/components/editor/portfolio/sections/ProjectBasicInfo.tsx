@@ -1,7 +1,8 @@
 'use client';
 
-import type { PortfolioProject, ProjectCategory } from '@/types/portfolio';
+import type { PortfolioProject, ProjectCategory } from '@silverbeen/types';
 import { FormField, inputClassName, AutoTextarea } from '@/components/editor/FormField';
+import { PROJECT_CATEGORIES, PROJECT_CATEGORY_LABELS } from '@/constants/portfolio';
 import { Calendar, FolderOpen, UserCircle } from 'lucide-react';
 
 interface ProjectBasicInfoProps {
@@ -12,11 +13,10 @@ interface ProjectBasicInfoProps {
   ) => void;
 }
 
-const categoryOptions: { value: ProjectCategory; label: string }[] = [
-  { value: 'personal', label: '개인 프로젝트' },
-  { value: 'team', label: '팀 프로젝트' },
-  { value: 'club', label: '동아리 프로젝트' },
-];
+const categoryOptions = PROJECT_CATEGORIES.map((value) => ({
+  value,
+  label: PROJECT_CATEGORY_LABELS[value].label,
+}));
 
 export function ProjectBasicInfo({ project, onChange }: ProjectBasicInfoProps) {
   return (

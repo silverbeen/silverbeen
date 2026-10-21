@@ -1,46 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { api } from '@/lib/api';
-import { createClient } from '@/lib/supabase/client';
-import { formatShortDate } from '@/lib/utils';
-import type { Post } from '@/types/post';
+import { useAdminResource } from '@/hooks/useAdminResource';
+import { formatShortDate } from '@/utils/date';
+import type { Post } from '@silverbeen/types';
+
+const RECENT_POSTS_LIMIT = 5;
+
+async function loadRecentPosts(): Promise<Post[]> {
+  const posts = await api.blogs.getAdminList();
+  return posts.slice(0, RECENT_POSTS_LIMIT);
+}
 
 export function RecentPosts() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (session?.access_token) {
-          const allPosts = await api.blogs.getAdminList(session.access_token);
-          setPosts(allPosts.slice(0, 5));
-        } else {
-          const data = await api.blogs.getList({ page: 1, limit: 5 });
-          setPosts(data.posts);
-        }
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPosts();
-  }, []);
+  const { data: posts, loading, error, reload } = useAdminResource(loadRecentPosts, []);
 
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4" />
         <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
+          {[...Array(RECENT_POSTS_LIMIT)].map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
             </div>
@@ -64,7 +46,14 @@ export function RecentPosts() {
         </Link>
       </div>
 
-      {posts.length === 0 ? (
+      {error ? (
+        <div role="alert" className="text-sm text-red-600 dark:text-red-400">
+          게시글을 불러오지 못했습니다.{' '}
+          <button type="button" onClick={reload} className="font-medium underline">
+            다시 시도
+          </button>
+        </div>
+      ) : posts.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm">
           아직 작성된 글이 없습니다.
         </p>

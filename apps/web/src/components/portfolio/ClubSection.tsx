@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Users, Calendar, Github } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import { containerVariants, itemVariants } from './constants';
-import type { Club } from '@/types/portfolio';
+import type { Club } from '@silverbeen/types';
 
 interface ClubSectionProps {
   clubs: Club[];

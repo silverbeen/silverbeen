@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import type { Tag } from '@/types/post';
+import { ApiError } from '@/lib/api';
+import type { Tag } from '@silverbeen/types';
 
 interface TagSelectorProps {
   tags: Tag[];
@@ -21,6 +22,7 @@ export function TagSelector({
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const selectedTagIdsRef = useRef(selectedTagIds);
 
   useEffect(() => {
@@ -39,12 +41,17 @@ export function TagSelector({
     if (!newTagName.trim()) return;
 
     setCreating(true);
+    setCreateError(null);
     try {
       const newTag = await onCreateTag(newTagName.trim());
       onTagsChange([...selectedTagIdsRef.current, newTag.id]);
       setNewTagName('');
-    } catch {
-      alert('태그 생성에 실패했습니다.');
+    } catch (err) {
+      setCreateError(
+        err instanceof ApiError && err.status === 409
+          ? '이미 존재하는 태그입니다.'
+          : '태그 생성에 실패했습니다.'
+      );
     } finally {
       setCreating(false);
     }
@@ -109,8 +116,13 @@ export function TagSelector({
                 <input
                   type="text"
                   value={newTagName}
-                  onChange={(e) => setNewTagName(e.target.value)}
+                  onChange={(e) => {
+                    setNewTagName(e.target.value);
+                    setCreateError(null);
+                  }}
                   placeholder="새 태그 이름"
+                  aria-invalid={createError ? true : undefined}
+                  aria-describedby={createError ? 'tag-create-error' : undefined}
                   className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   onClick={(e) => e.stopPropagation()}
                   onKeyDown={(e) => {
@@ -132,6 +144,11 @@ export function TagSelector({
                   {creating ? '...' : '추가'}
                 </button>
               </div>
+              {createError && (
+                <p id="tag-create-error" role="alert" className="mt-1 text-xs text-red-500 dark:text-red-400">
+                  {createError}
+                </p>
+              )}
             </div>
             <div className="p-2">
               {tags.length === 0 ? (

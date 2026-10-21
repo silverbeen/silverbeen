@@ -1,5 +1,6 @@
 import { Briefcase, Users, FolderGit2 } from 'lucide-react';
-import type { ProjectCategory } from '@/types/portfolio';
+import type { ProjectCategory } from '@silverbeen/types';
+import { PROJECT_CATEGORY_LABELS } from '@/constants/portfolio';
 
 export const categoryConfig: Record<
   ProjectCategory,
@@ -13,24 +14,21 @@ export const categoryConfig: Record<
   }
 > = {
   personal: {
-    label: '개인 프로젝트',
-    shortLabel: '개인',
+    ...PROJECT_CATEGORY_LABELS.personal,
     icon: Briefcase,
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     gradient: 'from-blue-500/5 via-transparent to-transparent',
     accent: 'border border-blue-500/20 bg-blue-500/5 text-blue-600 dark:text-blue-400',
   },
   team: {
-    label: '팀 프로젝트',
-    shortLabel: '팀',
+    ...PROJECT_CATEGORY_LABELS.team,
     icon: Users,
     color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
     gradient: 'from-emerald-500/5 via-transparent to-transparent',
     accent: 'border border-emerald-500/20 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400',
   },
   club: {
-    label: '동아리 프로젝트',
-    shortLabel: '동아리',
+    ...PROJECT_CATEGORY_LABELS.club,
     icon: FolderGit2,
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
     gradient: 'from-violet-500/5 via-transparent to-transparent',

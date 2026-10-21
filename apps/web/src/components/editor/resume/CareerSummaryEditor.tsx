@@ -1,9 +1,9 @@
 'use client';
 
-import type { CareerSummary } from '@/types/resume';
+import type { CareerSummary } from '@silverbeen/types';
 import { FormField, inputClassName } from '../FormField';
-import { SortableList } from '../SortableList';
-import { Plus, Trash2, Briefcase, Calendar, User, FileText } from 'lucide-react';
+import { ListEditor } from '../ListEditor';
+import { Trash2, Briefcase, Calendar, User, FileText } from 'lucide-react';
 
 interface CareerSummaryEditorProps {
   data: CareerSummary[];
@@ -11,78 +11,22 @@ interface CareerSummaryEditorProps {
 }
 
 export function CareerSummaryEditor({ data, onChange }: CareerSummaryEditorProps) {
-  const handleAdd = () => {
-    const newCareer: CareerSummary = {
-      company: '',
-      position: '',
-      startDate: '',
-    };
-    onChange([...data, newCareer]);
-  };
-
-  const handleRemove = (index: number) => {
-    onChange(data.filter((_, i) => i !== index));
-  };
-
-  const handleUpdate = (index: number, updated: CareerSummary) => {
-    onChange(data.map((item, i) => (i === index ? updated : item)));
-  };
-
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-primary-500" />
-            경력
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            회사명, 직책, 근무 기간을 입력해주세요
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleAdd}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30"
-        >
-          <Plus className="h-4 w-4" />
-          경력 추가
-        </button>
-      </div>
-
-      {data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
-          <Briefcase className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">
-            경력을 추가해주세요
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-            회사명, 직책, 근무 기간 정보를 입력할 수 있습니다
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-medium">{data.length}개의 경력</span>
-            <span>•</span>
-            <span>드래그하여 순서 변경</span>
-          </div>
-          <SortableList
-            items={data}
-            getKey={(_, index) => `career-${index}`}
-            onReorder={onChange}
-            renderItem={(career, index) => (
-              <CareerCard
-                career={career}
-                onChange={(updated) => handleUpdate(index, updated)}
-                onRemove={() => handleRemove(index)}
-              />
-            )}
-          />
-        </div>
+    <ListEditor
+      items={data}
+      onChange={onChange}
+      createItem={(): CareerSummary => ({ company: '', position: '', startDate: '' })}
+      title="경력"
+      description="회사명, 직책, 근무 기간을 입력해주세요"
+      icon={Briefcase}
+      addLabel="경력 추가"
+      itemUnit="경력"
+      emptyTitle="경력을 추가해주세요"
+      emptyDescription="회사명, 직책, 근무 기간 정보를 입력할 수 있습니다"
+      renderItem={(career, { update, remove }) => (
+        <CareerCard career={career} onChange={update} onRemove={remove} />
       )}
-    </div>
+    />
   );
 }
 

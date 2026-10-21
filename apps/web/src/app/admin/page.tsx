@@ -93,11 +93,6 @@ const menuItems = [
 
 export default async function AdminPage() {
   const supabase = await createClient();
-
-  if (!supabase) {
-    redirect('/admin/login');
-  }
-
   const {
     data: { user },
   } = await supabase.auth.getUser();

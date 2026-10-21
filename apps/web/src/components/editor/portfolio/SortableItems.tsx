@@ -1,6 +1,6 @@
 'use client';
 
-import type { GrowthExperience } from '@/types/portfolio';
+import type { GrowthExperience } from '@silverbeen/types';
 import { inputClassName, AutoTextarea } from '../FormField';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -29,6 +29,7 @@ export function SortableGrowthItem({
     isDragging,
   } = useSortable({ id });
 
+  // dnd-kit 동적 transform/transition은 인라인 스타일 허용
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -100,6 +101,7 @@ export function SortableLinkItem({
     isDragging,
   } = useSortable({ id });
 
+  // dnd-kit 동적 transform/transition은 인라인 스타일 허용
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -150,71 +152,6 @@ export function SortableLinkItem({
       >
         <Trash2 className="h-4 w-4" />
       </button>
-    </div>
-  );
-}
-
-// Sortable Image Item 컴포넌트
-interface SortableImageItemProps {
-  id: string;
-  url: string;
-  index: number;
-  onRemove: () => void;
-}
-
-export function SortableImageItem({
-  id,
-  url,
-  index,
-  onRemove,
-}: SortableImageItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative group rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-600 ${
-        isDragging ? 'opacity-50 shadow-lg z-50' : ''
-      }`}
-    >
-      <img
-        src={url}
-        alt={`Project ${index + 1}`}
-        className="w-24 h-24 object-cover"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-        <button
-          type="button"
-          className="pointer-events-auto p-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors cursor-grab active:cursor-grabbing"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="pointer-events-auto p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 }

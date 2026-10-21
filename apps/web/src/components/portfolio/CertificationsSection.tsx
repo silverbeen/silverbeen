@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Award } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import { containerVariants } from './constants';
-import type { Certification } from '@/types/portfolio';
+import type { Certification } from '@silverbeen/types';
 
 interface CertificationsSectionProps {
   certifications: Certification[];

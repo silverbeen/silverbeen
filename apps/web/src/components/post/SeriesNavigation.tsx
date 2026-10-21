@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
-import type { Series, SeriesPost } from '@/types/post';
+import type { Series, SeriesPost } from '@silverbeen/types';
 
 interface SeriesNavigationProps {
   series: Series;

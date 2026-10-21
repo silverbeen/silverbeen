@@ -1,7 +1,7 @@
 'use client';
 
-import type { PortfolioProject } from '@/types/portfolio';
-import { StringArrayField } from '@/components/editor/ArrayField';
+import type { PortfolioProject } from '@silverbeen/types';
+import { StringArrayField } from '@/components/editor/StringArrayField';
 
 interface ProjectTechAndTasksProps {
   project: PortfolioProject;

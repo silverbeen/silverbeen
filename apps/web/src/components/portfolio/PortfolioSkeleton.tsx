@@ -1,5 +1,3 @@
-'use client';
-
 export function PortfolioSkeleton() {
   return (
     <div className="min-h-screen bg-background">

@@ -2,7 +2,7 @@
 
 import { Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
-import type { CareerSummary } from "@/types/resume";
+import type { CareerSummary } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
 import { calculateDuration, calculateTotalExperience, formatPeriod } from "@/utils/date";
 

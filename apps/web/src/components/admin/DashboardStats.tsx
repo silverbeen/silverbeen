@@ -1,57 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { FileText, Tag, Eye, CheckCircle, Clock } from 'lucide-react';
 import { api } from '@/lib/api';
-import { createClient } from '@/lib/supabase/client';
-import type { Post, Tag as TagType } from '@/types/post';
+import { useAdminResource } from '@/hooks/useAdminResource';
+import type { StatsOverview } from '@silverbeen/types';
 
-interface Stats {
-  totalPosts: number;
-  publishedPosts: number;
-  draftPosts: number;
+interface DashboardStatsData {
+  overview: StatsOverview;
   totalTags: number;
-  totalViews: number;
+}
+
+async function loadDashboardStats(): Promise<DashboardStatsData | null> {
+  const [overview, tags] = await Promise.all([api.stats.getOverview(), api.tags.getList()]);
+  return { overview, totalTags: tags.length };
 }
 
 export function DashboardStats() {
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!session?.access_token) {
-          setLoading(false);
-          return;
-        }
-
-        const [posts, tagsData] = await Promise.all([
-          api.blogs.getAdminList(session.access_token),
-          api.tags.getList(),
-        ]);
-
-        const tags = tagsData as TagType[];
-
-        setStats({
-          totalPosts: posts.length,
-          publishedPosts: posts.filter((p: Post) => p.published).length,
-          draftPosts: posts.filter((p: Post) => !p.published).length,
-          totalTags: tags.length,
-          totalViews: posts.reduce((sum: number, p: Post) => sum + p.viewCount, 0),
-        });
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchStats();
-  }, []);
+  const { data: stats, loading, error, reload } = useAdminResource(loadDashboardStats, null);
 
   if (loading) {
     return (
@@ -69,40 +34,51 @@ export function DashboardStats() {
     );
   }
 
-  if (!stats) return null;
+  if (error || !stats) {
+    return (
+      <div role="alert" className="mb-8 flex items-center justify-between rounded-xl bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+        <span>통계를 불러오지 못했습니다{error ? `: ${error.message}` : '.'}</span>
+        <button type="button" onClick={reload} className="font-medium underline">
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  const { overview, totalTags } = stats;
 
   const statItems = [
     {
       label: '전체 게시글',
-      value: stats.totalPosts,
+      value: overview.totalPosts,
       icon: FileText,
       color: 'text-blue-500',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30',
     },
     {
       label: '발행됨',
-      value: stats.publishedPosts,
+      value: overview.publishedPosts,
       icon: CheckCircle,
       color: 'text-green-500',
       bgColor: 'bg-green-100 dark:bg-green-900/30',
     },
     {
       label: '임시저장',
-      value: stats.draftPosts,
+      value: overview.draftPosts,
       icon: Clock,
       color: 'text-yellow-500',
       bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
     },
     {
       label: '태그',
-      value: stats.totalTags,
+      value: totalTags,
       icon: Tag,
       color: 'text-purple-500',
       bgColor: 'bg-purple-100 dark:bg-purple-900/30',
     },
     {
       label: '총 조회수',
-      value: stats.totalViews.toLocaleString(),
+      value: overview.totalViews.toLocaleString(),
       icon: Eye,
       color: 'text-primary-500',
       bgColor: 'bg-primary-100 dark:bg-primary-900/30',

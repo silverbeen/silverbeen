@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo, type ReactNode } from 'react';
+import { useState, useCallback, useRef, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useToast } from '@/components/ui';
-import { createClient } from '@/lib/supabase/client';
 import type { OnMount } from '@monaco-editor/react';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
@@ -17,41 +15,15 @@ const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
   ),
 });
 
-// Next.js Image wrapper for preview components
-export const NextImage = ({
-  src,
-  alt,
-  fill,
-  className,
-  priority,
-}: {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-  priority?: boolean;
-}) => (
-  <Image
-    src={src}
-    alt={alt}
-    fill={fill}
-    className={className}
-    priority={priority}
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
-);
-
 interface JsonEditorPageProps<T> {
   /** 페이지 제목 */
   pageTitle: string;
-  /** 데이터 불러오기 에러 메시지 */
-  fetchErrorMessage: string;
   /** 저장 성공 메시지 */
   saveSuccessMessage: string;
-  /** 데이터 fetch 함수 */
-  fetchData: () => Promise<T>;
-  /** 데이터 저장 함수 */
-  saveData: (data: T, token: string) => Promise<T>;
+  /** 편집 시작 데이터 (폼 모드에서 편집 중이던 데이터 포함). 마운트 시 한 번만 읽음 */
+  initialData: T;
+  /** 데이터 저장 함수 (인증은 lib/api에서 처리) */
+  saveData: (data: T) => Promise<unknown>;
   /** 미리보기 렌더링 함수 */
   renderPreview: (data: T) => ReactNode;
   /** 폼 모드로 전환 콜백 (있을 경우 토글 버튼 표시) - 현재 편집 데이터 전달 */
@@ -60,22 +32,20 @@ interface JsonEditorPageProps<T> {
 
 export function JsonEditorPage<T>({
   pageTitle,
-  fetchErrorMessage,
   saveSuccessMessage,
-  fetchData,
+  initialData,
   saveData,
   renderPreview,
   onModeChange,
 }: JsonEditorPageProps<T>) {
-  const [data, setData] = useState<T | null>(null);
-  const [initialJsonString, setInitialJsonString] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<T>(initialData);
+  // 에디터 초기값 (커서 위치 유지를 위해 이후에는 갱신하지 않음)
+  const [initialJsonString] = useState(() => JSON.stringify(initialData, null, 2));
   const [isSaving, setIsSaving] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const { toast } = useToast();
-  const supabase = useMemo(() => createClient(), []);
 
   // Monaco Editor 인스턴스 ref
   type EditorInstance = Parameters<OnMount>[0];
@@ -84,23 +54,6 @@ export function JsonEditorPage<T>({
   const handleEditorMount: OnMount = useCallback((editor) => {
     editorRef.current = editor;
   }, []);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const result = await fetchData();
-        setData(result);
-        setInitialJsonString(JSON.stringify(result, null, 2));
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        toast(fetchErrorMessage, 'error');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [fetchData, fetchErrorMessage, toast]);
 
   // 에디터 값 변경 시 data만 업데이트 (커서 위치 유지를 위해 jsonString 상태는 업데이트하지 않음)
   const handleEditorChange = useCallback((value: string | undefined) => {
@@ -123,22 +76,13 @@ export function JsonEditorPage<T>({
       return;
     }
 
-    if (!data) return;
-
     setIsSaving(true);
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      await saveData(data, session.access_token);
+      await saveData(data);
       toast(saveSuccessMessage, 'success');
     } catch (error) {
       console.error('Failed to save data:', error);
-      toast('저장에 실패했습니다.', 'error');
+      toast(error instanceof Error ? error.message : '저장에 실패했습니다.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -156,14 +100,6 @@ export function JsonEditorPage<T>({
       toast('JSON 형식이 올바르지 않습니다.', 'error');
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-500">로딩 중...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -183,7 +119,7 @@ export function JsonEditorPage<T>({
           </div>
           <div className="flex items-center gap-3">
             {/* 폼 모드 전환 버튼 */}
-            {onModeChange && data && !hasError && (
+            {onModeChange && !hasError && (
               <button
                 onClick={() => onModeChange(data)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -298,7 +234,7 @@ export function JsonEditorPage<T>({
               </span>
             </div>
             <div className="flex-1 overflow-auto">
-              {data && !hasError ? (
+              {!hasError ? (
                 <div className="p-6">
                   <div className="max-w-3xl mx-auto flex flex-col gap-8">
                     {renderPreview(data)}
@@ -306,9 +242,7 @@ export function JsonEditorPage<T>({
                 </div>
               ) : (
                 <div className="h-full flex items-center justify-center text-gray-500">
-                  {hasError
-                    ? 'JSON 오류를 수정하면 미리보기가 표시됩니다.'
-                    : '데이터가 없습니다.'}
+                  JSON 오류를 수정하면 미리보기가 표시됩니다.
                 </div>
               )}
             </div>

@@ -1,32 +1,21 @@
-'use client';
-
-import {
-  ProfileSection,
-  ClubSection,
-  ProjectSection,
-  AwardsSection,
-  CertificationsSection,
-  ActivitiesSection,
-  SkillsSection,
-  EducationSection,
-} from '@/components/portfolio';
-import type { PortfolioData } from '@/types/portfolio';
+import { ProfileSection } from './ProfileSection';
+import { ClubSection } from './ClubSection';
+import { ProjectSection } from './ProjectSection';
+import { AwardsSection } from './AwardsSection';
+import { CertificationsSection } from './CertificationsSection';
+import { ActivitiesSection } from './ActivitiesSection';
+import { SkillsSection } from './SkillsSection';
+import { EducationSection } from './EducationSection';
+import type { PortfolioData } from '@silverbeen/types';
 
 interface PortfolioSectionsProps {
   data: PortfolioData;
-  ImageComponent: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-    priority?: boolean;
-  }>;
 }
 
-export function PortfolioSections({ data, ImageComponent }: PortfolioSectionsProps) {
+export function PortfolioSections({ data }: PortfolioSectionsProps) {
   return (
     <>
-      <ProfileSection profile={data.profile} ImageComponent={ImageComponent} />
+      <ProfileSection profile={data.profile} />
 
       {data.skills && (
         <>

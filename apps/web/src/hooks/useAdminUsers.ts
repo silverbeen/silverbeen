@@ -1,99 +1,41 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { api } from '@/lib/api';
-import { createClient } from '@/lib/supabase/client';
-import type { User } from '@/types/user';
+import type { User } from '@silverbeen/types';
+import { useAdminResource } from './useAdminResource';
+import { useAuthUser } from './useAuthUser';
 
 export function useAdminUsers() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const supabase = useMemo(() => createClient(), []);
-
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      setCurrentUserId(session.user.id);
-      const data = await api.users.getList(session.access_token);
-      setUsers(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch users'));
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const { user: currentUser } = useAuthUser();
+  const { data: users, setData: setUsers, loading, error, reload } = useAdminResource<User[]>(
+    api.users.getList,
+    []
+  );
 
   const updateRole = useCallback(
     async (userId: string, newRole: 'ADMIN' | 'USER') => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      await api.users.updateRole(userId, newRole, session.access_token);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
-      );
+      await api.users.updateRole(userId, newRole);
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
     },
-    [supabase]
+    [setUsers]
   );
 
   const deleteUser = useCallback(
     async (userId: string) => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      await api.users.delete(userId, session.access_token);
+      await api.users.delete(userId);
       setUsers((prev) => prev.filter((u) => u.id !== userId));
     },
-    [supabase]
+    [setUsers]
   );
 
   return {
     users,
     loading,
     error,
-    currentUserId,
+    currentUserId: currentUser?.id ?? null,
     updateRole,
     deleteUser,
-    refetch: fetchUsers,
+    refetch: reload,
   };
 }

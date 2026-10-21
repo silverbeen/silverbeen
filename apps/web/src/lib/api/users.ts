@@ -1,22 +1,22 @@
 import { fetcher } from './client';
-import type { User } from '@/types/user';
+import type { User } from '@silverbeen/types';
 
 export const usersApi = {
-  getList: (token: string) =>
+  getList: () =>
     fetcher<User[]>('/users', {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  updateRole: (id: string, role: 'ADMIN' | 'USER', token: string) =>
+  updateRole: (id: string, role: 'ADMIN' | 'USER') =>
     fetcher<User>(`/users/${id}/role`, {
       method: 'PATCH',
       body: JSON.stringify({ role }),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  delete: (id: string, token: string) =>
+  delete: (id: string) =>
     fetcher<{ success: boolean }>(`/users/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 };

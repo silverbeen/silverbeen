@@ -1,17 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-
-function isAdmin(user: { app_metadata: Record<string, unknown> } | null): boolean {
-  return (user?.app_metadata?.role as string)?.toLowerCase() === 'admin';
-}
+import { isAdmin } from '@/lib/auth';
 
 export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // 환경변수가 없으면 인증 체크 없이 통과
     console.warn('Missing Supabase environment variables in middleware');
+    // 인증 체크가 불가능하므로 어드민 영역은 차단 (fail closed)
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+      return new NextResponse('Authentication is not configured', { status: 503 });
+    }
     return NextResponse.next({ request });
   }
 
@@ -65,7 +65,7 @@ export async function updateSession(request: NextRequest) {
 
       // signOut으로 설정된 쿠키를 리다이렉트 응답에 복사
       supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value);
+        redirectResponse.cookies.set(cookie);
       });
 
       return redirectResponse;

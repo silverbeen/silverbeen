@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { ResumeData } from '@/types/resume';
+import type { ResumeData } from '@silverbeen/types';
 import resumeData from '@/data/resume.json';
 import { ResumeContent } from './ResumeContent';
 import { ScrollToTopButton } from '@/components/post/ScrollToTopButton';
-import { api, ApiError } from '@/lib/api';
+import { ApiError } from '@/lib/api';
+import { resumeApi } from '@/lib/api/resume';
 
 async function getResumeData(): Promise<ResumeData | null> {
   try {
-    return await api.resume.get({ revalidate: 60 });
+    return await resumeApi.getResume({ revalidate: 60 });
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return null;

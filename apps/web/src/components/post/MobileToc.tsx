@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useHeadings, useActiveHeading, scrollToHeading } from '@/hooks/useHeadings';
 
-interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
+const HEADER_OFFSET = 120;
 
-
+/** heading 레벨별 들여쓰기 (h1: 0, h2: 16px, h3: 32px) */
+const INDENT_CLASS: Record<number, string> = {
+  1: 'pl-0',
+  2: 'pl-4',
+  3: 'pl-8',
+};
 
 export function MobileTocButton({
   isOpen,
@@ -40,67 +42,15 @@ export function MobileTocPanel({
   isOpen,
   onClose,
 }: { isOpen: boolean; onClose: () => void }) {
-  const [activeId, setActiveId] = useState<string>('');
-  const [headings, setHeadings] = useState<TocItem[]>([]);
-
-  // DOM에서 실제 heading 요소를 가져옴 (rehype-slug가 생성한 ID 사용)
-  useEffect(() => {
-    const headingElements = document.querySelectorAll('h1[id], h2[id], h3[id]');
-    const items: TocItem[] = [];
-
-    headingElements.forEach((el) => {
-      const level = parseInt(el.tagName[1], 10);
-      items.push({
-        id: el.id,
-        text: el.textContent || '',
-        level,
-      });
-    });
-
-    setHeadings(items);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: '-120px 0px -80% 0px',
-        threshold: 0,
-      }
-    );
-
-    const headingElements = document.querySelectorAll('h1[id], h2[id], h3[id]');
-    headingElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      headingElements.forEach((el) => observer.unobserve(el));
-    };
-  }, [headings]);
+  const headings = useHeadings();
+  const activeId = useActiveHeading(headings, HEADER_OFFSET);
 
   const handleClick = (id: string) => {
     // 먼저 패널을 닫음
     onClose();
 
     // 약간의 딜레이 후 스크롤 (애니메이션이 끝난 후)
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      if (element) {
-        const offset = 120;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY - offset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth',
-        });
-      }
-    }, 50);
+    setTimeout(() => scrollToHeading(id, HEADER_OFFSET), 50);
   };
 
   if (headings.length === 0) return null;
@@ -118,11 +68,8 @@ export function MobileTocPanel({
           <div className="mx-auto max-w-4xl px-6 py-4">
             <h4 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">목차</h4>
             <ul className="space-y-2">
-              {headings.map((heading, index) => (
-                <li
-                  key={`${heading.id}-${index}`}
-                  style={{ paddingLeft: `${(heading.level - 1) * 16}px` }}
-                >
+              {headings.map((heading) => (
+                <li key={heading.id} className={INDENT_CLASS[heading.level] ?? 'pl-8'}>
                   <button
                     onClick={() => handleClick(heading.id)}
                     className={`w-full cursor-pointer text-left text-sm leading-relaxed transition-colors duration-200 hover:text-primary-500 ${
@@ -145,12 +92,7 @@ export function MobileTocPanel({
 
 export function useMobileToc() {
   const [isOpen, setIsOpen] = useState(false);
-  const [hasHeadings, setHasHeadings] = useState(false);
-
-  useEffect(() => {
-    const headingElements = document.querySelectorAll('h1[id], h2[id], h3[id]');
-    setHasHeadings(headingElements.length > 0);
-  }, []);
+  const hasHeadings = useHeadings().length > 0;
 
   const toggle = () => setIsOpen((prev) => !prev);
   const close = () => setIsOpen(false);

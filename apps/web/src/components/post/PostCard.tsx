@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Post } from '@/types/post';
-import { formatDateShort } from '@/utils/date';
+import type { Post } from '@silverbeen/types';
+import { formatDate } from '@/utils/date';
 import { getReadingTime, getPreview } from '@/utils/post';
 
 interface PostCardProps {
@@ -108,7 +108,7 @@ export function PostCard({ post, priority = false }: PostCardProps) {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {formatDateShort(post.createdAt)}
+              {formatDate(post.createdAt)}
             </time>
             {post.coverImage && (
               <>

@@ -2,7 +2,7 @@
 
 import { GraduationCap } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Education } from "@/types/resume";
+import type { Education } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
 
 interface EducationSectionProps {

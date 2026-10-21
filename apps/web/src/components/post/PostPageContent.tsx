@@ -1,128 +1,74 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { TagFilter } from './TagFilter';
 import { SearchInput } from './SearchInput';
 import { SortSelector, type SortByType, type OrderType } from './SortSelector';
 import { PostsGrid } from './PostsGrid';
 import { Pagination } from './Pagination';
-import type { PostListResponse } from '@/types/post';
+import { buildBlogQueryString, type BlogQuery } from '@/utils/blogQuery';
+import type { PostListResponse, Tag } from '@silverbeen/types';
 
 interface PostPageContentProps {
-  initialData: PostListResponse | null;
-  initialTag: string | null;
-  initialPage: number;
-  initialSortBy: SortByType;
-  initialOrder: OrderType;
-  initialSearch: string;
+  /** 서버(BlogPage)에서 URL 쿼리 기준으로 조회한 결과. 실패 시 null */
+  posts: PostListResponse | null;
+  tags: Tag[];
+  query: BlogQuery;
 }
 
-export function PostPageContent({
-  initialData,
-  initialTag,
-  initialPage,
-  initialSortBy,
-  initialOrder,
-  initialSearch,
-}: PostPageContentProps) {
+/**
+ * 블로그 목록 UI. 데이터는 서버에서만 조회하고, 여기서는 URL만 갱신한다.
+ * (router.replace → 서버 컴포넌트 재렌더링 → 새 props)
+ */
+export function PostPageContent({ posts, tags, query }: PostPageContentProps) {
   const router = useRouter();
-  const [postsData, setPostsData] = useState<PostListResponse | null>(initialData);
-  const [tag, setTag] = useState<string | null>(initialTag);
-  const [page, setPage] = useState(initialPage);
-  const [sortBy, setSortBy] = useState<SortByType>(initialSortBy);
-  const [order, setOrder] = useState<OrderType>(initialOrder);
-  const [search, setSearch] = useState(initialSearch);
+  const [isPending, startTransition] = useTransition();
+  // 서버 응답 전에도 선택한 탭/정렬/페이지가 즉시 반영되도록 낙관적 상태 사용
+  const [optimisticQuery, setOptimisticQuery] = useOptimistic(query);
 
-  const stateRef = useRef({ tag, page, sortBy, order, search });
-  stateRef.current = { tag, page, sortBy, order, search };
-
-  const handleDataLoaded = useCallback((data: PostListResponse | null) => {
-    setPostsData(data);
-  }, []);
-
-  const updateParams = useCallback(
-    (
-      newTag: string | null,
-      newPage: number,
-      newSortBy: SortByType,
-      newOrder: OrderType,
-      newSearch?: string,
-    ) => {
-      setTag(newTag);
-      setPage(newPage);
-      setSortBy(newSortBy);
-      setOrder(newOrder);
-      if (newSearch !== undefined) setSearch(newSearch);
-
-      const params = new URLSearchParams();
-      if (newTag) params.set('tag', newTag);
-      if (newPage > 1) params.set('page', newPage.toString());
-      if (newSortBy !== 'createdAt') params.set('sortBy', newSortBy);
-      if (newOrder !== 'desc') params.set('order', newOrder);
-      const searchValue = newSearch !== undefined ? newSearch : stateRef.current.search;
-      if (searchValue) params.set('search', searchValue);
-
-      const queryString = params.toString();
-      router.replace(queryString ? `/blog?${queryString}` : '/blog', { scroll: false });
+  const navigate = useCallback(
+    (patch: Partial<BlogQuery>) => {
+      const next: BlogQuery = { ...optimisticQuery, page: 1, ...patch };
+      startTransition(() => {
+        setOptimisticQuery(next);
+        router.replace(`/blog${buildBlogQueryString(next)}`, { scroll: false });
+      });
     },
-    [router],
+    [optimisticQuery, router, setOptimisticQuery],
   );
 
-  const handleTagChange = useCallback(
-    (newTag: string | null) => {
-      const { sortBy, order } = stateRef.current;
-      updateParams(newTag, 1, sortBy, order);
-    },
-    [updateParams],
-  );
-
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      const { tag, sortBy, order } = stateRef.current;
-      updateParams(tag, newPage, sortBy, order);
-    },
-    [updateParams],
-  );
-
+  const handleTagChange = useCallback((tag: string | null) => navigate({ tag }), [navigate]);
+  const handlePageChange = useCallback((page: number) => navigate({ page }), [navigate]);
   const handleSortChange = useCallback(
-    (newSortBy: SortByType, newOrder: OrderType) => {
-      const { tag } = stateRef.current;
-      updateParams(tag, 1, newSortBy, newOrder);
-    },
-    [updateParams],
+    (sortBy: SortByType, order: OrderType) => navigate({ sortBy, order }),
+    [navigate],
   );
-
-  const handleSearchChange = useCallback(
-    (newSearch: string) => {
-      const { tag, sortBy, order } = stateRef.current;
-      updateParams(tag, 1, sortBy, order, newSearch);
-    },
-    [updateParams],
-  );
+  const handleSearchChange = useCallback((search: string) => navigate({ search }), [navigate]);
 
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <TagFilter currentTag={tag} onTagChange={handleTagChange} />
+        <TagFilter tags={tags} currentTag={optimisticQuery.tag} onTagChange={handleTagChange} />
         <div className="flex items-center gap-3">
-          <SearchInput value={search} onChange={handleSearchChange} />
-          <SortSelector sortBy={sortBy} order={order} onSortChange={handleSortChange} />
+          <SearchInput value={query.search} onChange={handleSearchChange} />
+          <SortSelector
+            sortBy={optimisticQuery.sortBy}
+            order={optimisticQuery.order}
+            onSortChange={handleSortChange}
+          />
         </div>
       </div>
-      <PostsGrid
-        tag={tag || undefined}
-        page={page}
-        sortBy={sortBy}
-        order={order}
-        search={search || undefined}
-        initialData={initialData}
-        onDataLoaded={handleDataLoaded}
-      />
-      {postsData && (
+      <div
+        aria-busy={isPending}
+        className={`transition-opacity duration-200 ${isPending ? 'pointer-events-none opacity-60' : ''}`}
+      >
+        <PostsGrid data={posts} tag={query.tag} search={query.search} />
+      </div>
+      {posts && (
         <Pagination
-          currentPage={page}
-          totalPages={postsData.totalPages}
+          currentPage={optimisticQuery.page}
+          totalPages={posts.totalPages}
           onPageChange={handlePageChange}
         />
       )}

@@ -2,22 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { PostEditor } from '@/components/post/PostEditor';
-import { useAdminPosts } from '@/hooks/usePosts';
+import { PostEditor, type PostFormData } from '@/components/post/PostEditor';
+import { AdminPageShell } from '@/components/admin/AdminPageShell';
+import { api } from '@/lib/api';
 import { useToast } from '@/components/ui';
-import type { CreatePostDto } from '@/types/post';
 
 export default function NewPostPage() {
   const router = useRouter();
-  const { createPost } = useAdminPosts();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async (data: CreatePostDto) => {
+  const handleSave = async ({ seriesId, ...data }: PostFormData) => {
     setSaving(true);
     try {
-      const post = await createPost(data);
+      // 새 글은 시리즈가 없으면 필드 자체를 생략
+      const post = await api.blogs.create({ ...data, seriesId: seriesId ?? undefined });
       toast(data.published ? '글이 발행되었습니다.' : '임시저장되었습니다.', 'success');
       router.push(`/admin/posts/${post.id}/edit`);
     } catch (err) {
@@ -29,24 +28,10 @@ export default function NewPostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="mb-8">
-          <Link
-            href="/admin/posts"
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-2 inline-block"
-          >
-            ← 글 목록으로 돌아가기
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            새 글 작성
-          </h1>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-          <PostEditor onSave={handleSave} saving={saving} />
-        </div>
+    <AdminPageShell title="새 글 작성" backHref="/admin/posts" backLabel="글 목록으로 돌아가기" maxWidth="7xl">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <PostEditor onSave={handleSave} saving={saving} />
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

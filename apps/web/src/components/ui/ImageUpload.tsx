@@ -89,6 +89,7 @@ export function ImageUpload({
 
       {value ? (
         <div className="relative group">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 임의 URL 미리보기 (next/image 도메인 제한 회피) */}
           <img
             src={value}
             alt="Cover"

@@ -6,7 +6,7 @@ import type {
   UpdatePostDto,
   AdjacentPostsResponse,
   LikeStatusResponse,
-} from '@/types/post';
+} from '@silverbeen/types';
 
 export const postsApi = {
   getList: (
@@ -37,35 +37,35 @@ export const postsApi = {
   getBySlug: (slug: string, options?: { revalidate?: number }) =>
     fetcher<Post>(`/posts/${slug}`, { revalidate: options?.revalidate }),
 
-  getById: (id: number, options?: { revalidate?: number }) =>
-    fetcher<Post>(`/posts/${id}`, { revalidate: options?.revalidate }),
+  /** 어드민 전용: 비공개(draft) 글 포함 ID 조회 */
+  getAdminById: (id: number) => fetcher<Post>(`/posts/admin/${id}`, { auth: true }),
 
   incrementView: (slug: string) =>
     fetcher<Post>(`/posts/${slug}/view`, { method: 'POST' }),
 
-  getAdminList: (token: string) =>
+  getAdminList: () =>
     fetcher<Post[]>('/posts/admin', {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  create: (data: CreatePostDto, token: string) =>
+  create: (data: CreatePostDto) =>
     fetcher<Post>('/posts', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  update: (id: number, data: UpdatePostDto, token: string) =>
+  update: (id: number, data: UpdatePostDto) =>
     fetcher<Post>(`/posts/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  delete: (id: number, token: string) =>
+  delete: (id: number) =>
     fetcher<void>(`/posts/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
   getAdjacent: (id: number, options?: { revalidate?: number }) =>

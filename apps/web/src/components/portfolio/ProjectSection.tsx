@@ -2,12 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Briefcase, Users, FolderGit2, Layers } from 'lucide-react';
+import { ChevronDown, Layers } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import { ProjectCard } from './ProjectCard';
 import { ProjectDetailModal } from './ProjectDetailModal';
-import { containerVariants, scaleItemVariants } from './constants';
-import type { PortfolioProject, ProjectCategory } from '@/types/portfolio';
+import { categoryConfig, containerVariants, scaleItemVariants } from './constants';
+import { PROJECT_CATEGORIES } from '@/constants/portfolio';
+import type { PortfolioProject, ProjectCategory } from '@silverbeen/types';
 
 interface ProjectSectionProps {
   projects: PortfolioProject[];
@@ -15,9 +16,11 @@ interface ProjectSectionProps {
 
 const categories: { value: ProjectCategory | 'all'; label: string; icon: React.ElementType }[] = [
   { value: 'all', label: '전체', icon: Layers },
-  { value: 'personal', label: '개인', icon: Briefcase },
-  { value: 'team', label: '팀', icon: Users },
-  { value: 'club', label: '동아리', icon: FolderGit2 },
+  ...PROJECT_CATEGORIES.map((category) => ({
+    value: category,
+    label: categoryConfig[category].shortLabel,
+    icon: categoryConfig[category].icon,
+  })),
 ];
 
 type SortOrder = 'recommended' | 'newest' | 'oldest';

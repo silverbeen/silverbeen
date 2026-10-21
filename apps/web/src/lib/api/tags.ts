@@ -1,26 +1,26 @@
 import { fetcher } from './client';
-import type { Tag, CreateTagDto, UpdateTagDto } from '@/types/post';
+import type { Tag, CreateTagDto, UpdateTagDto } from '@silverbeen/types';
 
 export const tagsApi = {
   getList: () => fetcher<Tag[]>('/tags'),
 
-  create: (data: CreateTagDto, token: string) =>
+  create: (data: CreateTagDto) =>
     fetcher<Tag>('/tags', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  update: (id: string, data: UpdateTagDto, token: string) =>
+  update: (id: string, data: UpdateTagDto) =>
     fetcher<Tag>(`/tags/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  delete: (id: string, token: string) =>
+  delete: (id: string) =>
     fetcher<void>(`/tags/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 };

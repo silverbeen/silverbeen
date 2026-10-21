@@ -2,7 +2,7 @@
 
 import { ExternalLink, Trophy, Medal, Award as AwardIcon } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Award } from "@/types/resume";
+import type { Award } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
 
 interface AwardSectionProps {

@@ -1,5 +1,5 @@
 import { fetcher } from './client';
-import type { Series, CreateSeriesDto, UpdateSeriesDto } from '@/types/post';
+import type { Series, CreateSeriesDto, UpdateSeriesDto } from '@silverbeen/types';
 
 export const seriesApi = {
   getList: (options?: { revalidate?: number }) =>
@@ -8,33 +8,30 @@ export const seriesApi = {
   getBySlug: (slug: string, options?: { revalidate?: number }) =>
     fetcher<Series>(`/series/${slug}`, { revalidate: options?.revalidate }),
 
-  getById: (id: string, options?: { revalidate?: number }) =>
-    fetcher<Series>(`/series/${id}`, { revalidate: options?.revalidate }),
-
-  create: (data: CreateSeriesDto, token: string) =>
+  create: (data: CreateSeriesDto) =>
     fetcher<Series>('/series', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  update: (id: string, data: UpdateSeriesDto, token: string) =>
+  update: (id: string, data: UpdateSeriesDto) =>
     fetcher<Series>(`/series/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  delete: (id: string, token: string) =>
+  delete: (id: string) =>
     fetcher<void>(`/series/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  updatePostOrder: (id: string, postIds: number[], token: string) =>
+  updatePostOrder: (id: string, postIds: number[]) =>
     fetcher<Series>(`/series/${id}/order`, {
       method: 'PUT',
       body: JSON.stringify({ postIds }),
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 };

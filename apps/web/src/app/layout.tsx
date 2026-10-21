@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ToastProvider, ConfirmProvider } from "@/components/ui";
 import { config } from "@/config";
 import "@silverbeen/ui/styles/globals.css";
 import "./globals.css";
@@ -79,9 +80,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className="min-h-[calc(100vh-8rem)]">{children}</main>
-          <Footer />
+          <ToastProvider>
+            <ConfirmProvider>
+              <Header />
+              <main className="min-h-[calc(100vh-8rem)]">{children}</main>
+              <Footer />
+            </ConfirmProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

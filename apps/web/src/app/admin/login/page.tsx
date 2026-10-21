@@ -1,36 +1,45 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { config } from '@/config';
+
+const ERROR_PARAM_MESSAGES = new Map([
+  ['unauthorized', '접근 권한이 없습니다. 허용된 계정으로 로그인하세요.'],
+  ['auth_failed', '인증에 실패했습니다. 다시 시도해주세요.'],
+  ['invalid_reset_link', '비밀번호 재설정 링크가 만료되었거나 유효하지 않습니다.'],
+]);
+
+const SUCCESS_PARAM_MESSAGES = new Map([
+  ['password_updated', '비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.'],
+]);
+
+function getErrorMessageFromParam(param: string | null): string | null {
+  return (param && ERROR_PARAM_MESSAGES.get(param)) || null;
+}
+
+function getSuccessMessageFromParam(param: string | null): string | null {
+  return (param && SUCCESS_PARAM_MESSAGES.get(param)) || null;
+}
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  // undefined = 아직 사용자 액션 없음 → URL 쿼리(error/message)에서 파생된 메시지 표시
+  const [errorState, setError] = useState<string | null | undefined>(undefined);
+  const [successState, setSuccess] = useState<string | null | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
 
-  useEffect(() => {
-    const errorParam = searchParams.get('error');
-    const messageParam = searchParams.get('message');
-
-    if (errorParam === 'unauthorized') {
-      setError('접근 권한이 없습니다. 허용된 계정으로 로그인하세요.');
-    } else if (errorParam === 'auth_failed') {
-      setError('인증에 실패했습니다. 다시 시도해주세요.');
-    } else if (errorParam === 'invalid_reset_link') {
-      setError('비밀번호 재설정 링크가 만료되었거나 유효하지 않습니다.');
-    }
-
-    if (messageParam === 'password_updated') {
-      setSuccess('비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.');
-    }
-  }, [searchParams]);
+  const error =
+    errorState === undefined ? getErrorMessageFromParam(searchParams.get('error')) : errorState;
+  const success =
+    successState === undefined
+      ? getSuccessMessageFromParam(searchParams.get('message'))
+      : successState;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
