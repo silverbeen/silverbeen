@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ShareService } from './share.service';
 import { CreateShareLinkDto } from './dto';
@@ -36,13 +37,13 @@ export class ShareController {
 
   @Patch(':id/toggle')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async toggleActive(@Param('id') id: string) {
+  async toggleActive(@Param('id', ParseUUIDPipe) id: string) {
     return this.shareService.toggleActive(id);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.shareService.delete(id);
   }
 

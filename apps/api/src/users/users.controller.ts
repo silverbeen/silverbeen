@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Logger,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -50,7 +61,7 @@ export class UsersController {
   @Patch(':id/role')
   @UseGuards(SupabaseGuard, AdminGuard)
   async updateRole(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
     @CurrentUser() currentUser: AuthUser,
   ) {
@@ -64,7 +75,7 @@ export class UsersController {
    */
   @Delete(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async delete(@Param('id') id: string, @CurrentUser() currentUser: AuthUser) {
+  async delete(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() currentUser: AuthUser) {
     this.logger.log(`Deleting user ${id}`);
     return this.usersService.deleteFromSupabase(id, currentUser.id);
   }

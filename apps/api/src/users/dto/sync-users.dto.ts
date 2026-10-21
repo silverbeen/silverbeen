@@ -1,22 +1,29 @@
-import { IsArray, IsString, IsOptional, ValidateNested } from 'class-validator';
+import { IsArray, IsEmail, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class UserMetadataDto {
   @IsOptional()
   @IsString()
   name?: string;
+}
 
+class AppMetadataDto {
   @IsOptional()
   @IsString()
   role?: string;
 }
 
-class SupabaseUserDto {
-  @IsString()
+export class SupabaseUserDto {
+  @IsUUID()
   id: string;
 
-  @IsString()
+  @IsEmail()
   email: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AppMetadataDto)
+  app_metadata?: AppMetadataDto;
 
   @IsOptional()
   @ValidateNested()

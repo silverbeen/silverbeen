@@ -1,25 +1,18 @@
-import { IsOptional, IsInt, Min, IsString, IsIn, MaxLength } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsInt, Min, Max, IsString, IsIn, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class GetPostsQueryDto {
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value == null || value === '') return undefined;
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? undefined : parsed;
-  })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number;
 
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value == null || value === '') return undefined;
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? undefined : parsed;
-  })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number;
 
   @IsOptional()

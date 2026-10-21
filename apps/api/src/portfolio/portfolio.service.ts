@@ -1,28 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { SingletonContentStore } from '../common/singleton-content/singleton-content.store';
 
 @Injectable()
 export class PortfolioService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly store: SingletonContentStore;
 
-  async getPortfolio() {
-    const portfolio = await this.prisma.portfolio.findUnique({
-      where: { id: 'main' },
-    });
-
-    if (!portfolio) {
-      throw new NotFoundException('Portfolio not found');
-    }
-
-    return portfolio.content;
+  constructor(prisma: PrismaService) {
+    this.store = new SingletonContentStore(prisma.portfolio, 'Portfolio');
   }
 
-  async updatePortfolio(content: Prisma.InputJsonValue) {
-    return this.prisma.portfolio.upsert({
-      where: { id: 'main' },
-      update: { content },
-      create: { id: 'main', content },
-    });
+  getPortfolio() {
+    return this.store.get();
+  }
+
+  updatePortfolio(content: Prisma.InputJsonObject) {
+    return this.store.update(content);
   }
 }

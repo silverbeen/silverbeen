@@ -1,10 +1,9 @@
-import { IsString, IsNotEmpty, IsOptional, IsIn, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { ShareType } from '@prisma/client';
 
 export class CreateShareLinkDto {
-  @IsString()
-  @IsNotEmpty()
-  @IsIn(['RESUME', 'PORTFOLIO'])
-  type: 'RESUME' | 'PORTFOLIO';
+  @IsEnum(ShareType)
+  type: ShareType;
 
   @IsOptional()
   @IsString()

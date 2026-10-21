@@ -1,28 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { SingletonContentStore } from '../common/singleton-content/singleton-content.store';
 
 @Injectable()
 export class ResumeService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly store: SingletonContentStore;
 
-  async getResume() {
-    const resume = await this.prisma.resume.findUnique({
-      where: { id: 'main' },
-    });
-
-    if (!resume) {
-      throw new NotFoundException('Resume not found');
-    }
-
-    return resume.content;
+  constructor(prisma: PrismaService) {
+    this.store = new SingletonContentStore(prisma.resume, 'Resume');
   }
 
-  async updateResume(content: Prisma.InputJsonValue) {
-    return this.prisma.resume.upsert({
-      where: { id: 'main' },
-      update: { content },
-      create: { id: 'main', content },
-    });
+  getResume() {
+    return this.store.get();
+  }
+
+  updateResume(content: Prisma.InputJsonObject) {
+    return this.store.update(content);
   }
 }

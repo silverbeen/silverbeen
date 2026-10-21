@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
@@ -21,8 +22,8 @@ interface JwtPayload {
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
-  constructor() {
-    const supabaseUrl = process.env.SUPABASE_URL;
+  constructor(configService: ConfigService) {
+    const supabaseUrl = configService.get<string>('SUPABASE_URL');
 
     if (!supabaseUrl) {
       throw new Error('SUPABASE_URL environment variable is required');
@@ -41,7 +42,7 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  validate(payload: JwtPayload) {
     if (!payload.sub) {
       throw new UnauthorizedException('Invalid token');
     }

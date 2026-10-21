@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsBoolean,
-  IsArray,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsArray, IsUUID } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -29,10 +23,10 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
+  @IsUUID(undefined, { each: true })
   tagIds?: string[];
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   seriesId?: string;
 }
