@@ -1,7 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSeriesDto, UpdateSeriesDto } from './dto';
-import { generateUniqueSlug } from '../common/utils/slug.util';
+import { persistWithUniqueSlug, slugExistsCheck } from '../common/utils/slug.util';
+
+/** 어드민 응답용: 비공개(draft) 글 포함 */
+const adminSeriesInclude = {
+  posts: {
+    orderBy: { seriesOrder: 'asc' },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      published: true,
+      seriesOrder: true,
+    },
+  },
+} satisfies Prisma.SeriesInclude;
 
 @Injectable()
 export class SeriesService {
@@ -48,11 +63,13 @@ export class SeriesService {
     return series;
   }
 
+  /** 공개 조회: 공개된 글만 포함 */
   async findById(id: string) {
     const series = await this.prisma.series.findUnique({
       where: { id },
       include: {
         posts: {
+          where: { published: true },
           orderBy: { seriesOrder: 'asc' },
           select: {
             id: true,
@@ -70,75 +87,84 @@ export class SeriesService {
   }
 
   async create(dto: CreateSeriesDto) {
-    const slug = await generateUniqueSlug(dto.title, async (s) => {
-      const existing = await this.prisma.series.findUnique({ where: { slug: s } });
-      return !!existing;
-    });
-
-    return this.prisma.series.create({
-      data: { ...dto, slug },
-      include: { posts: true },
-    });
+    return persistWithUniqueSlug(dto.title, this.slugExists(), (slug) =>
+      this.prisma.series.create({
+        data: { ...dto, slug },
+        include: { posts: true },
+      }),
+    );
   }
 
   async update(id: string, dto: UpdateSeriesDto) {
-    await this.findById(id);
+    await this.assertExists(id);
 
-    const data: Record<string, unknown> = { ...dto };
-
-    if (dto.title) {
-      const slug = await generateUniqueSlug(dto.title, async (s) => {
-        const existing = await this.prisma.series.findUnique({ where: { slug: s } });
-        return !!existing && existing.id !== id;
+    const persist = (slug?: string) =>
+      this.prisma.series.update({
+        where: { id },
+        data: { ...dto, slug } satisfies Prisma.SeriesUpdateInput,
+        include: { posts: true },
       });
 
-      data.slug = slug;
+    if (!dto.title) {
+      return persist();
     }
 
-    return this.prisma.series.update({
-      where: { id },
-      data,
-      include: { posts: true },
-    });
+    return persistWithUniqueSlug(dto.title, this.slugExists(id), persist);
   }
 
   async delete(id: string) {
-    await this.findById(id);
+    await this.assertExists(id);
 
-    return this.prisma.$transaction(async (prisma) => {
-      await prisma.post.updateMany({
+    return this.prisma.$transaction(async (tx) => {
+      await tx.post.updateMany({
         where: { seriesId: id },
         data: { seriesId: null, seriesOrder: null },
       });
 
-      return prisma.series.delete({ where: { id } });
+      return tx.series.delete({ where: { id } });
     });
   }
 
+  /**
+   * 시리즈 글 목록/순서 변경 (어드민)
+   * postIds가 빈 배열이면 시리즈의 모든 글 연결을 해제
+   */
   async updatePostOrder(id: string, postIds: number[]) {
-    await this.findById(id);
+    return this.prisma.$transaction(async (tx) => {
+      await this.assertExists(id, tx);
 
-    if (!postIds || postIds.length === 0) {
-      return this.findById(id);
-    }
-
-    const transactionOps = [
-      // 시리즈에서 제거된 포스트의 연결을 해제합니다.
-      this.prisma.post.updateMany({
+      // 시리즈에서 제거된 포스트의 연결을 해제합니다. (빈 배열이면 전체 해제)
+      await tx.post.updateMany({
         where: { seriesId: id, NOT: { id: { in: postIds } } },
         data: { seriesId: null, seriesOrder: null },
-      }),
+      });
+
       // 시리즈에 포함된 포스트들의 순서를 업데이트합니다.
-      ...postIds.map((postId, index) =>
-        this.prisma.post.update({
-          where: { id: postId },
-          data: { seriesId: id, seriesOrder: index + 1 },
-        })
-      ),
-    ];
+      await Promise.all(
+        postIds.map((postId, index) =>
+          tx.post.update({
+            where: { id: postId },
+            data: { seriesId: id, seriesOrder: index + 1 },
+          }),
+        ),
+      );
 
-    await this.prisma.$transaction(transactionOps);
+      return tx.series.findUniqueOrThrow({
+        where: { id },
+        include: adminSeriesInclude,
+      });
+    });
+  }
 
-    return this.findById(id);
+  private async assertExists(id: string, client: Prisma.TransactionClient = this.prisma) {
+    const series = await client.series.findUnique({ where: { id }, select: { id: true } });
+    if (!series) throw new NotFoundException('Series not found');
+  }
+
+  private slugExists(excludeId?: string) {
+    return slugExistsCheck(
+      (slug) => this.prisma.series.findUnique({ where: { slug }, select: { id: true } }),
+      excludeId,
+    );
   }
 }

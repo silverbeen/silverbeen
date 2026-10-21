@@ -1,7 +1,8 @@
 'use client';
 
-import type { Skills } from '@/types/resume';
-import { StringArrayField } from '../ArrayField';
+import type { Skills } from '@silverbeen/types';
+import { StringArrayField } from '../StringArrayField';
+import { SKILL_LABELS } from '@/constants/skills';
 import {
   Code2,
   Database,
@@ -18,61 +19,58 @@ interface SkillsEditorProps {
   onChange: (data: Skills) => void;
 }
 
-const skillCategories: {
+const skillCategoryMeta: {
   key: keyof Skills;
-  label: string;
   icon: React.ReactNode;
   description: string;
 }[] = [
   {
     key: 'languages',
-    label: '언어',
     icon: <Code2 className="h-5 w-5" />,
     description: 'TypeScript, JavaScript, Python 등',
   },
   {
     key: 'stateManagement',
-    label: '상태관리',
     icon: <Database className="h-5 w-5" />,
     description: 'Redux, Zustand, Recoil 등',
   },
   {
     key: 'libraries',
-    label: '라이브러리',
     icon: <Library className="h-5 w-5" />,
     description: 'React, Next.js, TailwindCSS 등',
   },
   {
     key: 'tools',
-    label: '도구',
     icon: <Wrench className="h-5 w-5" />,
     description: 'VS Code, Git, npm/pnpm 등',
   },
   {
     key: 'collaboration',
-    label: '협업',
     icon: <Users className="h-5 w-5" />,
     description: 'Slack, Notion, Jira 등',
   },
   {
     key: 'integrations',
-    label: '연동',
     icon: <Link className="h-5 w-5" />,
     description: 'REST API, GraphQL, Firebase 등',
   },
   {
     key: 'infrastructure',
-    label: '인프라',
     icon: <Server className="h-5 w-5" />,
     description: 'AWS, Docker, Vercel 등',
   },
   {
     key: 'testing',
-    label: '테스트',
     icon: <TestTube className="h-5 w-5" />,
     description: 'Jest, Cypress, Playwright 등',
   },
 ];
+
+// 라벨은 공개 화면/PDF와 동일한 SKILL_LABELS 사용
+const skillCategories = skillCategoryMeta.map((meta) => ({
+  ...meta,
+  label: SKILL_LABELS[meta.key],
+}));
 
 export function SkillsEditor({ data, onChange }: SkillsEditorProps) {
   const handleChange = (key: keyof Skills, items: string[]) => {

@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min } from 'class-validator';
+import { IsOptional, IsInt, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class GetDailyStatsQuery {
@@ -6,6 +6,7 @@ export class GetDailyStatsQuery {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(365)
   days: number = 30;
 }
 
@@ -14,5 +15,6 @@ export class GetTopPostsQuery {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit: number = 10;
 }

@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { Trophy, Medal, Award as AwardIcon, Sparkles } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import { containerVariants } from './constants';
-import type { Award } from '@/types/portfolio';
+import type { PortfolioAward } from '@silverbeen/types';
 
 interface AwardsSectionProps {
-  awards: Award[];
+  awards: PortfolioAward[];
 }
 
 const awardItemVariants = {

@@ -3,10 +3,20 @@
 import { useState, useEffect } from 'react';
 import { Mail, Phone, Github, BookOpen, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { Profile } from '@/types/resume';
+import Image from 'next/image';
+import type { Profile } from '@silverbeen/types';
 
 // 타이핑 효과 컴포넌트
-function TypingEffect({ text, className }: { text: string; className?: string }) {
+function TypingEffect({
+  text,
+  highlight,
+  className,
+}: {
+  text: string;
+  /** 하나의 덩어리로 렌더링할 강조 텍스트 (예: 이름) */
+  highlight?: string;
+  className?: string;
+}) {
   const [displayedText, setDisplayedText] = useState('');
   const [isPlaying, setIsPlaying] = useState(true);
   const isComplete = displayedText.length >= text.length;
@@ -27,24 +37,15 @@ function TypingEffect({ text, className }: { text: string; className?: string })
     setIsPlaying(true);
   };
 
-  // 마침표: 메인 컬러, 강은빈: 물결 밑줄
+  // 마침표: 메인 컬러, 강조 텍스트(이름): 하나의 span으로 유지
   const renderStyledText = (text: string) => {
-    const targetName = '강은빈';
     const parts: React.ReactNode[] = [];
     let currentIndex = 0;
 
     while (currentIndex < text.length) {
-      if (text.slice(currentIndex).startsWith(targetName)) {
-        // TODO: 물결 밑줄 스타일 (disabled)
-        // style={{
-        //   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 12'%3E%3Cpath d='M0 6 Q8 2, 17 6 T35 6 T52 6 T70 6' stroke='%23514EF6' stroke-width='4.5' fill='none' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M2 6.5 Q10 3, 19 6.5 T37 6.5 T54 6.5 T70 6.5' stroke='%23514EF6' stroke-width='2' fill='none' stroke-linecap='round' opacity='0.4'/%3E%3Cpath d='M0 5.5 Q9 2.5, 18 5.5 T36 5.5 T53 5.5 T70 5.5' stroke='%23514EF6' stroke-width='1' fill='none' stroke-linecap='round' opacity='0.25'/%3E%3C/svg%3E")`,
-        //   backgroundRepeat: 'repeat-x',
-        //   backgroundPosition: 'bottom',
-        //   backgroundSize: '70px 12px',
-        //   paddingBottom: '9px',
-        // }}
-        parts.push(<span key={currentIndex}>{targetName}</span>);
-        currentIndex += targetName.length;
+      if (highlight && text.slice(currentIndex).startsWith(highlight)) {
+        parts.push(<span key={currentIndex}>{highlight}</span>);
+        currentIndex += highlight.length;
       } else {
         const char = text[currentIndex];
         if (char === '.') {
@@ -86,13 +87,6 @@ function TypingEffect({ text, className }: { text: string; className?: string })
 
 interface ProfileSectionProps {
   profile: Profile;
-  ImageComponent?: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-    priority?: boolean;
-  }>;
 }
 
 const containerVariants = {
@@ -130,21 +124,7 @@ const imageVariants = {
   },
 };
 
-function DefaultImage({
-  src,
-  alt,
-  className,
-}: {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-  priority?: boolean;
-}) {
-  return <img src={src} alt={alt} className={`${className || ''} h-full w-full object-cover`} />;
-}
-
-export function ProfileSection({ profile, ImageComponent = DefaultImage }: ProfileSectionProps) {
+export function ProfileSection({ profile }: ProfileSectionProps) {
   return (
     <motion.section
       id="profile"
@@ -158,6 +138,7 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
           {profile.greeting && (
             <TypingEffect
               text={profile.greeting}
+              highlight={profile.name}
               className="text-foreground text-[50px] font-bold"
             />
           )}
@@ -213,11 +194,12 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
         >
-          <ImageComponent
+          <Image
             src={profile.photo}
             alt={profile.name}
             fill
             className="object-cover"
+            sizes="160px"
             priority
           />
         </motion.div>

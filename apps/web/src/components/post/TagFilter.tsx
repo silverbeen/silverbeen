@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useTags } from '@/hooks/useTags';
+import type { Tag } from '@silverbeen/types';
 
 const TAG_BUTTON_STYLE = {
   active: 'bg-primary-500 text-white shadow-lg shadow-primary-500/25',
@@ -11,12 +11,12 @@ const TAG_BUTTON_STYLE = {
 };
 
 interface TagFilterProps {
+  tags: Tag[];
   currentTag: string | null;
   onTagChange: (tag: string | null) => void;
 }
 
-export function TagFilter({ currentTag, onTagChange }: TagFilterProps) {
-  const { tags, loading } = useTags();
+export function TagFilter({ tags, currentTag, onTagChange }: TagFilterProps) {
   const sortedTags = useMemo(
     () => [...tags].sort((a, b) => (b._count?.posts ?? 0) - (a._count?.posts ?? 0)),
     [tags],
@@ -39,19 +39,6 @@ export function TagFilter({ currentTag, onTagChange }: TagFilterProps) {
     observer.observe(el);
     return () => observer.disconnect();
   }, [tags]);
-
-  if (loading) {
-    return (
-      <div className="flex flex-wrap gap-2">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="h-10 w-20 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
-          />
-        ))}
-      </div>
-    );
-  }
 
   if (tags.length === 0) return null;
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { config } from '@/config';
-import type { PortfolioData } from '@/types/portfolio';
+import type { PortfolioData } from '@silverbeen/types';
 import portfolioData from '@/data/portfolio.json';
 import { PortfolioContent } from './PortfolioContent';
 import { portfolioApi } from '@/lib/api/portfolio';

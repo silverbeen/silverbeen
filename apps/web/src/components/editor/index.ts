@@ -1,3 +1,4 @@
 export * from './FormField';
-export * from './ArrayField';
+export * from './StringArrayField';
 export * from './SortableList';
+export * from './ListEditor';

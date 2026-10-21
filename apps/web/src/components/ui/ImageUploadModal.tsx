@@ -107,6 +107,7 @@ export function ImageUploadModal({
           {preview ? (
             <div className="space-y-4">
               <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL 로컬 미리보기 */}
                 <img
                   src={preview.preview}
                   alt="Preview"

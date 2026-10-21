@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { CalendarDays, ExternalLink } from 'lucide-react';
 import { SectionTitle } from '../resume/SectionTitle';
 import { containerVariants } from './constants';
-import type { Activity } from '@/types/portfolio';
+import type { Activity } from '@silverbeen/types';
 
 interface ActivitiesSectionProps {
   activities: Activity[];

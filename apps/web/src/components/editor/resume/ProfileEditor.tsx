@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Profile } from '@/types/resume';
+import type { Profile } from '@silverbeen/types';
 import { FormField, inputClassName, AutoTextarea } from '../FormField';
 import { ImageUploadModal } from '@/components/ui';
 import { User, Mail, Github, Globe, Linkedin, Phone, Upload, Trash2 } from 'lucide-react';
@@ -25,6 +25,8 @@ export function ProfileEditor({ data, onChange, errors }: ProfileEditorProps) {
       <div className="flex items-start gap-6 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="relative group">
           {data.photo ? (
+            // 에디터 미리보기는 임의 URL일 수 있어 next/image 대신 img 사용
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={data.photo}
               alt="Profile"

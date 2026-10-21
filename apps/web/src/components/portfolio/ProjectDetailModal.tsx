@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Github, Users, Calendar, Sparkles, Lightbulb, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { categoryConfig } from './constants';
-import { ImageModal } from '@/components/resume/ImageModal';
-import type { PortfolioProject } from '@/types/portfolio';
+import { ImageModal } from '@/components/ui/ImageModal';
+import { useImageGallery } from '@/hooks/useImageGallery';
+import { useModalBehavior } from '@/hooks/useModalBehavior';
+import type { PortfolioProject } from '@silverbeen/types';
 
 interface ProjectDetailModalProps {
   project: PortfolioProject | null;
@@ -17,15 +19,7 @@ interface ProjectDetailModalProps {
 }
 
 function ImageGallery({ images, projectName }: { images: string[]; projectName: string }) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-  const handlePrev = useCallback(() => {
-    setSelectedIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : images.length - 1));
-  }, [images.length]);
-
-  const handleNext = useCallback(() => {
-    setSelectedIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : 0));
-  }, [images.length]);
+  const gallery = useImageGallery(images.length);
 
   return (
     <>
@@ -38,7 +32,7 @@ function ImageGallery({ images, projectName }: { images: string[]; projectName: 
           {images.map((src, index) => (
             <button
               key={src}
-              onClick={() => setSelectedIndex(index)}
+              onClick={() => gallery.open(index)}
               className="group relative aspect-video overflow-hidden rounded-lg border border-primary/10 bg-muted/30 transition-all hover:border-primary/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             >
               <Image
@@ -60,13 +54,12 @@ function ImageGallery({ images, projectName }: { images: string[]; projectName: 
 
       <ImageModal
         images={images}
-        currentIndex={selectedIndex ?? 0}
-        isOpen={selectedIndex !== null}
-        onClose={() => setSelectedIndex(null)}
-        onPrev={handlePrev}
-        onNext={handleNext}
+        currentIndex={gallery.currentIndex}
+        isOpen={gallery.isOpen}
+        onClose={gallery.close}
+        onPrev={gallery.prev}
+        onNext={gallery.next}
         projectName={projectName}
-        ImageComponent={Image}
       />
     </>
   );
@@ -142,42 +135,33 @@ export function ProjectDetailModal({
     }
   }, [onNavigate]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!isOpen) return;
+  // 중첩 모달(이미지 미리보기)이 열려 있으면 그 모달이 키 입력을 처리
+  useModalBehavior(isOpen, {
+    onKeyDown: (e) => {
+      if (e.key === 'ArrowLeft' && prevProject) {
+        handleNavigate(prevProject);
+      } else if (e.key === 'ArrowRight' && nextProject) {
+        handleNavigate(nextProject);
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+  });
 
-    if (e.key === 'ArrowLeft' && prevProject) {
-      handleNavigate(prevProject);
-    } else if (e.key === 'ArrowRight' && nextProject) {
-      handleNavigate(nextProject);
-    } else if (e.key === 'Escape') {
-      onClose();
-    }
-  }, [isOpen, prevProject, nextProject, handleNavigate, onClose]);
-
-  // 모달 오픈 시 스크롤 락, 키보드 이벤트, 포커스 트랩
+  // 모달 오픈 시 포커스 이동, 닫힐 때 이전 포커스 복귀
   useEffect(() => {
     if (!isOpen) return;
 
-    // 현재 포커스된 요소 저장
     previousActiveElement.current = document.activeElement as HTMLElement;
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
-
-    // 모달에 포커스 이동
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       modalRef.current?.focus();
     }, 0);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-
-      // 이전 포커스 요소로 복귀
+      clearTimeout(timer);
       previousActiveElement.current?.focus();
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen]);
 
   if (!project) return null;
 

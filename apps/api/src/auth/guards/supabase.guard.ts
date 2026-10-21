@@ -7,11 +7,7 @@ export class SupabaseGuard extends AuthGuard('supabase') {
     return super.canActivate(context);
   }
 
-  handleRequest<TUser = unknown>(
-    err: Error | null,
-    user: TUser,
-    info: Error | null,
-  ): TUser {
+  handleRequest<TUser = unknown>(err: Error | null, user: TUser, info: Error | null): TUser {
     if (err || !user) {
       throw new UnauthorizedException(err?.message || info?.message || 'Unauthorized');
     }

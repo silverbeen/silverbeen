@@ -1,21 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Experience } from "@/types/resume";
+import Image from "next/image";
+import type { Experience } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
-import { ImageModal } from "./ImageModal";
+import { ImageModal } from "@/components/ui/ImageModal";
+import { useImageGallery } from "@/hooks/useImageGallery";
 import { calculateDuration, formatPeriod } from "@/utils/date";
 
 interface ExperienceSectionProps {
   experience: Experience[];
-  ImageComponent?: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-  }>;
 }
 
 const containerVariants = {
@@ -52,28 +47,8 @@ const projectVariants = {
   },
 };
 
-function DefaultImage({
-  src,
-  alt,
-  className,
-}: {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-}) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={`${className || ""} object-cover w-full h-full`}
-    />
-  );
-}
-
 export function ExperienceSection({
   experience,
-  ImageComponent = DefaultImage,
 }: ExperienceSectionProps) {
   return (
     <section id="experience">
@@ -94,7 +69,6 @@ export function ExperienceSection({
               <ExperienceCard
                 experience={exp}
                 companyKey={companyKey}
-                ImageComponent={ImageComponent}
               />
             </div>
           );
@@ -107,16 +81,9 @@ export function ExperienceSection({
 function ExperienceCard({
   experience,
   companyKey,
-  ImageComponent = DefaultImage,
 }: {
   experience: Experience;
   companyKey: string;
-  ImageComponent?: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-  }>;
 }) {
   const duration = calculateDuration(experience.startDate, experience.endDate);
   const period = formatPeriod(experience.startDate, experience.endDate);
@@ -188,7 +155,7 @@ function ExperienceCard({
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: index * 0.1 }}
             >
-              <ProjectCard project={project} ImageComponent={ImageComponent} />
+              <ProjectCard project={project} />
             </motion.div>
           );
         })}
@@ -199,39 +166,11 @@ function ExperienceCard({
 
 function ProjectCard({
   project,
-  ImageComponent = DefaultImage,
 }: {
   project: Experience["projects"][number];
-  ImageComponent?: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-  }>;
 }) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const openModal = (index: number) => {
-    setCurrentImageIndex(index);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => setModalOpen(false);
-
-  const goToPrev = () => {
-    if (!project.images) return;
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? project.images!.length - 1 : prev - 1
-    );
-  };
-
-  const goToNext = () => {
-    if (!project.images) return;
-    setCurrentImageIndex((prev) =>
-      prev === project.images!.length - 1 ? 0 : prev + 1
-    );
-  };
+  const images = project.images ?? [];
+  const gallery = useImageGallery(images.length);
 
   return (
     <motion.div
@@ -417,13 +356,14 @@ function ProjectCard({
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => openModal(idx)}
+                onClick={() => gallery.open(idx)}
               >
-                <ImageComponent
+                <Image
                   src={image}
                   alt={`${project.name} screenshot ${idx + 1}`}
                   fill
                   className="object-cover transition-transform duration-300 group-hover/image:scale-105"
+                  sizes="(max-width: 640px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/image:bg-black/20">
                   <svg
@@ -447,14 +387,14 @@ function ProjectCard({
       )}
 
       {/* 이미지 모달 */}
-      {project.images && project.images.length > 0 && (
+      {images.length > 0 && (
         <ImageModal
-          images={project.images}
-          currentIndex={currentImageIndex}
-          isOpen={modalOpen}
-          onClose={closeModal}
-          onPrev={goToPrev}
-          onNext={goToNext}
+          images={images}
+          currentIndex={gallery.currentIndex}
+          isOpen={gallery.isOpen}
+          onClose={gallery.close}
+          onPrev={gallery.prev}
+          onNext={gallery.next}
           projectName={project.name}
         />
       )}

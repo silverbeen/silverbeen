@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagDto, UpdateTagDto } from './dto';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
@@ -21,13 +31,13 @@ export class TagsController {
 
   @Patch(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.tagsService.update(id, updateTagDto);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.tagsService.delete(id);
   }
 }

@@ -1,50 +1,24 @@
+import type { DailyStat, TopPost, TagStat, StatsOverview } from '@silverbeen/types';
 import { fetcher } from './client';
 
-export interface DailyStat {
-  date: string;
-  views: number;
-}
-
-export interface TopPost {
-  id: number;
-  title: string;
-  slug: string;
-  viewCount: number;
-  createdAt: string;
-}
-
-export interface TagStat {
-  name: string;
-  postCount: number;
-  totalViews: number;
-}
-
-export interface StatsOverview {
-  totalPosts: number;
-  publishedPosts: number;
-  draftPosts: number;
-  totalViews: number;
-  todayViews: number;
-}
-
 export const statsApi = {
-  getOverview: (token: string) =>
+  getOverview: () =>
     fetcher<StatsOverview>('/stats/overview', {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  getDailyStats: (token: string, days?: number) =>
+  getDailyStats: (days?: number) =>
     fetcher<DailyStat[]>(`/stats/daily${days ? `?days=${days}` : ''}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  getTopPosts: (token: string, limit?: number) =>
+  getTopPosts: (limit?: number) =>
     fetcher<TopPost[]>(`/stats/top-posts${limit ? `?limit=${limit}` : ''}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 
-  getTagStats: (token: string) =>
+  getTagStats: () =>
     fetcher<TagStat[]>('/stats/tags', {
-      headers: { Authorization: `Bearer ${token}` },
+      auth: true,
     }),
 };

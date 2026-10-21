@@ -1,12 +1,14 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import rehypeExternalLinks from 'rehype-external-links';
 import remarkGfm from 'remark-gfm';
 import 'highlight.js/styles/github-dark.css';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import { config } from '@/config';
 import { GiscusComments } from '@/components/post/GiscusComments';
 import { TableOfContents } from '@/components/post/TableOfContents';
@@ -21,51 +23,70 @@ import { SeriesNavigation } from '@/components/post/SeriesNavigation';
 import { formatDateKorean } from '@/utils/date';
 import { getReadingTime } from '@/utils/post';
 import type { Metadata } from 'next';
-import type { Post } from '@/types/post';
+import type { Post } from '@silverbeen/types';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/**
+ * 공개(발행된) 글 조회. generateMetadata와 페이지에서 같은 요청을 공유하도록 cache로 중복 제거.
+ * 존재하지 않거나 비공개(draft)인 글은 null (백엔드가 draft에 404 반환)
+ */
+const getPublishedPost = cache(async (slug: string): Promise<Post | null> => {
+  try {
+    const post = await api.blogs.getBySlug(slug, { revalidate: 60 });
+    return post.published ? post : null;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
+});
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
 
+  let blog: Post | null;
   try {
-    const blog = await api.blogs.getBySlug(slug);
-    const description = blog.excerpt || blog.content.slice(0, 160).replace(/\n/g, ' ');
-    const url = `${config.siteUrl}/blog/${blog.slug}`;
+    blog = await getPublishedPost(slug);
+  } catch {
+    // 일시적인 API 오류: 기본 메타데이터로 대체 (본문 렌더링에서 에러 처리)
+    return { title: '블로그' };
+  }
 
-    return {
+  if (!blog) {
+    notFound();
+  }
+
+  const description = blog.excerpt || blog.content.slice(0, 160).replace(/\n/g, ' ');
+  const url = `${config.siteUrl}/blog/${blog.slug}`;
+
+  return {
+    title: blog.title,
+    description,
+    openGraph: {
       title: blog.title,
       description,
-      openGraph: {
-        title: blog.title,
-        description,
-        url,
-        type: 'article',
-        publishedTime: blog.createdAt,
-        modifiedTime: blog.updatedAt,
-        authors: [config.author.name],
-        tags: blog.tags.map((tag) => tag.name),
-        images: blog.coverImage
-          ? [{ url: blog.coverImage, width: 1200, height: 630, alt: blog.title }]
-          : undefined,
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: blog.title,
-        description,
-        images: blog.coverImage ? [blog.coverImage] : undefined,
-      },
-      alternates: {
-        canonical: url,
-      },
-    };
-  } catch {
-    return {
-      title: '글을 찾을 수 없습니다',
-    };
-  }
+      url,
+      type: 'article',
+      publishedTime: blog.createdAt,
+      modifiedTime: blog.updatedAt,
+      authors: [config.author.name],
+      tags: blog.tags.map((tag) => tag.name),
+      images: blog.coverImage
+        ? [{ url: blog.coverImage, width: 1200, height: 630, alt: blog.title }]
+        : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: blog.title,
+      description,
+      images: blog.coverImage ? [blog.coverImage] : undefined,
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
 }
 
 function BlogJsonLd({ blog }: { blog: Post }) {
@@ -140,18 +161,15 @@ function BlogJsonLd({ blog }: { blog: Post }) {
 export default async function BlogPage({ params }: PageProps) {
   const { slug } = await params;
 
-  let blog;
-  let adjacentPosts;
-  try {
-    blog = await api.blogs.getBySlug(slug, { revalidate: 60 });
-    adjacentPosts = await api.blogs.getAdjacent(blog.id, { revalidate: 60 });
-  } catch {
+  const blog = await getPublishedPost(slug);
+  if (!blog) {
     notFound();
   }
 
-  if (!blog || !blog.published) {
-    notFound();
-  }
+  // 이전/다음 글은 부가 정보이므로 실패해도 본문은 렌더링
+  const adjacentPosts = await api.blogs
+    .getAdjacent(blog.id, { revalidate: 60 })
+    .catch(() => null);
 
   const readingTime = getReadingTime(blog.content);
 
@@ -165,7 +183,7 @@ export default async function BlogPage({ params }: PageProps) {
         {/* Floating ToC - Right Side */}
         <aside className="fixed top-40 right-[max(1rem,calc(50%-38rem))] z-30 hidden w-40 xl:block">
           <div className="sticky top-24">
-            <TableOfContents content={blog.content} />
+            <TableOfContents />
           </div>
         </aside>
         <article>
@@ -215,7 +233,14 @@ export default async function BlogPage({ params }: PageProps) {
 
           {blog.coverImage && (
             <div className="relative mb-8 aspect-video overflow-hidden rounded-xl">
-              <img src={blog.coverImage} alt={blog.title} className="h-full w-full object-cover" />
+              <Image
+                src={blog.coverImage}
+                alt={blog.title}
+                fill
+                priority
+                sizes="(max-width: 896px) 100vw, 896px"
+                className="object-cover"
+              />
             </div>
           )}
 
@@ -246,7 +271,7 @@ export default async function BlogPage({ params }: PageProps) {
 
           <hr className="mb-8 border-gray-200 dark:border-gray-700" />
 
-          <PostNavigation adjacentPosts={adjacentPosts} />
+          {adjacentPosts && <PostNavigation adjacentPosts={adjacentPosts} />}
 
           <section>
             <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">댓글</h2>

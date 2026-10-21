@@ -1,9 +1,9 @@
 'use client';
 
-import type { Award } from '@/types/resume';
+import type { Award } from '@silverbeen/types';
 import { FormField, inputClassName, AutoTextarea } from '../FormField';
-import { SortableList } from '../SortableList';
-import { Plus, Trash2, Medal, Calendar, Link as LinkIcon, Tag } from 'lucide-react';
+import { ListEditor } from '../ListEditor';
+import { Trash2, Medal, Calendar, Link as LinkIcon, Tag } from 'lucide-react';
 
 interface AwardEditorProps {
   data: Award[];
@@ -11,77 +11,22 @@ interface AwardEditorProps {
 }
 
 export function AwardEditor({ data, onChange }: AwardEditorProps) {
-  const handleAdd = () => {
-    const newAward: Award = {
-      date: '',
-      title: '',
-    };
-    onChange([...data, newAward]);
-  };
-
-  const handleRemove = (index: number) => {
-    onChange(data.filter((_, i) => i !== index));
-  };
-
-  const handleUpdate = (index: number, updated: Award) => {
-    onChange(data.map((item, i) => (i === index ? updated : item)));
-  };
-
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Medal className="h-5 w-5 text-primary-500" />
-            수상
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            수상 경력을 추가해주세요
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleAdd}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30"
-        >
-          <Plus className="h-4 w-4" />
-          수상 추가
-        </button>
-      </div>
-
-      {data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
-          <Medal className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">
-            수상 내역을 추가해주세요
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-            수상명, 날짜, 설명을 입력할 수 있습니다
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-medium">{data.length}개의 수상</span>
-            <span>•</span>
-            <span>드래그하여 순서 변경</span>
-          </div>
-          <SortableList
-            items={data}
-            getKey={(_, index) => `award-${index}`}
-            onReorder={onChange}
-            renderItem={(award, index) => (
-              <AwardCard
-                award={award}
-                onChange={(updated) => handleUpdate(index, updated)}
-                onRemove={() => handleRemove(index)}
-              />
-            )}
-          />
-        </div>
+    <ListEditor
+      items={data}
+      onChange={onChange}
+      createItem={(): Award => ({ date: '', title: '' })}
+      title="수상"
+      description="수상 경력을 추가해주세요"
+      icon={Medal}
+      addLabel="수상 추가"
+      itemUnit="수상"
+      emptyTitle="수상 내역을 추가해주세요"
+      emptyDescription="수상명, 날짜, 설명을 입력할 수 있습니다"
+      renderItem={(award, { update, remove }) => (
+        <AwardCard award={award} onChange={update} onRemove={remove} />
       )}
-    </div>
+    />
   );
 }
 

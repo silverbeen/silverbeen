@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { BookOpen, FileText, FolderKanban, Moon, Sun, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { useHydrated } from "@/hooks/useHydrated";
 
 const navItems = [
   { href: "/resume", label: "Resume", icon: FileText },
@@ -17,23 +18,8 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMounted(true);
-
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const mounted = useHydrated();
+  const { isLoggedIn } = useAuthUser();
 
   const handleLogout = async () => {
     const supabase = createClient();

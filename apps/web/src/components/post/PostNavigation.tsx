@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { AdjacentPostsResponse } from '@/types/post';
+import type { AdjacentPostsResponse } from '@silverbeen/types';
 
 interface PostNavigationProps {
   adjacentPosts: AdjacentPostsResponse;

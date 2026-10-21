@@ -11,11 +11,24 @@ interface SearchInputProps {
 
 export function SearchInput({ value, onChange, placeholder = '검색어를 입력하세요...' }: SearchInputProps) {
   const [inputValue, setInputValue] = useState(value);
+  const [prevValue, setPrevValue] = useState(value);
+  const [lastEmitted, setLastEmitted] = useState(value);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+  // 외부(URL 뒤로가기 등)에서 value가 바뀐 경우에만 입력값 동기화.
+  // 내가 보낸 값이 반영된 경우는 그 사이 추가 입력을 덮어쓰지 않도록 건너뜀
+  if (value !== prevValue) {
+    setPrevValue(value);
+    if (value !== lastEmitted) {
+      setInputValue(value);
+      setLastEmitted(value);
+    }
+  }
+
+  const emit = (newValue: string) => {
+    setLastEmitted(newValue);
+    onChange(newValue);
+  };
 
   useEffect(() => {
     return () => {
@@ -27,14 +40,14 @@ export function SearchInput({ value, onChange, placeholder = '검색어를 입�
     setInputValue(newValue);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      onChange(newValue);
+      emit(newValue.trim());
     }, 300);
   };
 
   const handleClear = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setInputValue('');
-    onChange('');
+    emit('');
   };
 
   return (

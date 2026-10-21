@@ -1,4 +1,4 @@
-import type { Profile, Skills, Education } from './resume';
+import type { Profile, Skills, Education, Certification } from './resume';
 
 export type { Profile, Skills, Education };
 
@@ -39,16 +39,11 @@ export interface PortfolioProject {
   pdfHidden?: boolean;
 }
 
-export interface Award {
+export interface PortfolioAward {
   name: string;
   prize: string;
   date: string;
   description?: string;
-}
-
-export interface Certification {
-  name: string;
-  date: string;
 }
 
 export interface Activity {
@@ -64,7 +59,7 @@ export interface PortfolioData {
   education?: Education[];
   clubs: Club[];
   projects: PortfolioProject[];
-  awards?: Award[];
+  awards?: PortfolioAward[];
   certifications?: Certification[];
   activities?: Activity[];
 }

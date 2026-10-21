@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Giscus from '@giscus/react';
 import { useTheme } from 'next-themes';
+import { useHydrated } from '@/hooks/useHydrated';
 
 interface GiscusCommentsProps {
   slug: string;
@@ -14,11 +14,7 @@ const GISCUS_CATEGORY_ID = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID;
 
 export function GiscusComments({ slug }: GiscusCommentsProps) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   if (!mounted) {
     return (

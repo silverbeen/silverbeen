@@ -1,6 +1,7 @@
 'use client';
 
-import type { PortfolioProject, ProjectCategory } from '@/types/portfolio';
+import type { PortfolioProject } from '@silverbeen/types';
+import { PROJECT_CATEGORY_LABELS } from '@/constants/portfolio';
 import {
   ProjectBasicInfo,
   ProjectTechAndTasks,
@@ -24,12 +25,6 @@ interface ProjectCardProps {
   onChange: (project: PortfolioProject) => void;
   onRemove: () => void;
 }
-
-const categoryOptions: { value: ProjectCategory; label: string }[] = [
-  { value: 'personal', label: '개인 프로젝트' },
-  { value: 'team', label: '팀 프로젝트' },
-  { value: 'club', label: '동아리 프로젝트' },
-];
 
 export function ProjectCard({
   project,
@@ -66,10 +61,7 @@ export function ProjectCard({
                 {project.name || '새 프로젝트'}
               </h4>
               <span className="px-2.5 py-0.5 text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full">
-                {
-                  categoryOptions.find((c) => c.value === project.category)
-                    ?.label
-                }
+                {PROJECT_CATEGORY_LABELS[project.category]?.label}
               </span>
               {project.hidden && (
                 <span className="px-2.5 py-0.5 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full">

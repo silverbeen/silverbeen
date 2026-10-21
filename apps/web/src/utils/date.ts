@@ -123,12 +123,36 @@ export function formatDateKorean(dateString: string): string {
 }
 
 /**
- * ISO 날짜 문자열을 짧은 한국어 형식으로 변환 (예: 2024년 1월 15일)
+ * ISO 날짜 문자열을 "2024년 1월 15일" 형식으로 변환. 값이 없으면 '-'
  */
-export function formatDateShort(dateString: string): string {
+export function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+  });
+}
+
+/**
+ * ISO 날짜 문자열을 연도 없이 "1월 15일" 형식으로 변환
+ */
+export function formatShortDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+/**
+ * ISO 날짜 문자열을 "1월 15일 오후 03:20" 형식으로 변환. 값이 없으면 '-'
+ */
+export function formatDateTime(dateString: string | null | undefined): string {
+  if (!dateString) return '-';
+  return new Date(dateString).toLocaleString('ko-KR', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }

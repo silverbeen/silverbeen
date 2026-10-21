@@ -1,7 +1,8 @@
 'use client';
 
-export type SortByType = 'createdAt' | 'viewCount' | 'likeCount' | 'title';
-export type OrderType = 'asc' | 'desc';
+import type { SortByType, OrderType } from '@/utils/blogQuery';
+
+export type { SortByType, OrderType };
 
 interface SortSelectorProps {
   sortBy: SortByType;

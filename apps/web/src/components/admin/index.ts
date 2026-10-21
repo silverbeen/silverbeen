@@ -1,1 +1,1 @@
-export { JsonEditorPage, NextImage } from './JsonEditorPage';
+export { JsonEditorPage } from './JsonEditorPage';

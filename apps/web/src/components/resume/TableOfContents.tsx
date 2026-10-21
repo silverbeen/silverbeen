@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import type { Experience } from "@/types/resume";
+import type { Experience } from '@silverbeen/types';
 
 interface TableOfContentsProps {
   experience: Experience[];

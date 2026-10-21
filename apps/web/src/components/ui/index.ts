@@ -2,6 +2,7 @@ export { ToastProvider, useToast } from './Toast';
 export { ImageUpload } from './ImageUpload';
 export { ImageUploadModal } from './ImageUploadModal';
 export { ConfirmProvider, useConfirm } from './ConfirmDialog';
+export { Modal } from './Modal';
 export { Button, buttonVariants } from './button';
 export { Input } from './input';
 export {

@@ -1,6 +1,6 @@
 'use client';
 
-import type { PortfolioProject } from '@/types/portfolio';
+import type { PortfolioProject } from '@silverbeen/types';
 
 interface ProjectDisplayOptionsProps {
   project: PortfolioProject;

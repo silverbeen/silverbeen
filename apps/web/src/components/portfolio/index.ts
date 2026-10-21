@@ -10,4 +10,3 @@ export { ActivitiesSection } from './ActivitiesSection';
 export { SkillsSection } from './SkillsSection';
 export { EducationSection } from './EducationSection';
 export { PortfolioSections } from './PortfolioSections';
-export { PortfolioPdfExportButton } from './PortfolioPdfExportButton';

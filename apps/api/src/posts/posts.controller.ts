@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, UpdatePostDto, GetPostsQueryDto } from './dto';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
@@ -28,6 +39,14 @@ export class PostsController {
     return this.postsService.findAllAdmin(user.id);
   }
 
+  // 어드민 전용: draft 포함 ID 조회 (':idOrSlug'보다 먼저 선언)
+  @Get('admin/:id')
+  @UseGuards(SupabaseGuard, AdminGuard)
+  async findByIdForAdmin(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.findByIdForAdmin(id);
+  }
+
+  // 공개 조회: 공개된 글만 반환 (draft는 404)
   @Get(':idOrSlug')
   async findByIdOrSlug(@Param('idOrSlug') idOrSlug: string) {
     // 전체 문자열이 숫자인 경우에만 ID로 조회, 아닌 경우 slug로 조회
@@ -46,17 +65,17 @@ export class PostsController {
   @Put(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthUser,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    return this.postsService.update(parseInt(id, 10), user.id, updatePostDto);
+    return this.postsService.update(id, user.id, updatePostDto);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async delete(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.postsService.delete(parseInt(id, 10), user.id);
+  async delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: AuthUser) {
+    return this.postsService.delete(id, user.id);
   }
 
   @Post(':slug/view')
@@ -65,23 +84,17 @@ export class PostsController {
   }
 
   @Post(':slug/like')
-  async toggleLike(
-    @Param('slug') slug: string,
-    @Body('fingerprint') fingerprint: string,
-  ) {
+  async toggleLike(@Param('slug') slug: string, @Body('fingerprint') fingerprint: string) {
     return this.postsService.toggleLike(slug, fingerprint);
   }
 
   @Get(':slug/like-status')
-  async getLikeStatus(
-    @Param('slug') slug: string,
-    @Query('fingerprint') fingerprint: string,
-  ) {
+  async getLikeStatus(@Param('slug') slug: string, @Query('fingerprint') fingerprint: string) {
     return this.postsService.getLikeStatus(slug, fingerprint);
   }
 
   @Get(':id/adjacent')
-  async getAdjacentPosts(@Param('id') id: string) {
-    return this.postsService.getAdjacentPosts(parseInt(id, 10));
+  async getAdjacentPosts(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getAdjacentPosts(id);
   }
 }

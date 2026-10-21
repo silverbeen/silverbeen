@@ -1,5 +1,3 @@
-"use client";
-
 function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div

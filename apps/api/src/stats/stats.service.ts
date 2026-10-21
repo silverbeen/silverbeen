@@ -59,9 +59,10 @@ export class StatsService {
   }
 
   async getTagStats() {
+    // 필요한 필드(name, 공개 글 viewCount)만 조회
     const tags = await this.prisma.tag.findMany({
-      include: {
-        _count: { select: { posts: { where: { published: true } } } },
+      select: {
+        name: true,
         posts: {
           where: { published: true },
           select: { viewCount: true },
@@ -72,7 +73,7 @@ export class StatsService {
     return tags
       .map((tag) => ({
         name: tag.name,
-        postCount: tag._count.posts,
+        postCount: tag.posts.length,
         totalViews: tag.posts.reduce((sum, p) => sum + p.viewCount, 0),
       }))
       .sort((a, b) => b.totalViews - a.totalViews);

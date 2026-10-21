@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from './client';
 import { optimizeImage, type ImageOptimizeOptions } from '@/lib/image';
 
@@ -91,11 +92,77 @@ export async function uploadImage(
  * @param path - 삭제할 이미지 경로
  */
 export async function deleteImage(path: string): Promise<void> {
-  const supabase = createClient();
+  await deleteImages([path]);
+}
 
-  const { error } = await supabase.storage.from(BUCKET_NAME).remove([path]);
+/**
+ * 여러 이미지를 한 번의 요청으로 삭제합니다.
+ * @param paths - 삭제할 이미지 경로 목록
+ */
+export async function deleteImages(paths: string[]): Promise<void> {
+  if (paths.length === 0) return;
+
+  const supabase = createClient();
+  const { error } = await supabase.storage.from(BUCKET_NAME).remove(paths);
 
   if (error) {
     throw new Error(`이미지 삭제 실패: ${error.message}`);
   }
+}
+
+export interface StoredImage {
+  name: string;
+  url: string;
+  path: string;
+  folder: string;
+  createdAt: string;
+}
+
+const LIST_PAGE_SIZE = 100;
+
+async function listFolderImages(supabase: SupabaseClient, folder: string): Promise<StoredImage[]> {
+  const bucket = supabase.storage.from(BUCKET_NAME);
+  const images: StoredImage[] = [];
+
+  for (let offset = 0; ; offset += LIST_PAGE_SIZE) {
+    const { data, error } = await bucket.list(folder, {
+      sortBy: { column: 'created_at', order: 'desc' },
+      limit: LIST_PAGE_SIZE,
+      offset,
+    });
+
+    if (error) {
+      throw new Error(`이미지 목록 조회 실패 (${folder}): ${error.message}`);
+    }
+
+    for (const file of data) {
+      // .emptyFolderPlaceholder 등 숨김 파일 제외
+      if (file.name.startsWith('.')) continue;
+      const path = `${folder}/${file.name}`;
+      images.push({
+        name: file.name,
+        path,
+        folder,
+        url: bucket.getPublicUrl(path).data.publicUrl,
+        createdAt: file.created_at || '',
+      });
+    }
+
+    if (data.length < LIST_PAGE_SIZE) break;
+  }
+
+  return images;
+}
+
+/**
+ * 여러 폴더의 이미지를 페이지네이션하며 모두 조회 (최신순 정렬)
+ * @param folders - 조회할 폴더 목록 (예: ['posts', 'covers'])
+ */
+export async function listImages(folders: string[]): Promise<StoredImage[]> {
+  const supabase = createClient();
+  const results = await Promise.all(folders.map((folder) => listFolderImages(supabase, folder)));
+
+  return results
+    .flat()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }

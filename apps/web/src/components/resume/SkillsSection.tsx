@@ -1,34 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { Skills } from "@/types/resume";
+import type { Skills } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
+import { SKILL_LABELS, SKILL_ORDER } from "@/constants/skills";
 
 interface SkillsSectionProps {
   skills: Skills;
 }
-
-const skillLabels: Record<string, string> = {
-  languages: "Core",
-  stateManagement: "상태 관리",
-  libraries: "모노레포 & 라이브러리",
-  tools: "개발 도구 & CI/CD",
-  collaboration: "협업",
-  integrations: "연동",
-  infrastructure: "인프라",
-  testing: "테스트",
-};
-
-const skillOrder: (keyof typeof skillLabels)[] = [
-  "languages",
-  "stateManagement",
-  "libraries",
-  "tools",
-  "collaboration",
-  "integrations",
-  "infrastructure",
-  "testing",
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -71,8 +50,8 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
       >
-        {skillOrder.map((key) => {
-          const items = skills[key as keyof Skills];
+        {SKILL_ORDER.map((key) => {
+          const items = skills[key];
           if (!items || items.length === 0) return null;
           return (
             <motion.div
@@ -81,7 +60,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
               variants={rowVariants}
             >
               <span className="min-w-28 shrink-0 text-sm font-medium text-foreground">
-                {skillLabels[key]}
+                {SKILL_LABELS[key]}
               </span>
               <motion.div
                 className="flex flex-wrap gap-1.5"

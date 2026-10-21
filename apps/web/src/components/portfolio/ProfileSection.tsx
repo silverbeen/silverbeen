@@ -2,35 +2,15 @@
 
 import { Mail, Github, BookOpen, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { containerVariants, itemVariants, imageVariants } from './constants';
-import type { Profile } from '@/types/portfolio';
+import type { Profile } from '@silverbeen/types';
 
 interface ProfileSectionProps {
   profile: Profile;
-  ImageComponent?: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-    priority?: boolean;
-  }>;
 }
 
-function DefaultImage({
-  src,
-  alt,
-  className,
-}: {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-  priority?: boolean;
-}) {
-  return <img src={src} alt={alt} className={`${className || ''} h-full w-full object-cover`} />;
-}
-
-export function ProfileSection({ profile, ImageComponent = DefaultImage }: ProfileSectionProps) {
+export function ProfileSection({ profile }: ProfileSectionProps) {
   return (
     <motion.section
       id="profile"
@@ -44,11 +24,12 @@ export function ProfileSection({ profile, ImageComponent = DefaultImage }: Profi
         {profile.photo && (
           <motion.div className="group relative mx-auto shrink-0 md:mx-0" variants={imageVariants}>
             <div className="relative h-36 w-36 overflow-hidden rounded-3xl md:h-44 md:w-44">
-              <ImageComponent
+              <Image
                 src={profile.photo}
                 alt={profile.name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="176px"
                 priority
               />
               {/* 미묘한 오버레이 */}

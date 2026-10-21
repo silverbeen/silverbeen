@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
+  IsUUID,
   IsDateString,
   ValidateIf,
 } from 'class-validator';
@@ -30,7 +31,7 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
+  @IsUUID(undefined, { each: true })
   tagIds?: string[];
 
   @IsOptional()
@@ -39,6 +40,6 @@ export class UpdatePostDto {
 
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
-  @IsString()
+  @IsUUID()
   seriesId?: string | null;
 }

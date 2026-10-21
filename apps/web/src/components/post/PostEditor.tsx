@@ -11,13 +11,18 @@ import { useMarkdownImage } from '@/hooks/useMarkdownImage';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { loadDraft as loadDraftUtil } from '@/utils/draft';
 import { useToast, ImageUpload } from '@/components/ui';
-import type { CreatePostDto, Post } from '@/types/post';
+import type { CreatePostDto, Post } from '@silverbeen/types';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
+/**
+ * 에디터 저장 데이터. seriesId는 null이면 "시리즈 없음" (수정 시 기존 시리즈 연결 해제)
+ */
+export type PostFormData = Omit<CreatePostDto, 'seriesId'> & { seriesId: string | null };
+
 interface PostEditorProps {
   initialData?: Post;
-  onSave: (data: CreatePostDto) => Promise<void>;
+  onSave: (data: PostFormData) => Promise<void>;
   saving?: boolean;
 }
 
@@ -124,7 +129,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       return;
     }
 
-    const data: CreatePostDto = {
+    const data: PostFormData = {
       title: title.trim(),
       content,
       excerpt: excerpt.trim() || undefined,
@@ -132,7 +137,7 @@ export function PostEditor({ initialData, onSave, saving }: PostEditorProps) {
       tagIds: selectedTagIds,
       published: shouldPublish,
       createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
-      seriesId: initialData ? (seriesId ?? undefined) : seriesId || undefined,
+      seriesId: seriesId || null,
     };
 
     await onSave(data);

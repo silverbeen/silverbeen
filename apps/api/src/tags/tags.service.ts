@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTagDto, UpdateTagDto } from './dto';
+import { isPrismaError } from '../common/utils/prisma-error.util';
 
 @Injectable()
 export class TagsService {
@@ -30,44 +31,40 @@ export class TagsService {
   }
 
   async create(createTagDto: CreateTagDto) {
-    const existing = await this.prisma.tag.findUnique({
-      where: { name: createTagDto.name },
-    });
-
-    if (existing) {
-      throw new ConflictException('Tag already exists');
+    try {
+      return await this.prisma.tag.create({
+        data: { name: createTagDto.name },
+      });
+    } catch (err) {
+      throw this.toHttpError(err);
     }
-
-    return this.prisma.tag.create({
-      data: { name: createTagDto.name },
-    });
   }
 
   async update(id: string, updateTagDto: UpdateTagDto) {
-    await this.findById(id);
-
-    const existing = await this.prisma.tag.findFirst({
-      where: {
-        name: updateTagDto.name,
-        NOT: { id },
-      },
-    });
-
-    if (existing) {
-      throw new ConflictException('Tag already exists');
+    try {
+      return await this.prisma.tag.update({
+        where: { id },
+        data: { name: updateTagDto.name },
+      });
+    } catch (err) {
+      throw this.toHttpError(err);
     }
-
-    return this.prisma.tag.update({
-      where: { id },
-      data: { name: updateTagDto.name },
-    });
   }
 
   async delete(id: string) {
-    await this.findById(id);
+    try {
+      return await this.prisma.tag.delete({
+        where: { id },
+      });
+    } catch (err) {
+      throw this.toHttpError(err);
+    }
+  }
 
-    return this.prisma.tag.delete({
-      where: { id },
-    });
+  /** name unique 제약 위반 → 409, 대상 없음 → 404 (웹에서 'already exists' 메시지 확인) */
+  private toHttpError(err: unknown): unknown {
+    if (isPrismaError(err, 'P2002')) return new ConflictException('Tag already exists');
+    if (isPrismaError(err, 'P2025')) return new NotFoundException('Tag not found');
+    return err;
   }
 }

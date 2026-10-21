@@ -2,7 +2,7 @@
 
 import { Award } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Certification } from "@/types/resume";
+import type { Certification } from '@silverbeen/types';
 import { SectionTitle } from "./SectionTitle";
 
 interface CertificationSectionProps {

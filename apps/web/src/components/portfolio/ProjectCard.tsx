@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Github, Users, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import { categoryConfig } from './constants';
-import type { PortfolioProject } from '@/types/portfolio';
+import type { PortfolioProject } from '@silverbeen/types';
 
 interface ProjectCardProps {
   project: PortfolioProject;

@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { SeriesService } from './series.service';
 import { CreateSeriesDto, UpdateSeriesDto, UpdatePostOrderDto } from './dto';
@@ -38,19 +39,19 @@ export class SeriesController {
 
   @Put(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async update(@Param('id') id: string, @Body() dto: UpdateSeriesDto) {
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateSeriesDto) {
     return this.seriesService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.seriesService.delete(id);
   }
 
   @Put(':id/order')
   @UseGuards(SupabaseGuard, AdminGuard)
-  async updatePostOrder(@Param('id') id: string, @Body() dto: UpdatePostOrderDto) {
+  async updatePostOrder(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePostOrderDto) {
     return this.seriesService.updatePostOrder(id, dto.postIds);
   }
 }

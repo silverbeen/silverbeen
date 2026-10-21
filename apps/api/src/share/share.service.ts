@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateShareLinkDto } from './dto';
 import { randomBytes } from 'crypto';
+import { isPrismaError } from '../common/utils/prisma-error.util';
 
 @Injectable()
 export class ShareService {
@@ -59,13 +60,25 @@ export class ShareService {
     return this.prisma.shareLink.delete({ where: { id } });
   }
 
+  /**
+   * 조회수 증가 (단일 원자적 update)
+   * 비활성/만료 링크는 증가하지 않고 404
+   */
   async incrementView(slug: string) {
-    const link = await this.prisma.shareLink.findUnique({ where: { slug } });
-    if (!link) throw new NotFoundException('Share link not found');
-
-    return this.prisma.shareLink.update({
-      where: { slug },
-      data: { viewCount: { increment: 1 } },
-    });
+    try {
+      return await this.prisma.shareLink.update({
+        where: {
+          slug,
+          active: true,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+        data: { viewCount: { increment: 1 } },
+      });
+    } catch (err) {
+      if (isPrismaError(err, 'P2025')) {
+        throw new NotFoundException('Share link not found');
+      }
+      throw err;
+    }
   }
 }

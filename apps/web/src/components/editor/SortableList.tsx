@@ -1,23 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { useDndSensors } from '@/hooks/useDndSensors';
+import { getItemId, moveItemById } from '@/utils/ids';
 
 interface SortableItemProps {
   id: string;
@@ -25,15 +14,11 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, children }: SortableItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
+  // dnd-kit 동적 transform/transition은 인라인 스타일 허용
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -44,7 +29,8 @@ function SortableItem({ id, children }: SortableItemProps) {
     <div ref={setNodeRef} style={style} className="flex items-start gap-2">
       <button
         type="button"
-        className="p-1.5 mt-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing shrink-0 transition-colors"
+        aria-label="드래그하여 순서 변경"
+        className="mt-2 shrink-0 cursor-grab p-1.5 text-gray-400 transition-colors hover:text-gray-600 active:cursor-grabbing dark:hover:text-gray-300"
         {...attributes}
         {...listeners}
       >
@@ -55,54 +41,35 @@ function SortableItem({ id, children }: SortableItemProps) {
   );
 }
 
-interface SortableListProps<T> {
+interface SortableListProps<T extends object> {
   items: T[];
-  getKey: (item: T, index: number) => string;
   onReorder: (items: T[]) => void;
   renderItem: (item: T, index: number) => ReactNode;
+  /** 항목의 안정적인 key (기본: `_id`, utils/ids 참고) */
+  getKey?: (item: T) => string;
 }
 
-export function SortableList<T>({
+export function SortableList<T extends object>({
   items,
-  getKey,
   onReorder,
   renderItem,
+  getKey = getItemId,
 }: SortableListProps<T>) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const sensors = useDndSensors();
+  const keys = items.map(getKey);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = items.findIndex((item, i) => getKey(item, i) === active.id);
-    const newIndex = items.findIndex((item, i) => getKey(item, i) === over.id);
-
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const newItems = [...items];
-    const [removed] = newItems.splice(oldIndex, 1);
-    newItems.splice(newIndex, 0, removed);
-
-    onReorder(newItems);
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over) return;
+    const reordered = moveItemById(items, String(active.id), String(over.id), getKey);
+    if (reordered) onReorder(reordered);
   };
 
-  const keys = items.map((item, i) => getKey(item, i));
-
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={keys} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
           {items.map((item, index) => (
-            <SortableItem key={getKey(item, index)} id={getKey(item, index)}>
+            <SortableItem key={keys[index]} id={keys[index]}>
               {renderItem(item, index)}
             </SortableItem>
           ))}

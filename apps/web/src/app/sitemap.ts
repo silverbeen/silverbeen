@@ -8,10 +8,19 @@ interface PostForSitemap {
   updatedAt: string;
 }
 
+// API의 limit 상한(@Max(100))에 맞춰 페이지 단위로 조회
+const SITEMAP_PAGE_SIZE = 100;
+
 async function getAllPosts(): Promise<PostForSitemap[]> {
   try {
-    const { posts } = await api.blogs.getList({ limit: 1000 }, { revalidate: 3600 });
-    return posts || [];
+    const fetchPage = (page: number) =>
+      api.blogs.getList({ page, limit: SITEMAP_PAGE_SIZE }, { revalidate: 3600 });
+
+    const first = await fetchPage(1);
+    const restPages = Array.from({ length: Math.max(first.totalPages - 1, 0) }, (_, i) => i + 2);
+    const rest = await Promise.all(restPages.map(fetchPage));
+
+    return [first, ...rest].flatMap(({ posts }) => posts ?? []);
   } catch (error) {
     console.error('Failed to fetch posts for sitemap:', error);
     return [];

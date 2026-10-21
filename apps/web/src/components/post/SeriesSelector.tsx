@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
 import { api } from '@/lib/api';
-import type { Series } from '@/types/post';
+import { useAdminResource } from '@/hooks/useAdminResource';
+import type { Series } from '@silverbeen/types';
+
+const loadSeries = () => api.series.getList();
 
 interface SeriesSelectorProps {
   selectedSeriesId: string | null;
@@ -11,19 +13,25 @@ interface SeriesSelectorProps {
 }
 
 export function SeriesSelector({ selectedSeriesId, onSeriesChange }: SeriesSelectorProps) {
-  const [seriesList, setSeriesList] = useState<Series[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.series.getList().then((data) => {
-      setSeriesList(data);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+  const { data: seriesList, loading, error, reload } = useAdminResource<Series[]>(loadSeries, []);
 
   if (loading) {
     return (
       <div className="h-10 w-full animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        role="alert"
+        className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
+      >
+        <span>시리즈 목록을 불러오지 못했습니다.</span>
+        <button type="button" onClick={reload} className="font-medium underline">
+          다시 시도
+        </button>
+      </div>
     );
   }
 

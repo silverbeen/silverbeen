@@ -1,31 +1,20 @@
-'use client';
-
-import {
-  ProfileSection,
-  SkillsSection,
-  CareerSummarySection,
-  ExperienceSection,
-  EducationSection,
-  CertificationSection,
-  AwardSection,
-} from '@/components/resume';
-import type { ResumeData } from '@/types/resume';
+import { ProfileSection } from './ProfileSection';
+import { SkillsSection } from './SkillsSection';
+import { CareerSummarySection } from './CareerSummarySection';
+import { ExperienceSection } from './ExperienceSection';
+import { EducationSection } from './EducationSection';
+import { CertificationSection } from './CertificationSection';
+import { AwardSection } from './AwardSection';
+import type { ResumeData } from '@silverbeen/types';
 
 interface ResumeSectionsProps {
   data: ResumeData;
-  ImageComponent: React.ComponentType<{
-    src: string;
-    alt: string;
-    fill?: boolean;
-    className?: string;
-    priority?: boolean;
-  }>;
 }
 
-export function ResumeSections({ data, ImageComponent }: ResumeSectionsProps) {
+export function ResumeSections({ data }: ResumeSectionsProps) {
   return (
     <>
-      <ProfileSection profile={data.profile} ImageComponent={ImageComponent} />
+      <ProfileSection profile={data.profile} />
 
       <hr className="border-sky-100 dark:border-sky-900/30" />
 
@@ -40,7 +29,7 @@ export function ResumeSections({ data, ImageComponent }: ResumeSectionsProps) {
         </>
       )}
 
-      <ExperienceSection experience={data.experience} ImageComponent={ImageComponent} />
+      <ExperienceSection experience={data.experience} />
 
       <hr className="border-sky-100 dark:border-sky-900/30" />
 

@@ -1,36 +1,6 @@
-"use client";
-
-import Image from "next/image";
-import {
-  ResumeSections,
-  TableOfContents,
-  PdfExportButton,
-} from "@/components/resume";
-import type { ResumeData } from "@/types/resume";
-
-// Next.js Image wrapper for the UI components
-const NextImage = ({
-  src,
-  alt,
-  fill,
-  className,
-  priority,
-}: {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-  priority?: boolean;
-}) => (
-  <Image
-    src={src}
-    alt={alt}
-    fill={fill}
-    className={className}
-    priority={priority}
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
-);
+import { ResumeSections, TableOfContents } from '@/components/resume';
+import { PdfExportButton } from '@/components/ui/PdfExportButton';
+import type { ResumeData } from '@silverbeen/types';
 
 interface ResumeContentProps {
   data: ResumeData;
@@ -38,12 +8,12 @@ interface ResumeContentProps {
 
 export function ResumeContent({ data }: ResumeContentProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       <TableOfContents experience={data.experience} />
-      <PdfExportButton />
+      <PdfExportButton endpoint="/api/generate-pdf" fallbackFilename="resume.pdf" />
       <main id="resume-content" className="mx-auto max-w-4xl px-6 py-16">
         <div className="flex flex-col gap-12">
-          <ResumeSections data={data} ImageComponent={NextImage} />
+          <ResumeSections data={data} />
         </div>
       </main>
     </div>
